@@ -57,6 +57,7 @@
     "edu.wpi.first.math.**.proto.*",
     "edu.wpi.first.math.**.struct.*",
   ],
+  "java.dependency.enableDependencyCheckup": false,
   "workbench.colorTheme": "Default Light Modern",
   "editor.minimap.enabled": false,
   "editor.inlayHints.enabled": "off"

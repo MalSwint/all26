@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.Metrics;
-import org.team100.lib.geometry.PathPoint;
+import org.team100.lib.geometry.PathPointSE2;
 import org.team100.lib.geometry.WaypointSE2;
-import org.team100.lib.trajectory.path.spline.HolonomicSpline;
+import org.team100.lib.trajectory.path.spline.HolonomicSplineSE2;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -61,7 +61,7 @@ public class PathFactory {
      * A path that passes through the waypoints and control directions.
      */
     public Path100 fromWaypoints(List<WaypointSE2> waypoints) {
-        List<HolonomicSpline> splines = splinesFromWaypoints(waypoints);
+        List<HolonomicSplineSE2> splines = splinesFromWaypoints(waypoints);
         return fromSplines(splines);
     }
 
@@ -73,10 +73,10 @@ public class PathFactory {
     /**
      * Make a list of splines with the waypoints as knots.
      */
-    private List<HolonomicSpline> splinesFromWaypoints(List<WaypointSE2> waypoints) {
-        List<HolonomicSpline> splines = new ArrayList<>(waypoints.size() - 1);
+    private List<HolonomicSplineSE2> splinesFromWaypoints(List<WaypointSE2> waypoints) {
+        List<HolonomicSplineSE2> splines = new ArrayList<>(waypoints.size() - 1);
         for (int i = 1; i < waypoints.size(); ++i) {
-            splines.add(new HolonomicSpline(waypoints.get(i - 1), waypoints.get(i)));
+            splines.add(new HolonomicSplineSE2(waypoints.get(i - 1), waypoints.get(i)));
         }
         return splines;
     }
@@ -90,30 +90,30 @@ public class PathFactory {
      * The trajectory scheduler consumes these points, interpolating between them
      * with straight lines.
      */
-    List<PathPoint> samplesFromSpline(HolonomicSpline spline) {
-        List<PathPoint> result = new ArrayList<>();
-        result.add(spline.getPathPoint(0.0));
+    List<PathPointSE2> samplesFromSpline(HolonomicSplineSE2 spline) {
+        List<PathPointSE2> result = new ArrayList<>();
+        result.add(spline.sample(0.0));
         getSegmentArc(spline, result, 0, 1);
         return result;
     }
 
-    public Path100 fromSplines(List<? extends HolonomicSpline> splines) {
+    public Path100 fromSplines(List<? extends HolonomicSplineSE2> splines) {
         return new Path100(samplesFromSplines(splines));
     }
 
     /**
      * For testing only. Do not call this directly
      */
-    public List<PathPoint> samplesFromSplines(List<? extends HolonomicSpline> splines) {
-        List<PathPoint> result = new ArrayList<>();
+    public List<PathPointSE2> samplesFromSplines(List<? extends HolonomicSplineSE2> splines) {
+        List<PathPointSE2> result = new ArrayList<>();
         if (splines.isEmpty())
             return result;
-        result.add(splines.get(0).getPathPoint(0.0));
+        result.add(splines.get(0).sample(0.0));
         for (int i = 0; i < splines.size(); i++) {
-            HolonomicSpline s = splines.get(i);
+            HolonomicSplineSE2 s = splines.get(i);
             if (DEBUG)
                 System.out.printf("SPLINE:\n%d\n%s\n", i, s);
-            List<PathPoint> samples = samplesFromSpline(s);
+            List<PathPointSE2> samples = samplesFromSpline(s);
             // the sample at the end of the previous spline is the same as the one for the
             // beginning of the next, so don't include it twice.
             samples.remove(0);
@@ -130,14 +130,14 @@ public class PathFactory {
      * Note if the path is s-shaped, then bisection can find the middle :-)
      */
     private void getSegmentArc(
-            HolonomicSpline spline,
-            List<PathPoint> rv,
+            HolonomicSplineSE2 spline,
+            List<PathPointSE2> rv,
             double s0,
             double s1) {
-        Pose2d p0 = spline.getPathPoint(s0).waypoint().pose();
+        Pose2d p0 = spline.sample(s0).waypoint().pose();
         double shalf = (s0 + s1) / 2;
-        Pose2d phalf = spline.getPathPoint(shalf).waypoint().pose();
-        Pose2d p1 = spline.getPathPoint(s1).waypoint().pose();
+        Pose2d phalf = spline.sample(shalf).waypoint().pose();
+        Pose2d p1 = spline.sample(s1).waypoint().pose();
 
         // twist from p0 to p1
         Twist2d twist_full = p0.log(p1);
@@ -149,8 +149,8 @@ public class PathFactory {
         Transform2d error = phalf_predicted.minus(phalf);
 
         // also prohibit large changes in direction between points
-        PathPoint p20 = spline.getPathPoint(s0);
-        PathPoint p21 = spline.getPathPoint(s1);
+        PathPointSE2 p20 = spline.sample(s0);
+        PathPointSE2 p21 = spline.sample(s1);
         Twist2d p2t = p20.waypoint().course().minus(p21.waypoint().course());
 
         // note the extra conditions to avoid points too far apart.
@@ -167,7 +167,7 @@ public class PathFactory {
             getSegmentArc(spline, rv, shalf, s1);
         } else {
             // midpoint is close enough, so add the endpoint
-            rv.add(spline.getPathPoint(s1));
+            rv.add(spline.sample(s1));
         }
     }
 }

@@ -15,7 +15,7 @@ import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.path.Path100;
 import org.team100.lib.trajectory.path.PathFactory;
-import org.team100.lib.trajectory.path.spline.HolonomicSpline;
+import org.team100.lib.trajectory.path.spline.HolonomicSplineSE2;
 import org.team100.lib.trajectory.timing.TrajectoryFactory;
 import org.team100.lib.trajectory.timing.TimedState;
 import org.team100.lib.trajectory.timing.TimingConstraint;
@@ -175,12 +175,12 @@ class Trajectory100Test implements Timeless {
 
         // SAMPLE SPLINE DIRECTLY (200 ns)
 
-        HolonomicSpline spline = new HolonomicSpline(p0, p1);
+        HolonomicSplineSE2 spline = new HolonomicSplineSE2(p0, p1);
 
         long start = System.nanoTime();
         for (int rep = 0; rep < reps; ++rep) {
             for (int t = 0; t < times; ++t) {
-                spline.getPathPoint(0.1 * t);
+                spline.sample(0.1 * t);
             }
         }
         long end = System.nanoTime();

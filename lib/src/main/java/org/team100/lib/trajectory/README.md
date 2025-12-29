@@ -18,11 +18,11 @@ you want to travel through.  A waypoint includes
    * a _direction_ of motion.  Note that "direction" in SE(2) has three dimensions.
    * a _scale_ used for the next step.
 
-2. Construct a list of `HolonomicSpline`, with the waypoints above (called "knots") between them.
+2. Construct a list of `HolonomicSplineSE2`, with the waypoints above (called "knots") between them.
 The "scale" parameter above determines the "straightness" of the curve at each knot.
 In our implementation, the curvature at each knot is zero.
 
-3. Construct a list of points (`PathPoint`) along the splines, such that straight lines
+3. Construct a list of points (`PathPointSE2`) along the splines, such that straight lines
 connecting the points ("secant lines") don't deviate too much from the true spline, and aren't
 too far apart from each other. (This uses recursive bisection.)  These points will
 be close together where the curvature is high, and far apart along straighter sections

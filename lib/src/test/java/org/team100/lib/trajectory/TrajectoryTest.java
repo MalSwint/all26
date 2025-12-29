@@ -63,7 +63,7 @@ public class TrajectoryTest {
 
     @Test
     void testCircle() {
-        // see HolonomicSplineTest.testCircle();
+        // see HolonomicSplineSE2Test.testCircle();
         // this is to see how to create the dtheta and curvature
         // without the spline.
         double scale = 1.3;

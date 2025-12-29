@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DeltaSE2;
-import org.team100.lib.geometry.PathPoint;
+import org.team100.lib.geometry.PathPointSE2;
 import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
@@ -179,7 +179,7 @@ class FullStateControllerSE2Test implements Timeless {
         ModelSE2 measurement = new ModelSE2();
         ModelSE2 currentReference = ModelSE2
                 .fromTimedState(new TimedState(
-                        new PathPoint(
+                        new PathPointSE2(
                                 WaypointSE2.irrotational(
                                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                                 0, 0),
@@ -196,7 +196,7 @@ class FullStateControllerSE2Test implements Timeless {
                 0.01, 0.02);
         ModelSE2 measurement = new ModelSE2(new Pose2d(1, 0, new Rotation2d()));
         ModelSE2 currentReference = ModelSE2
-                .fromTimedState(new TimedState(new PathPoint(
+                .fromTimedState(new TimedState(new PathPointSE2(
                         WaypointSE2.irrotational(
                                 new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                         0, 0), 0, 0, 0));
@@ -212,7 +212,7 @@ class FullStateControllerSE2Test implements Timeless {
                 0.01, 0.02);
         ModelSE2 measurement = new ModelSE2(new Pose2d(0, 0, new Rotation2d()));
         ModelSE2 currentReference = ModelSE2
-                .fromTimedState(new TimedState(new PathPoint(
+                .fromTimedState(new TimedState(new PathPointSE2(
                         WaypointSE2.irrotational(
                                 new Pose2d(1, 0, new Rotation2d(0)), 0, 1.2),
                         0, 0), 0, 0, 0));
@@ -229,7 +229,7 @@ class FullStateControllerSE2Test implements Timeless {
                 0.01, 0.02);
         ModelSE2 measurement = new ModelSE2(new Pose2d(1, 0, new Rotation2d(1)));
         ModelSE2 currentReference = ModelSE2
-                .fromTimedState(new TimedState(new PathPoint(
+                .fromTimedState(new TimedState(new PathPointSE2(
                         WaypointSE2.irrotational(
                                 new Pose2d(0, 0, new Rotation2d(1)), 0, 1.2),
                         0, 0), 0, 0, 0));
@@ -248,7 +248,7 @@ class FullStateControllerSE2Test implements Timeless {
         // motion is in a straight line, down the x axis
 
         // setpoint is also at the origin
-        PathPoint state = new PathPoint(
+        PathPointSE2 state = new PathPointSE2(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 0, 0);
@@ -273,7 +273,7 @@ class FullStateControllerSE2Test implements Timeless {
         ModelSE2 measurement = new ModelSE2(new Pose2d(0, 0, Rotation2d.kCCW_Pi_2));
         // motion is in a straight line, down the x axis
         // setpoint is +x, facing down y
-        PathPoint state = new PathPoint(
+        PathPointSE2 state = new PathPointSE2(
                 WaypointSE2.irrotational(
                         new Pose2d(1, 0, new Rotation2d(Math.PI / 2)), 0, 1.2),
                 0, 0);
@@ -299,7 +299,7 @@ class FullStateControllerSE2Test implements Timeless {
                 new VelocitySE2(1, 0, 0));
         // motion is in a straight line, down the x axis
         // setpoint is also at the origin
-        PathPoint state = new PathPoint(
+        PathPointSE2 state = new PathPointSE2(
                 WaypointSE2.irrotational(new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2), 0, 0);
         double t = 0;
         // moving
@@ -325,7 +325,7 @@ class FullStateControllerSE2Test implements Timeless {
                 new VelocitySE2(0, 1, 0));
         // motion is in a straight line, down the x axis
         // at the origin
-        PathPoint state = new PathPoint(
+        PathPointSE2 state = new PathPointSE2(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 0, 0);
@@ -349,7 +349,7 @@ class FullStateControllerSE2Test implements Timeless {
                 0.02);
         // motion is in a straight line, down the x axis
         // setpoint is also at the origin
-        PathPoint state = new PathPoint(
+        PathPointSE2 state = new PathPointSE2(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 0, 0);
@@ -373,7 +373,7 @@ class FullStateControllerSE2Test implements Timeless {
                 0.02);
         // motion is in a straight line, down the x axis
         // setpoint is the same
-        PathPoint state = new PathPoint(
+        PathPointSE2 state = new PathPointSE2(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(Math.PI / 2)), 0, 1.2),
                 0, 0);
@@ -397,7 +397,7 @@ class FullStateControllerSE2Test implements Timeless {
                 0.02);
         // motion is tangential to the x axis but turning left
         // setpoint is also at the origin
-        PathPoint state = new PathPoint(
+        PathPointSE2 state = new PathPointSE2(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 1, 1);
@@ -426,7 +426,7 @@ class FullStateControllerSE2Test implements Timeless {
         // motion is in a straight line, down the x axis
         // no curvature
         double curvatureRad_M = 0;
-        PathPoint state = new PathPoint(
+        PathPointSE2 state = new PathPointSE2(
                 setpointPose,
                 0,
                 curvatureRad_M);
@@ -460,7 +460,7 @@ class FullStateControllerSE2Test implements Timeless {
         // motion is in a straight line, down the x axis
         // no curvature
         double curvatureRad_M = 0;
-        PathPoint state = new PathPoint(
+        PathPointSE2 state = new PathPointSE2(
                 setpointPose,
                 0,
                 curvatureRad_M);
@@ -494,7 +494,7 @@ class FullStateControllerSE2Test implements Timeless {
         // motion is in a straight line, down the x axis
         // no curvature
         double curvatureRad_M = 0;
-        PathPoint state = new PathPoint(
+        PathPointSE2 state = new PathPointSE2(
                 setpointPose,
                 0,
                 curvatureRad_M);
@@ -531,7 +531,7 @@ class FullStateControllerSE2Test implements Timeless {
         // motion is in a straight line, down the x axis
         // no curvature
         double curvatureRad_M = 0;
-        PathPoint state = new PathPoint(
+        PathPointSE2 state = new PathPointSE2(
                 setpointPose,
                 0,
                 curvatureRad_M);
@@ -564,7 +564,7 @@ class FullStateControllerSE2Test implements Timeless {
         // motion is in a straight line, down the x axis
         // no curvature
         double curvatureRad_M = 0;
-        PathPoint state = new PathPoint(
+        PathPointSE2 state = new PathPointSE2(
                 setpointPose,
                 0,
                 curvatureRad_M);
@@ -597,7 +597,7 @@ class FullStateControllerSE2Test implements Timeless {
         // motion is in a straight line, down the x axis
         // no curvature
         double curvatureRad_M = 0;
-        PathPoint state = new PathPoint(
+        PathPointSE2 state = new PathPointSE2(
                 setpointPose,
                 0,
                 curvatureRad_M);
@@ -633,7 +633,7 @@ class FullStateControllerSE2Test implements Timeless {
         // motion is in a straight line, down the x axis
         // no curvature
         double curvatureRad_M = 0;
-        PathPoint state = new PathPoint(
+        PathPointSE2 state = new PathPointSE2(
                 setpointPose,
                 0,
                 curvatureRad_M);
@@ -674,7 +674,7 @@ class FullStateControllerSE2Test implements Timeless {
         // motion is in a straight line, down the x axis
         // no curvature
         double curvatureRad_M = 0;
-        PathPoint state = new PathPoint(
+        PathPointSE2 state = new PathPointSE2(
                 setpointPose,
                 0,
                 curvatureRad_M);

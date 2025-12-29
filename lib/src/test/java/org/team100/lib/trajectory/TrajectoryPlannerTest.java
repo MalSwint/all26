@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
-import org.team100.lib.geometry.PathPoint;
+import org.team100.lib.geometry.PathPointSE2;
 import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
@@ -295,7 +295,7 @@ class TrajectoryPlannerTest implements Timeless {
 
         class ConditionalTimingConstraint implements TimingConstraint {
             @Override
-            public double maxV(PathPoint state) {
+            public double maxV(PathPointSE2 state) {
                 double x = state.waypoint().pose().getTranslation().getX();
                 if (x < 1.5) {
                     return 2.0;
@@ -308,12 +308,12 @@ class TrajectoryPlannerTest implements Timeless {
             }
 
             @Override
-            public double maxAccel(PathPoint state, double velocity) {
+            public double maxAccel(PathPointSE2 state, double velocity) {
                 return 2;
             }
 
             @Override
-            public double maxDecel(PathPoint state, double velocity) {
+            public double maxDecel(PathPointSE2 state, double velocity) {
                 return -1;
             }
         }

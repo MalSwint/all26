@@ -11,7 +11,7 @@ import org.team100.lib.geometry.AccelerationSE2;
 import org.team100.lib.geometry.DeltaSE2;
 import org.team100.lib.geometry.GlobalVelocityR2;
 import org.team100.lib.geometry.WaypointSE2;
-import org.team100.lib.geometry.PathPoint;
+import org.team100.lib.geometry.PathPointSE2;
 import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.localization.Blip24;
 import org.team100.lib.logging.primitive.PrimitiveLogger;
@@ -451,7 +451,7 @@ public class LoggerFactory {
 
     public class TimedStateLogger {
         private final Level m_level;
-        private final PathPointLogger m_pose2dWithMotionLogger;
+        private final PathPointSE2Logger m_pose2dWithMotionLogger;
         private final DoubleLogger m_timeLogger;
         private final DoubleLogger m_velocityLogger;
         private final DoubleLogger m_accelLogger;
@@ -501,18 +501,18 @@ public class LoggerFactory {
         return new PoseWithCurvatureLogger(level, leaf);
     }
 
-    public class PathPointLogger {
+    public class PathPointSE2Logger {
         private final Level m_level;
         private final Pose2dLogger m_pose2dLogger;
         private final Rotation2dLogger m_rotation2dLogger;
 
-        PathPointLogger(Level level, String leaf) {
+        PathPointSE2Logger(Level level, String leaf) {
             m_level = level;
             m_pose2dLogger = pose2dLogger(level, join(leaf, "pose"));
             m_rotation2dLogger = rotation2dLogger(level, join(leaf, "course"));
         }
 
-        public void log(Supplier<PathPoint> vals) {
+        public void log(Supplier<PathPointSE2> vals) {
             if (!allow(m_level))
                 return;
             WaypointSE2 val = vals.get().waypoint();
@@ -521,8 +521,8 @@ public class LoggerFactory {
         }
     }
 
-    public PathPointLogger pose2dWithMotionLogger(Level level, String leaf) {
-        return new PathPointLogger(level, leaf);
+    public PathPointSE2Logger pose2dWithMotionLogger(Level level, String leaf) {
+        return new PathPointSE2Logger(level, leaf);
     }
 
     public class Twist2dLogger {

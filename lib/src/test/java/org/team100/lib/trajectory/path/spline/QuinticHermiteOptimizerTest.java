@@ -32,9 +32,9 @@ public class QuinticHermiteOptimizerTest {
                         new Rotation2d()),
                 new DirectionSE2(0, 1, 0), 1);
 
-        List<HolonomicSpline> splines = new ArrayList<>();
-        splines.add(new HolonomicSpline(a, b));
-        splines.add(new HolonomicSpline(b, c));
+        List<HolonomicSplineSE2> splines = new ArrayList<>();
+        splines.add(new HolonomicSplineSE2(a, b));
+        splines.add(new HolonomicSplineSE2(b, c));
 
         TrajectoryPlotter.plot(splines, 5);
 
@@ -64,10 +64,10 @@ public class QuinticHermiteOptimizerTest {
                         new Rotation2d()),
                 new DirectionSE2(-1, 0, 0), 1);
 
-        List<HolonomicSpline> splines = new ArrayList<>();
-        splines.add(new HolonomicSpline(d, e));
-        splines.add(new HolonomicSpline(e, f));
-        splines.add(new HolonomicSpline(f, g));
+        List<HolonomicSplineSE2> splines = new ArrayList<>();
+        splines.add(new HolonomicSplineSE2(d, e));
+        splines.add(new HolonomicSplineSE2(e, f));
+        splines.add(new HolonomicSplineSE2(f, g));
 
         TrajectoryPlotter.plot(splines, 5);
 
@@ -101,11 +101,11 @@ public class QuinticHermiteOptimizerTest {
                         new Rotation2d()),
                 new DirectionSE2(0, -1, 0), 1);
 
-        List<HolonomicSpline> splines2 = new ArrayList<>();
-        splines2.add(new HolonomicSpline(h, i));
-        splines2.add(new HolonomicSpline(i, j));
-        splines2.add(new HolonomicSpline(j, k));
-        splines2.add(new HolonomicSpline(k, l));
+        List<HolonomicSplineSE2> splines2 = new ArrayList<>();
+        splines2.add(new HolonomicSplineSE2(h, i));
+        splines2.add(new HolonomicSplineSE2(i, j));
+        splines2.add(new HolonomicSplineSE2(j, k));
+        splines2.add(new HolonomicSplineSE2(k, l));
 
         TrajectoryPlotter.plot(splines2, 5);
 
@@ -129,9 +129,9 @@ public class QuinticHermiteOptimizerTest {
                         new Rotation2d(Math.PI)),
                 new DirectionSE2(0, 1, 0), 1);
 
-        List<HolonomicSpline> splines = new ArrayList<>();
-        splines.add(new HolonomicSpline(a, b));
-        splines.add(new HolonomicSpline(b, c));
+        List<HolonomicSplineSE2> splines = new ArrayList<>();
+        splines.add(new HolonomicSplineSE2(a, b));
+        splines.add(new HolonomicSplineSE2(b, c));
 
         TrajectoryPlotter.plot(splines, 5);
 
@@ -161,10 +161,10 @@ public class QuinticHermiteOptimizerTest {
                         new Rotation2d()),
                 new DirectionSE2(-1, 0, 0), 1);
 
-        List<HolonomicSpline> splines = new ArrayList<>();
-        splines.add(new HolonomicSpline(d, e));
-        splines.add(new HolonomicSpline(e, f));
-        splines.add(new HolonomicSpline(f, g));
+        List<HolonomicSplineSE2> splines = new ArrayList<>();
+        splines.add(new HolonomicSplineSE2(d, e));
+        splines.add(new HolonomicSplineSE2(e, f));
+        splines.add(new HolonomicSplineSE2(f, g));
 
         TrajectoryPlotter.plot(splines, 5);
     }
@@ -198,11 +198,11 @@ public class QuinticHermiteOptimizerTest {
                         new Rotation2d(Math.PI / 2)),
                 new DirectionSE2(0, -1, 0), 1);
 
-        List<HolonomicSpline> splines = new ArrayList<>();
-        splines.add(new HolonomicSpline(h, i));
-        splines.add(new HolonomicSpline(i, j));
-        splines.add(new HolonomicSpline(j, k));
-        splines.add(new HolonomicSpline(k, l));
+        List<HolonomicSplineSE2> splines = new ArrayList<>();
+        splines.add(new HolonomicSplineSE2(h, i));
+        splines.add(new HolonomicSplineSE2(i, j));
+        splines.add(new HolonomicSplineSE2(j, k));
+        splines.add(new HolonomicSplineSE2(k, l));
 
         TrajectoryPlotter.plot(splines, 5);
 

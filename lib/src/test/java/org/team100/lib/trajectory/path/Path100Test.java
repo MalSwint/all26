@@ -9,9 +9,9 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.PathPoint;
+import org.team100.lib.geometry.PathPointSE2;
 import org.team100.lib.geometry.WaypointSE2;
-import org.team100.lib.trajectory.path.spline.HolonomicSpline;
+import org.team100.lib.trajectory.path.spline.HolonomicSplineSE2;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,27 +24,27 @@ class Path100Test {
             GeometryUtil.fromDegrees(60),
             GeometryUtil.fromDegrees(90));
 
-    private static final List<PathPoint> WAYPOINTS = Arrays.asList(
-            new PathPoint(
+    private static final List<PathPointSE2> WAYPOINTS = Arrays.asList(
+            new PathPointSE2(
                     WaypointSE2.irrotational(
                             new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                     0, 0),
-            new PathPoint(
+            new PathPointSE2(
                     WaypointSE2.irrotational(
                             new Pose2d(24, 0, new Rotation2d(Math.toRadians(30))), 0, 1.2),
                     0, 0),
-            new PathPoint(
+            new PathPointSE2(
                     WaypointSE2.irrotational(
                             new Pose2d(36, 12, new Rotation2d(Math.toRadians(60))), 0, 1.2),
                     0, 0),
-            new PathPoint(
+            new PathPointSE2(
                     WaypointSE2.irrotational(
                             new Pose2d(60, 12, new Rotation2d(Math.toRadians(90))), 0, 1.2),
                     0, 0));
 
     @Test
     void testEmpty() {
-        List<HolonomicSpline> splines = new ArrayList<>();
+        List<HolonomicSplineSE2> splines = new ArrayList<>();
         PathFactory pathFactory = new PathFactory(0.1, 0.1, 0.1, 0.1);
         Path100 path = pathFactory.fromSplines(splines);
         assertEquals(0, path.length(), 0.001);

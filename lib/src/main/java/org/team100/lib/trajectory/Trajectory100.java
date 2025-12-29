@@ -3,7 +3,7 @@ package org.team100.lib.trajectory;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.team100.lib.geometry.PathPoint;
+import org.team100.lib.geometry.PathPointSE2;
 import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.trajectory.timing.TimedState;
 import org.team100.lib.trajectory.timing.TimingConstraint;
@@ -113,7 +113,7 @@ public class Trajectory100 {
         System.out.println("i, s, t, v, a, k, x, y");
         for (int i = 0; i < length(); ++i) {
             TimedState ts = getPoint(i);
-            PathPoint pwm = ts.point();
+            PathPointSE2 pwm = ts.point();
             WaypointSE2 w = pwm.waypoint();
             Pose2d p = w.pose();
             System.out.printf("%d, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f\n",
@@ -127,7 +127,7 @@ public class Trajectory100 {
         System.out.println("t, v, a, k, x, y");
         for (double t = 0; t < duration(); t += 0.02) {
             TimedState ts = sample(t);
-            PathPoint pwm = ts.point();
+            PathPointSE2 pwm = ts.point();
             WaypointSE2 w = pwm.waypoint();
             Pose2d p = w.pose();
             System.out.printf("%5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f\n",

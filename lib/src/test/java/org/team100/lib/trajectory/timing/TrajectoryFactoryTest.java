@@ -12,7 +12,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.GeometryUtil;
-import org.team100.lib.geometry.PathPoint;
+import org.team100.lib.geometry.PathPointSE2;
 import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
@@ -33,14 +33,14 @@ public class TrajectoryFactoryTest {
     private static final double DELTA = 0.01;
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
-    public static final List<PathPoint> WAYPOINTS = Arrays.asList(
-            new PathPoint(WaypointSE2.irrotational(
+    public static final List<PathPointSE2> WAYPOINTS = Arrays.asList(
+            new PathPointSE2(WaypointSE2.irrotational(
                     new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2), 0, 0),
-            new PathPoint(WaypointSE2.irrotational(
+            new PathPointSE2(WaypointSE2.irrotational(
                     new Pose2d(24.0, 0.0, new Rotation2d(0)), 0, 1.2), 0, 0),
-            new PathPoint(WaypointSE2.irrotational(
+            new PathPointSE2(WaypointSE2.irrotational(
                     new Pose2d(36, 12, new Rotation2d(0)), 0, 1.2), 0, 0),
-            new PathPoint(WaypointSE2.irrotational(
+            new PathPointSE2(WaypointSE2.irrotational(
                     new Pose2d(60, 12, new Rotation2d(0)), 0, 1.2), 0, 0));
 
     public static final List<Rotation2d> HEADINGS = List.of(
@@ -104,12 +104,12 @@ public class TrajectoryFactoryTest {
     @Test
     void testJustTurningInPlace() {
         Path100 path = new Path100(Arrays.asList(
-                new PathPoint(
+                new PathPointSE2(
                         new WaypointSE2(
                                 new Pose2d(0, 0, new Rotation2d(0)),
                                 new DirectionSE2(0, 0, 1), 1),
                         1, 0),
-                new PathPoint(
+                new PathPointSE2(
                         new WaypointSE2(
                                 new Pose2d(0, 0, new Rotation2d(Math.PI)),
                                 new DirectionSE2(0, 0, 1), 1),
@@ -190,7 +190,7 @@ public class TrajectoryFactoryTest {
 
         class ConditionalTimingConstraint implements TimingConstraint {
             @Override
-            public double maxV(PathPoint state) {
+            public double maxV(PathPointSE2 state) {
                 if (state.waypoint().pose().getTranslation().getX() >= 24.0) {
                     return 5.0;
                 } else {
@@ -199,12 +199,12 @@ public class TrajectoryFactoryTest {
             }
 
             @Override
-            public double maxAccel(PathPoint state, double velocity) {
+            public double maxAccel(PathPointSE2 state, double velocity) {
                 return Double.POSITIVE_INFINITY;
             }
 
             @Override
-            public double maxDecel(PathPoint state, double velocity) {
+            public double maxDecel(PathPointSE2 state, double velocity) {
                 return Double.NEGATIVE_INFINITY;
             }
         }
@@ -221,18 +221,18 @@ public class TrajectoryFactoryTest {
 
         class ConditionalTimingConstraint implements TimingConstraint {
             @Override
-            public double maxV(PathPoint state) {
+            public double maxV(PathPointSE2 state) {
                 return Double.POSITIVE_INFINITY;
             }
 
             @Override
-            public double maxAccel(PathPoint state,
+            public double maxAccel(PathPointSE2 state,
                     double velocity) {
                 return 10.0 / velocity;
             }
 
             @Override
-            public double maxDecel(PathPoint state, double velocity) {
+            public double maxDecel(PathPointSE2 state, double velocity) {
                 return -10.0;
             }
         }

@@ -1,21 +1,21 @@
 package org.team100.lib.geometry;
 
-import org.team100.lib.trajectory.path.spline.HolonomicSpline;
+import org.team100.lib.trajectory.path.spline.HolonomicSplineSE2;
 import org.team100.lib.util.Math100;
 
 import edu.wpi.first.math.MathUtil;
 
 /**
- * Represents a point on a path in SE(2).
+ * Represents a point on a path in SE(2) (plane with rotation).
  * 
  * Includes a WaypointSE2, heading rate, and curvature.
  */
-public class PathPoint {
+public class PathPointSE2 {
     private static final boolean DEBUG = false;
     /** Pose and course. */
     private final WaypointSE2 m_waypoint;
     /** The source of this point (for resampling) */
-    private final HolonomicSpline m_spline;
+    private final HolonomicSplineSE2 m_spline;
     /** The parameter value of this point (for resampling) */
     private final double m_s;
     /** Change in heading per meter of motion, rad/m. */
@@ -28,9 +28,9 @@ public class PathPoint {
      * @param headingRateRad_M change in heading, per meter traveled
      * @param curvatureRad_M   change in course per meter traveled.
      */
-    public PathPoint(
+    public PathPointSE2(
             WaypointSE2 waypoint,
-            HolonomicSpline spline,
+            HolonomicSplineSE2 spline,
             double s,
             double headingRateRad_M,
             double curvatureRad_M) {
@@ -41,7 +41,7 @@ public class PathPoint {
         m_curvatureRad_M = curvatureRad_M;
     }
 
-    public PathPoint(
+    public PathPointSE2(
             WaypointSE2 waypoint,
             double headingRateRad_M,
             double curvatureRad_M) {
@@ -81,11 +81,11 @@ public class PathPoint {
      * 
      * Not a constant-twist arc.
      */
-    public PathPoint interpolate(PathPoint other, double x) {
+    public PathPointSE2 interpolate(PathPointSE2 other, double x) {
         if (DEBUG)
             System.out.printf("this s %f other s %f\n",
                     m_s, other.m_s);
-        HolonomicSpline spline = null;
+        HolonomicSplineSE2 spline = null;
         double s = 0;
         if (m_spline == other.m_spline) {
             // ok to interpolate using this spline
@@ -115,10 +115,10 @@ public class PathPoint {
                     m_s, other.m_s, x, s);
         // sample the spline again instead of interpolating.
         if (spline != null)
-            return spline.getPathPoint(s);
+            return spline.sample(s);
         // TODO: remove this way
         System.out.println("WARNING: no spline, using linear interpolation ");
-        return new PathPoint(
+        return new PathPointSE2(
                 GeometryUtil.interpolate(m_waypoint, other.m_waypoint, x),
                 spline,
                 s,
@@ -133,18 +133,18 @@ public class PathPoint {
      * 
      * Always non-negative.
      */
-    public double distanceCartesian(PathPoint other) {
+    public double distanceCartesian(PathPointSE2 other) {
         return Metrics.translationalDistance(m_waypoint.pose(), other.m_waypoint.pose());
     }
 
     public boolean equals(Object other) {
-        if (!(other instanceof PathPoint)) {
+        if (!(other instanceof PathPointSE2)) {
             if (DEBUG)
                 System.out.println("wrong type");
             return false;
         }
 
-        PathPoint p2dwc = (PathPoint) other;
+        PathPointSE2 p2dwc = (PathPointSE2) other;
         if (!m_waypoint.equals(p2dwc.m_waypoint)) {
             if (DEBUG)
                 System.out.println("wrong waypoint");

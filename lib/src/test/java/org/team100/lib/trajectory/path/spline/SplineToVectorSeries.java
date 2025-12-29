@@ -23,11 +23,11 @@ public class SplineToVectorSeries {
      * 
      * @return (x, y, dx, dy)
      */
-    public VectorSeries convert(String name, List<HolonomicSpline> splines) {
+    public VectorSeries convert(String name, List<HolonomicSplineSE2> splines) {
         VectorSeries series = new VectorSeries(name);
-        for (HolonomicSpline spline : splines) {
+        for (HolonomicSplineSE2 spline : splines) {
             for (double s = 0; s <= 1.001; s += DS) {
-                Pose2d p = spline.getPathPoint(s).waypoint().pose();
+                Pose2d p = spline.sample(s).waypoint().pose();
                 System.out.println(p);
                 double x = p.getX();
                 double y = p.getY();
@@ -46,9 +46,9 @@ public class SplineToVectorSeries {
      * 
      * @return (s, x)
      */
-    public static XYSeries x(String name, List<HolonomicSpline> splines) {
+    public static XYSeries x(String name, List<HolonomicSplineSE2> splines) {
         XYSeries series = new XYSeries(name);
-        for (HolonomicSpline spline : splines) {
+        for (HolonomicSplineSE2 spline : splines) {
             for (double s = 0; s <= 1.001; s += DS) {
                 double x = spline.x(s);
                 series.add(s, x);
@@ -62,9 +62,9 @@ public class SplineToVectorSeries {
      * 
      * @return (s, x')
      */
-    public static XYSeries xPrime(String name, List<HolonomicSpline> splines) {
+    public static XYSeries xPrime(String name, List<HolonomicSplineSE2> splines) {
         XYSeries series = new XYSeries(name);
-        for (HolonomicSpline spline : splines) {
+        for (HolonomicSplineSE2 spline : splines) {
             for (double s = 0; s <= 1.001; s += DS) {
                 double x = spline.dx(s);
                 series.add(s, x);
@@ -78,9 +78,9 @@ public class SplineToVectorSeries {
      * 
      * @return (s, x'')
      */
-    public static XYSeries xPrimePrime(String name, List<HolonomicSpline> splines) {
+    public static XYSeries xPrimePrime(String name, List<HolonomicSplineSE2> splines) {
         XYSeries series = new XYSeries(name);
-        for (HolonomicSpline spline : splines) {
+        for (HolonomicSplineSE2 spline : splines) {
             for (double s = 0; s <= 1.001; s += DS) {
                 double x = spline.ddx(s);
                 series.add(s, x);

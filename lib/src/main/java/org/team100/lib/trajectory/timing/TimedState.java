@@ -1,6 +1,6 @@
 package org.team100.lib.trajectory.timing;
 
-import org.team100.lib.geometry.PathPoint;
+import org.team100.lib.geometry.PathPointSE2;
 import org.team100.lib.util.Math100;
 
 /**
@@ -11,7 +11,7 @@ import org.team100.lib.util.Math100;
  */
 public class TimedState {
     private static final boolean DEBUG = false;
-    private final PathPoint m_point;
+    private final PathPointSE2 m_point;
     /** Time we achieve this state. */
     private final double m_timeS;
     /** Instantaneous pathwise velocity, m/s. */
@@ -23,7 +23,7 @@ public class TimedState {
     private final double m_accelM_S_S;
 
     public TimedState(
-            PathPoint state,
+            PathPointSE2 state,
             double t,
             double velocity,
             double acceleration) {
@@ -33,7 +33,7 @@ public class TimedState {
         m_accelM_S_S = acceleration;
     }
 
-    public PathPoint point() {
+    public PathPointSE2 point() {
         return m_point;
     }
 

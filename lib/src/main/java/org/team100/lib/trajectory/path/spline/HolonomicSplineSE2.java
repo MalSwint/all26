@@ -2,7 +2,7 @@ package org.team100.lib.trajectory.path.spline;
 
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.Metrics;
-import org.team100.lib.geometry.PathPoint;
+import org.team100.lib.geometry.PathPointSE2;
 import org.team100.lib.geometry.WaypointSE2;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -10,7 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 /**
- * Holonomic spline.
+ * Holonomic spline in the SE(2) manifold, the space of Pose2d.
  * 
  * Internally this is three one-dimensional splines (x, y, heading), with
  * respect to a parameter [0,1].
@@ -23,7 +23,7 @@ import edu.wpi.first.math.geometry.Translation2d;
  * This happily produces "splines" with sharp corners, if the segment
  * derivatives don't match.
  */
-public class HolonomicSpline {
+public class HolonomicSplineSE2 {
     private static final boolean DEBUG = false;
 
     private final SplineR1 m_x;
@@ -58,7 +58,7 @@ public class HolonomicSpline {
      * @param p0 starting pose
      * @param p1 ending pose
      */
-    public HolonomicSpline(WaypointSE2 p0, WaypointSE2 p1) {
+    public HolonomicSplineSE2(WaypointSE2 p0, WaypointSE2 p1) {
         // Translation distance in the xy plane.
         double distance = Metrics.translationalDistance(p0.pose(), p1.pose());
         if (distance < 1e-6)
@@ -116,8 +116,8 @@ public class HolonomicSpline {
      * 
      * @param s [0,1]
      */
-    public PathPoint getPathPoint(double s) {
-        return new PathPoint(
+    public PathPointSE2 sample(double s) {
+        return new PathPointSE2(
                 new WaypointSE2(
                         new Pose2d(new Translation2d(x(s), y(s)), getHeading(s)),
                         getCourse(s), 1),
@@ -222,7 +222,7 @@ public class HolonomicSpline {
     /**
      * Curvature is the change in motion direction per distance traveled.
      * rad/m.
-     * Note the denominator is distance in this case, not the parameter, p.
+     * Note the denominator is distance in this case, not the parameter.
      * but the argument to this function *is* the parameter, s. :-)
      */
     double getCurvature(double s) {

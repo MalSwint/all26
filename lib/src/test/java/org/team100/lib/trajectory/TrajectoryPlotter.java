@@ -22,7 +22,7 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.team100.lib.trajectory.path.Path100;
-import org.team100.lib.trajectory.path.spline.HolonomicSpline;
+import org.team100.lib.trajectory.path.spline.HolonomicSplineSE2;
 import org.team100.lib.trajectory.path.spline.SplineToVectorSeries;
 
 public class TrajectoryPlotter {
@@ -54,14 +54,14 @@ public class TrajectoryPlotter {
         return pathConverter.convert(name, path);
     }
 
-    public void plot(String name, List<HolonomicSpline> s) {
+    public void plot(String name, List<HolonomicSplineSE2> s) {
         VectorSeries converted = convert(name, s);
         XYDataset dataSet = TrajectoryPlotter.collect(converted);
         if (SHOW)
             actuallyPlot(name, () -> new VectorRenderer(), dataSet);
     }
 
-    public VectorSeries convert(String name, List<HolonomicSpline> s) {
+    public VectorSeries convert(String name, List<HolonomicSplineSE2> s) {
         return splineConverter.convert(name, s);
     }
 
@@ -156,7 +156,7 @@ public class TrajectoryPlotter {
     }
 
     public static void plot(
-            List<HolonomicSpline> splines,
+            List<HolonomicSplineSE2> splines,
             double arrows) {
         TrajectoryPlotter plotter = new TrajectoryPlotter(arrows);
         VectorSeries series = plotter.convert("before", splines);

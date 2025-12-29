@@ -69,6 +69,8 @@
         "workbench.colorTheme": "Default Light Modern",
         "workbench.editor.revealIfOpen": true,
         "workbench.tree.enableStickyScroll": false,
-        "editor.multiCursorLimit": 1
+        "editor.multiCursorLimit": 1,
+        "java.import.maven.disableTestClasspathFlag": false,
+        "java.import.projectSelection": "manual"
     }
 }

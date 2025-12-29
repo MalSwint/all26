@@ -1,18 +1,17 @@
 package org.team100.lib.trajectory.path.spline;
 
-import java.util.Optional;
-
 import org.team100.lib.geometry.DirectionR3;
 import org.team100.lib.geometry.DirectionSE3;
-import org.team100.lib.geometry.Pose3dWithDirection;
-import org.team100.lib.util.Math100;
+import org.team100.lib.geometry.PathPointSE3;
+import org.team100.lib.geometry.WaypointSE3;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 
 /**
- * Holonomic spline in three dimensions, similar to the 2d version.
+ * Holonomic spline in the SE(3) manifold, the space of Pose3d.
  * 
  * Internally this is five one-dimensional splines (x, y, z, phi, theta), with
  * respect to a parameter [0,1].
@@ -22,7 +21,7 @@ import edu.wpi.first.math.geometry.Translation3d;
  * there is "roll pitch yaw" from the reference, not "spherical coordinates"
  * (with a polar angle etc).
  */
-public class HolonomicSpline3d {
+public class HolonomicSplineSE3 {
     private static final boolean DEBUG = false;
     // curvature measurement performance scales with sample count so make it kinda
     // low. most splines go between 0.5 and 5 meters so this is steps of 2 to 20 cm.
@@ -40,20 +39,21 @@ public class HolonomicSpline3d {
     private final Rotation2d m_roll0;
     private final Rotation2d m_pitch0;
     private final Rotation2d m_yaw0;
+    private final Rotation3d m_heading0;
 
-    public HolonomicSpline3d(Pose3dWithDirection p0, Pose3dWithDirection p1) {
+    public HolonomicSplineSE3(WaypointSE3 p0, WaypointSE3 p1) {
         this(p0, p1, 1.2, 1.2);
     }
 
-    public HolonomicSpline3d(Pose3dWithDirection p0, Pose3dWithDirection p1, double mN0, double mN1) {
-        double scale0 = mN0 * p0.translation().getDistance(p1.translation());
-        double scale1 = mN1 * p0.translation().getDistance(p1.translation());
+    public HolonomicSplineSE3(WaypointSE3 p0, WaypointSE3 p1, double mN0, double mN1) {
+        double scale0 = mN0 * p0.pose().getTranslation().getDistance(p1.pose().getTranslation());
+        double scale1 = mN1 * p0.pose().getTranslation().getDistance(p1.pose().getTranslation());
 
         DirectionSE3 course0 = p0.course();
         DirectionSE3 course1 = p1.course();
 
-        double x0 = p0.translation().getX();
-        double x1 = p1.translation().getX();
+        double x0 = p0.pose().getTranslation().getX();
+        double x1 = p1.pose().getTranslation().getX();
         // first derivatives are just the course
         double dx0 = course0.x * scale0;
         double dx1 = course1.x * scale1;
@@ -61,8 +61,8 @@ public class HolonomicSpline3d {
         double ddx0 = 0;
         double ddx1 = 0;
 
-        double y0 = p0.translation().getY();
-        double y1 = p1.translation().getY();
+        double y0 = p0.pose().getTranslation().getY();
+        double y1 = p1.pose().getTranslation().getY();
         // first derivatives are just the course
         double dy0 = course0.y * scale0;
         double dy1 = course1.y * scale1;
@@ -70,8 +70,8 @@ public class HolonomicSpline3d {
         double ddy0 = 0;
         double ddy1 = 0;
 
-        double z0 = p0.translation().getZ();
-        double z1 = p1.translation().getZ();
+        double z0 = p0.pose().getTranslation().getZ();
+        double z1 = p1.pose().getTranslation().getZ();
         // first derivatives are just the course
         double dz0 = course0.z * scale0;
         double dz1 = course1.z * scale1;
@@ -83,11 +83,12 @@ public class HolonomicSpline3d {
         m_y = SplineR1.get(y0, y1, dy0, dy1, ddy0, ddy1);
         m_z = SplineR1.get(z0, z1, dz0, dz1, ddz0, ddz1);
 
-        m_roll0 = new Rotation2d(p0.heading().getX());
-        m_pitch0 = new Rotation2d(p0.heading().getY());
-        m_yaw0 = new Rotation2d(p0.heading().getZ());
+        m_heading0 = p0.pose().getRotation();
+        m_roll0 = new Rotation2d(p0.pose().getRotation().getX());
+        m_pitch0 = new Rotation2d(p0.pose().getRotation().getY());
+        m_yaw0 = new Rotation2d(p0.pose().getRotation().getZ());
 
-        Rotation3d headingDelta = p1.heading().minus(p0.heading());
+        Rotation3d headingDelta = p1.pose().getRotation().minus(p0.pose().getRotation());
         double rollDelta = headingDelta.getX();
         double pitchDelta = headingDelta.getY();
         double yawDelta = headingDelta.getZ();
@@ -119,66 +120,76 @@ public class HolonomicSpline3d {
     }
 
     /**
-     * Cartesian coordinate in meters.
+     * TODO: remove the "1" scale here
      * 
-     * @param t ranges from 0 to 1
-     * @return the point on the spline for that t value
+     * @param s [0,1]
      */
-    protected Translation3d getPoint(double t) {
-        return new Translation3d(x(t), y(t), z(t));
+    public PathPointSE3 sample(double s) {
+        return new PathPointSE3(new WaypointSE3(
+                new Pose3d(new Translation3d(x(s), y(s), z(s)), getHeading(s)),
+                getCourse(s), 1),
+                getN(s),
+                getK(s));
     }
 
-    double x(double t) {
-        return m_x.getPosition(t);
-    }
-
-    double y(double t) {
-        return m_y.getPosition(t);
-    }
-
-    double z(double t) {
-        return m_z.getPosition(t);
-    }
-
-    // public Pose3dWithMotion getPose3dWithMotion(double p) {
-    // return new Pose3dWithMotion(
-    // new HolonomicPose3d(
-    // getPoint(p),
-    // getHeading(p),
-    // getCourse(p).orElseThrow()),
-    // getDHeadingDs(p),
-    // getCurvature(p),
-    // getDCurvatureDs(p));
-    // }
-
-    public Optional<DirectionR3> getCourse(double t) {
-        double dx = dx(t);
-        double dy = dy(t);
-        double dz = dz(t);
-        if (Math100.epsilonEquals(dx, 0.0)
-                && Math100.epsilonEquals(dy, 0.0)
-                && Math100.epsilonEquals(dz, 0.0)) {
-            // rotation below would be garbage so give up
-            return Optional.empty();
-        }
-        return Optional.of(new DirectionR3(dx, dy, dz));
-    }
-
-    protected Rotation3d getHeading(double t) {
+    DirectionR3 getN(double s) {
         return null;
-        // return m_r0.rotateBy(Rotation2d.fromRadians(m_theta.getPosition(t)));
     }
 
-    double dx(double t) {
-        return m_x.getVelocity(t);
+    double getK(double s) {
+        return 0;
     }
 
-    double dy(double t) {
-        return m_y.getVelocity(t);
+    double x(double s) {
+        return m_x.getPosition(s);
     }
 
-    double dz(double t) {
-        return m_z.getVelocity(t);
+    double y(double s) {
+        return m_y.getPosition(s);
+    }
+
+    double z(double s) {
+        return m_z.getPosition(s);
+    }
+
+    public DirectionSE3 getCourse(double S) {
+        double dx = dx(S);
+        double dy = dy(S);
+        double dz = dz(S);
+        double dr = droll(S);
+        double dp = dpitch(S);
+        double dyaw = dyaw(S);
+        return new DirectionSE3(dx, dy, dz, dr, dp, dyaw);
+    }
+
+    protected Rotation3d getHeading(double s) {
+        Rotation3d delta = new Rotation3d(
+                m_roll.getPosition(s), m_pitch.getPosition(s), m_yaw.getPosition(s));
+        return m_heading0.rotateBy(delta);
+    }
+
+    double dx(double s) {
+        return m_x.getVelocity(s);
+    }
+
+    double dy(double s) {
+        return m_y.getVelocity(s);
+    }
+
+    double dz(double s) {
+        return m_z.getVelocity(s);
+    }
+
+    double droll(double s) {
+        return m_roll.getVelocity(s);
+    }
+
+    double dpitch(double s) {
+        return m_pitch.getVelocity(s);
+    }
+
+    double dyaw(double s) {
+        return m_yaw.getVelocity(s);
     }
 
     /**
@@ -190,6 +201,20 @@ public class HolonomicSpline3d {
         double dy = dy(t);
         double dz = dy(t);
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
+
+    /**
+     * Print samples for testing.
+     * 
+     * Uses the format of https://miabellaai.net/index.html, paste the data into the
+     * box near the bottom of the page, to see a 3d scatterplot.
+     */
+    public void dump() {
+        System.out.println("HolonomicSplineSE3;");
+        System.out.println("::X::Y::Z;");
+        for (double s = 0; s <= 1; s += 0.05) {
+            System.out.printf("A::%5.3f::%5.3f::%5.3f::1::50::A::1::0::0::0::0;\n", x(s), y(s), z(s));
+        }
     }
 
 }

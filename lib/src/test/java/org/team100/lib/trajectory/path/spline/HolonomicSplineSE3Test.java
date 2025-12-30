@@ -35,16 +35,18 @@ public class HolonomicSplineSE3Test implements Timeless {
 
     @Test
     void testDump() {
+        // note rotational direction is from yaw-left to pitch-down-and-yaw-left
+        // so the net is pitch-down
         WaypointSE3 w0 = new WaypointSE3(
                 new Pose3d(
                         new Translation3d(),
-                        new Rotation3d()),
-                new DirectionSE3(1, 0, 0, 0, 0, 0), 1);
+                        new Rotation3d(0, 0, Math.PI / 2)),
+                new DirectionSE3(1, 0, 1, 0, 1, 0), 1);
         WaypointSE3 w1 = new WaypointSE3(
                 new Pose3d(
                         new Translation3d(1, 1, 1),
-                        new Rotation3d()),
-                new DirectionSE3(0, 0, 1, 0, 0, 0), 1);
+                        new Rotation3d(0, Math.PI / 2, Math.PI / 2)),
+                new DirectionSE3(0, 1, -1, 0, 1, 0), 1);
         HolonomicSplineSE3 spline = new HolonomicSplineSE3(w0, w1);
         spline.dump();
     }

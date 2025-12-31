@@ -5,9 +5,12 @@ import org.team100.lib.geometry.Metrics;
 import org.team100.lib.geometry.PathPointSE2;
 import org.team100.lib.geometry.WaypointSE2;
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.numbers.N2;
 
 /**
  * Holonomic spline in the SE(2) manifold, the space of Pose2d.
@@ -213,21 +216,28 @@ public class HolonomicSplineSE2 {
     }
 
     /**
-     * Curvature is the change in motion direction per distance traveled.
-     * rad/m.
-     * Note the denominator is distance in this case, not the parameter.
-     * but the argument to this function *is* the parameter, s. :-)
+     * Scalar curvature, $\kappa$, is the norm of the curvature vector.
+     * 
+     * see MATH.md.
      */
     double getCurvature(double s) {
-        double dx = dx(s);
-        double dy = dy(s);
-        double ddx = ddx(s);
-        double ddy = ddy(s);
-        double d = dx * dx + dy * dy;
-        if (d <= 0) {
-            // this isn't really zero
-            return 0;
-        }
-        return (dx * ddy - ddx * dy) / Math.pow(d, 1.5);
+        return K(s).norm();
+    }
+
+    /**
+     * Curvature vector is the change in motion direction per distance traveled.
+     * rad/m.
+     * 
+     * see MATH.md
+     */
+    private Vector<N2> K(double s) {
+        // this derivation works for any dimensions.
+        Vector<N2> rprime = VecBuilder.fill(dx(s), dy(s));
+        Vector<N2> rprimeprime = VecBuilder.fill(ddx(s), ddy(s));
+        double rprimenorm = rprime.norm();
+        Vector<N2> T = rprime.div(rprimenorm);
+        Vector<N2> p2 = rprimeprime.div(rprimenorm * rprimenorm);
+        Vector<N2> K = p2.minus(T.times(T.dot(p2)));
+        return K;
     }
 }

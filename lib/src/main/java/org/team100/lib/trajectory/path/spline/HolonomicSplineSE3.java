@@ -1,14 +1,17 @@
 package org.team100.lib.trajectory.path.spline;
 
-import org.team100.lib.geometry.DirectionR3;
 import org.team100.lib.geometry.DirectionSE3;
 import org.team100.lib.geometry.PathPointSE3;
 import org.team100.lib.geometry.WaypointSE3;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N3;
 
 /**
  * Holonomic spline in the SE(3) manifold, the space of Pose3d.
@@ -70,22 +73,41 @@ public class HolonomicSplineSE3 {
         m_z = SplineR1.get(z0, z1, dz0, dz1, ddz0, ddz1);
 
         Rotation3d r0 = p0.pose().getRotation();
+        Rotation3d r1 = p1.pose().getRotation();
+        if (DEBUG) {
+            System.out.printf("r0 %f %f %f\n", r0.getX(), r0.getY(), r0.getZ());
+            System.out.printf("r1 %f %f %f\n", r1.getX(), r1.getY(), r1.getZ());
+        }
+        if (DEBUG) {
+            Rotation3d i0 = r0.interpolate(r1, 0);
+            System.out.printf("interp 0.0 %f %f %f\n", i0.getX(), i0.getY(), i0.getZ());
+            Rotation3d i1 = r0.interpolate(r1, 0.5);
+            System.out.printf("interp 0.5 %f %f %f\n", i1.getX(), i1.getY(), i1.getZ());
+            Rotation3d i2 = r0.interpolate(r1, 1);
+            System.out.printf("interp 1.0 %f %f %f\n", i2.getX(), i2.getY(), i2.getZ());
+        }
+        if (DEBUG) {
+            System.out.printf("r0 %f %f %f\n", r0.getX(), r0.getY(), r0.getZ());
+            Rotation3d r0inv = r0.unaryMinus();
+            System.out.printf("r0inv %f %f %f\n", r0inv.getX(), r0inv.getY(), r0inv.getZ());
+        }
+
         m_roll0 = new Rotation2d(r0.getX());
         m_pitch0 = new Rotation2d(r0.getY());
         m_yaw0 = new Rotation2d(r0.getZ());
 
-        Rotation3d r1 = p1.pose().getRotation();
         if (DEBUG) {
             System.out.printf("r0 roll %5.3f pitch %5.3f yaw %5.3f\n", r0.getX(), r0.getY(), r0.getZ());
             System.out.printf("r1 roll %5.3f pitch %5.3f yaw %5.3f\n", r1.getX(), r1.getY(), r1.getZ());
         }
-        Rotation3d headingDelta = r1.minus(r0);
-        if (DEBUG) {
-            System.out.printf("heading delta %s\n", headingDelta.getAxis());
-        }
-        double rollDelta = headingDelta.getX();
-        double pitchDelta = headingDelta.getY();
-        double yawDelta = headingDelta.getZ();
+        // "minus" does something strange
+        // see https://github.com/wpilibsuite/allwpilib/issues/8523
+        // so we do COMPONENTWISE instead.
+        // Rotation3d headingDelta = r1.minus(r0);
+
+        double rollDelta = MathUtil.angleModulus(r1.getX() - r0.getX());
+        double pitchDelta = MathUtil.angleModulus(r1.getY() - r0.getY());
+        double yawDelta = MathUtil.angleModulus(r1.getZ() - r0.getZ());
         if (DEBUG) {
             System.out.printf("rollDelta %5.3f pitchDelta %5.3f yawDelta %5.3f\n",
                     rollDelta, pitchDelta, yawDelta);
@@ -118,19 +140,52 @@ public class HolonomicSplineSE3 {
      * @param s [0,1]
      */
     public PathPointSE3 sample(double s) {
-        return new PathPointSE3(new WaypointSE3(
-                new Pose3d(new Translation3d(x(s), y(s), z(s)), getHeading(s)),
-                getCourse(s), 1),
-                getN(s),
-                getK(s));
+        Pose3d pose = new Pose3d(new Translation3d(x(s), y(s), z(s)), getHeading(s));
+        DirectionSE3 course = getCourse(s);
+        WaypointSE3 waypoint = new WaypointSE3(pose, course, 1);
+        Vector<N3> K = K(s);
+        Vector<N3> H = headingRate(s);
+        return new PathPointSE3(waypoint, K, H);
     }
 
-    DirectionR3 getN(double s) {
-        return null;
+    /**
+     * Scalar curvature, $\kappa$, is the norm of the curvature vector.
+     * 
+     * see MATH.md.
+     */
+    double getCurvature(double s) {
+        return K(s).norm();
     }
 
-    double getK(double s) {
-        return 0;
+    /**
+     * Curvature vector is the change in motion direction per distance traveled.
+     * rad/m.
+     * 
+     * see MATH.md
+     */
+    private Vector<N3> K(double s) {
+        // this derivation works for any dimensions.
+        Vector<N3> rprime = VecBuilder.fill(dx(s), dy(s), dz(s));
+        Vector<N3> rprimeprime = VecBuilder.fill(ddx(s), ddy(s), ddz(s));
+        double rprimenorm = rprime.norm();
+        Vector<N3> T = rprime.div(rprimenorm);
+        Vector<N3> p2 = rprimeprime.div(rprimenorm * rprimenorm);
+        Vector<N3> K = p2.minus(T.times(T.dot(p2)));
+        return K;
+    }
+
+    /**
+     * The heading rate is the path-length derivative of the heading vector.
+     */
+    Vector<N3> headingRate(double s) {
+        // these are relative to parameter, not path length
+        double droll = droll(s);
+        double dpitch = dpitch(s);
+        double dyaw = dyaw(s);
+        // meters per parameter
+        double v = getVelocity(s);
+        // roll/s / m/s = roll/ms etc
+        return VecBuilder.fill(droll/v, dpitch/v, dyaw/v);
     }
 
     double x(double s) {
@@ -185,6 +240,18 @@ public class HolonomicSplineSE3 {
 
     double dyaw(double s) {
         return m_yaw.getVelocity(s);
+    }
+
+    double ddx(double s) {
+        return m_x.getAcceleration(s);
+    }
+
+    double ddy(double s) {
+        return m_y.getAcceleration(s);
+    }
+
+    double ddz(double s) {
+        return m_z.getAcceleration(s);
     }
 
     /**

@@ -366,6 +366,10 @@ public class GeometryUtil {
         return VecBuilder.fill(t.getX(), t.getY(), 0);
     }
 
+    public static double cross(Vector<N2> a, Vector<N2> b) {
+        return a.get(0) * b.get(1) - a.get(1) * b.get(0);
+    }
+
     /////////////////////////////////////////////////////////////////
     ///
     /// DANGER ZONE

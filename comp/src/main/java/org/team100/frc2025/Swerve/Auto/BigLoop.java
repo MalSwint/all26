@@ -43,6 +43,8 @@ public class BigLoop implements Function<Pose2d, Trajectory100> {
                 p0.getX() + 2,
                 p0.getY() + 2,
                 p0.getRotation().plus(Rotation2d.kCW_Pi_2));
+        // note adjustment of scale and rotation "direction" (i.e. rate relative to
+        // translation)
         List<WaypointSE2> waypoints = List.of(
                 new WaypointSE2(
                         p0,
@@ -50,16 +52,16 @@ public class BigLoop implements Function<Pose2d, Trajectory100> {
                         1),
                 new WaypointSE2(
                         p1,
-                        new DirectionSE2(1, 0, 0),
-                        1),
+                        new DirectionSE2(1, 0, 0.5),
+                        1.3),
                 new WaypointSE2(
                         p2,
-                        new DirectionSE2(0, 1, 0),
-                        1),
+                        new DirectionSE2(0, 1, 0.5),
+                        1.3),
                 new WaypointSE2(
                         p3,
-                        new DirectionSE2(-1, 0, 0),
-                        1),
+                        new DirectionSE2(-1, 0, 0.5),
+                        1.3),
                 new WaypointSE2(
                         p0,
                         new DirectionSE2(-1, 0, 0),

@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 public class QuadraticInterpolatorTest {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     /** Fits linear exactly. */
     @Test

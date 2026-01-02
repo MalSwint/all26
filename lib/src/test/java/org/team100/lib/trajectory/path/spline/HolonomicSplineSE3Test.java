@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N3;
 
 public class HolonomicSplineSE3Test implements Timeless {
+    private static final boolean DEBUG = false;
     private static final double DELTA = 0.001;
 
     @Test
@@ -51,7 +52,8 @@ public class HolonomicSplineSE3Test implements Timeless {
                         new Rotation3d(0, Math.PI / 2, Math.PI / 2)),
                 new DirectionSE3(0, 1, -1, 0, 1, 0), 1);
         HolonomicSplineSE3 spline = new HolonomicSplineSE3(w0, w1);
-        spline.dump();
+        if (DEBUG)
+            spline.dump();
     }
 
     @Test
@@ -119,10 +121,12 @@ public class HolonomicSplineSE3Test implements Timeless {
             // Rotation3d r = p.waypoint().pose().getRotation();
             // System.out.printf("R (%5.3f, %5.3f, %5.3f)\n", r.getX(), r.getY(), r.getZ());
             // curvature should be roughly towards (0,1) with z of ~zero.
-            System.out.printf("K = (%5.3f, %5.3f, %5.3f)\n",
-                    K.get(0), K.get(1), K.get(2));
+            if (DEBUG)
+                System.out.printf("K = (%5.3f, %5.3f, %5.3f)\n",
+                        K.get(0), K.get(1), K.get(2));
         }
-        spline.dump();
+        if (DEBUG)
+            spline.dump();
     }
 
     /**
@@ -149,10 +153,12 @@ public class HolonomicSplineSE3Test implements Timeless {
             // and it should be roughly constant.
             // total heading change is 1.5ish, total path length is around 1.9
             // so heading change per meter is around 0.8.
-            System.out.printf("H = (%5.3f, %5.3f, %5.3f)\n",
-                    H.get(0), H.get(1), H.get(2));
+            if (DEBUG)
+                System.out.printf("H = (%5.3f, %5.3f, %5.3f)\n",
+                        H.get(0), H.get(1), H.get(2));
         }
-        spline.dump();
+        if (DEBUG)
+            spline.dump();
     }
 
 }

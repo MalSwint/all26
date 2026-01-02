@@ -63,7 +63,8 @@ public class DriveWithTrajectoryFunctionTest implements Timeless {
                 log, subsystem, controller, viz, this::makeTrajectory);
         drive.initialize();
         stepTime();
-        System.out.println("x, y, theta");
+        if (DEBUG)
+            System.out.println("x, y, theta");
         for (int i = 0; i < 200; ++i) {
             drive.execute();
             subsystem.m_state = new ModelSE2(subsystem.m_state.pose(), subsystem.m_setpoint);

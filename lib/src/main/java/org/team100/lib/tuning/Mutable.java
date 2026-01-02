@@ -12,6 +12,7 @@ import org.team100.lib.logging.LoggerFactory;
 import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.DoubleTopic;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.RobotBase;
 
 /**
  * A mutable double linked to Network Tables, for tuning.
@@ -42,7 +43,10 @@ public class Mutable implements DoubleSupplier {
         if (ALL_ENTRIES.containsKey(name)) {
             if (FATAL)
                 throw new IllegalArgumentException(name);
-            System.out.printf("** WARNING: duplicate Mutable name %s\n", name);
+            if (RobotBase.isReal()) {
+                // This is harmless in tests, so shut up about it.
+                System.out.printf("** WARNING: duplicate Mutable name %s\n", name);
+            }
             return ALL_ENTRIES.get(name);
         }
         DoubleTopic topic = inst.getDoubleTopic(name);

@@ -67,10 +67,11 @@ public class VariableVelocityShootingMethod {
 
     /**
      * Given inputs:
+     * 
      * * absolute position and velocity for robot and target,
      * * target elevation
-     * produce a
-     * solution for (azimuth, muzzle velocity, and elevation).
+     * 
+     * produce a solution for (azimuth, muzzle velocity, and elevation).
      */
     public Optional<Solution> solve(
             Translation2d robotPosition,
@@ -82,7 +83,7 @@ public class VariableVelocityShootingMethod {
         Translation2d T0 = targetPosition.minus(robotPosition);
         GlobalVelocityR2 vT = targetVelocity.minus(robotVelocity);
         Vector<N3> initialX = VecBuilder.fill(
-            T0.getAngle().getRadians(), 5, initialElevation);
+                T0.getAngle().getRadians(), 5, initialElevation);
         NewtonsMethod<N3, N3> solver = new NewtonsMethod<>(
                 Nat.N3(),
                 Nat.N3(),

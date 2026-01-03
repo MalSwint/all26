@@ -134,27 +134,10 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
                 }
             }
             if (restarts > 0) {
-                // if (DEBUG)
-                System.out.println("convergence failed, trying random restart");
-                // this is *really* random, including out-of-bounds.
-                // SimpleMatrix r = SimpleMatrix.random(m_xdim.getNum(), 1)
-                // .minus(0.5)
-                // .scale(1);
-                // Vector<X> rv = new Vector<>(r);
-                // System.out.printf("rv %s\n", StrUtil.vecStr(rv));
-                // rv = rv.plus(x);
-                // limit(rv);
-                // this picks a point *near* the failed point
-                // which is probably not what we want, since we'll
-                // just fall into the same local minimum
-                for (int i = 0; i < m_xdim.getNum(); i++) {
-                    x.set(i, 0, x.get(i) + 0.1 * (random.nextDouble() - 0.5));
-                }
-                // instead, pick a random point within the bounds.
-                for (int i = 0; i < m_xdim.getNum(); i++) {
-                    double range = m_xMax.get(i) - m_xMin.get(i);
-                    x.set(i, 0, m_xMin.get(i) + range * random.nextDouble());
-                }
+                if (DEBUG)
+                    System.out.println("convergence failed, trying random restart");
+                // nearbyStart(x);
+                randomStart(x);
                 limit(x);
                 return solve2(x, restarts - 1, throwOnFailure);
             }
@@ -175,6 +158,24 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
     }
 
     /**
+     * This picks a point *near* the failed point, which is probably not what we
+     * want, since we'll just fall into the same local minimum.
+     */
+    void nearbyStart(Vector<X> x) {
+        for (int i = 0; i < m_xdim.getNum(); i++) {
+            x.set(i, 0, x.get(i) + 0.1 * (random.nextDouble() - 0.5));
+        }
+    }
+
+    /** Pick a random point within the bounds. */
+    private void randomStart(Vector<X> x) {
+        for (int i = 0; i < m_xdim.getNum(); i++) {
+            double range = m_xMax.get(i) - m_xMin.get(i);
+            x.set(i, 0, m_xMin.get(i) + range * random.nextDouble());
+        }
+    }
+
+    /**
      * @return false if unsolvable
      */
     private boolean solveOnce(Vector<Y> error, Vector<X> x) {
@@ -185,9 +186,11 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
         }
         try {
             // solve J dx = error
+            // The normal solver seems to work:
             Vector<X> dx = new Vector<>(J.solve(error));
+            // QR decomposition also works:
             // Vector<X> dx = getDxWithQRDecomp(error, J);
-            // the pseudoinverse should always work (slower)
+            // The pseudoinverse should always work (but slower)
             // Matrix<X, Y> jInv = new Matrix<>(J.getStorage().pseudoInverse());
             // Vector<X> dx = new Vector<>(jInv.times(error));
 
@@ -208,7 +211,7 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
     }
 
     /**
-     * A solver that allows "wide" undetermined systems, but returns zero
+     * A solver that allows "wide" undetermined systems, but sometimes returns zero
      * as an answer, which is clearly wrong.
      * 
      * Solves J dx = error for dx

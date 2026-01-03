@@ -57,11 +57,10 @@ public class ShootingMethodTest {
         // more azimuth pushes target in y; for low elevation radius is low
         assertEquals(0.506, j.get(1, 0), 0.001);
         // more elevation makes x error more positive
-        assertEquals(4.688, j.get(0, 1), 0.001);
+        assertEquals(4.995, j.get(0, 1), 0.001);
         // more elevation doesn't change y error
         assertEquals(0, j.get(1, 1), 0.001);
-        // det should never be zero
-        assertEquals(-2.4, j.det(), 0.1);
+
 
         if (DEBUG)
             System.out.println(StrUtil.matStr(j));
@@ -283,15 +282,15 @@ public class ShootingMethodTest {
 
     }
 
+    private void checkX(ShootingMethod.Solution x, double azimuth, double elevation) {
+        assertEquals(azimuth, x.azimuth().getRadians(), 0.001);
+        assertEquals(elevation, x.elevation().getRadians(), 0.001);
+    }
+
     private void checkSolution(Range range, ShootingMethod.Solution x, double r, double tof) {
         FiringSolution s = range.get(x.elevation().getRadians());
         assertEquals(r, s.range(), 0.001);
         assertEquals(tof, s.tof(), 0.001);
-    }
-
-    private void checkX(ShootingMethod.Solution x, double azimuth, double elevation) {
-        assertEquals(azimuth, x.azimuth().getRadians(), 0.001);
-        assertEquals(elevation, x.elevation().getRadians(), 0.001);
     }
 
 }

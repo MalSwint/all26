@@ -127,22 +127,11 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
                     return x;
                 }
 
-                // if (DEBUG)
-                // System.out.printf("J %s\n", StrUtil.matStr(j));
-
-                // the pseudoinverse should always work too
-                // note this is quite slow
-                // Matrix<X, Y> jInv = new Matrix<>(j.getStorage().pseudoInverse());
-                // if (DEBUG)
-                // System.out.printf("Jinv %s\n", StrUtil.matStr(jInv));
-
-                // Vector<X> dx = new Vector<>(jInv.times(error));
-
-                // this method is faster.
-                // solve A x = B i.e. J dx = error
-
-                if (!solveOnce(error, x))
+                if (!solveOnce(error, x)) {
+                    if (DEBUG)
+                        System.out.println("solve failed");
                     break;
+                }
             }
             if (restarts > 0) {
                 // if (DEBUG)
@@ -197,9 +186,10 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
         try {
             // solve J dx = error
             Vector<X> dx = new Vector<>(J.solve(error));
-
-            // this solver also works but it's not better.
-            // Vector<X> dx = getDxWithQRDecomp(error, j);
+            // Vector<X> dx = getDxWithQRDecomp(error, J);
+            // the pseudoinverse should always work (slower)
+            // Matrix<X, Y> jInv = new Matrix<>(J.getStorage().pseudoInverse());
+            // Vector<X> dx = new Vector<>(jInv.times(error));
 
             if (DEBUG)
                 System.out.printf("dx: %s\n", StrUtil.vecStr(dx));
@@ -211,25 +201,29 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
             limit(x);
             return true;
         } catch (SingularMatrixException ex) {
-            // solver cannot succeed
+            if (DEBUG)
+                System.out.println("solver cannot succeed");
             return false;
         }
     }
 
-    /** A different solver */
-    Vector<X> getDxWithQRDecomp(Vector<Y> error, Matrix<Y, X> j) {
-        double[] A = j.getData();
-        int Arows = j.getNumRows();
-        int Acols = j.getNumCols();
-        double[] B = error.getData();
-        int Brows = error.getNumRows();
-        int Bcols = error.getNumCols();
-        // dst has same dimensions as B
-        double[] dst = new double[B.length];
-        // solve Ax=B
-        EigenJNI.solveFullPivHouseholderQr(A, Arows, Acols, B, Brows, Bcols, dst);
-        Vector<X> dx = new Vector<>(new Matrix<>(m_xdim, Nat.N1(), dst));
-        return dx;
+    /**
+     * A solver that allows "wide" undetermined systems, but returns zero
+     * as an answer, which is clearly wrong.
+     * 
+     * Solves J dx = error for dx
+     */
+    Vector<X> getDxWithQRDecomp(Vector<Y> error, Matrix<Y, X> J) {
+        double[] dst = new double[m_xdim.getNum()];
+        EigenJNI.solveFullPivHouseholderQr(
+                J.getData(),
+                m_ydim.getNum(),
+                m_xdim.getNum(),
+                error.getData(),
+                m_ydim.getNum(),
+                1,
+                dst);
+        return new Vector<>(new Matrix<>(m_xdim, Nat.N1(), dst));
     }
 
     /**
@@ -247,7 +241,7 @@ public class NewtonsMethod<X extends Num, Y extends Num> {
      */
     private void update(Vector<X> x, Vector<X> dx) {
         if (DEBUG) {
-            System.out.println("## NewtonsMethod.update()");
+            System.out.println("NewtonsMethod.update()");
             System.out.printf("x %s \n", StrUtil.vecStr(x));
             System.out.printf("dx %s\n", StrUtil.vecStr(dx));
         }

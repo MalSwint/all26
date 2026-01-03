@@ -51,7 +51,7 @@ public class JacobianTest {
         // dx/dh should be 1 in all positions
         assertEquals(1, j.get(0, 0), DELTA);
         // dx/dshoulder, zero in this position
-        assertEquals(0, j.get(0, 1), DELTA);
+        assertEquals(0, j.get(0, 1), 0.002);
         // dx/dwrist, zero in this position
         assertEquals(0, j.get(0, 2), DELTA);
 

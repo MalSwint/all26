@@ -17,7 +17,14 @@ import edu.wpi.first.math.Vector;
  */
 public class NumericalJacobian100 {
     private static final boolean DEBUG = false;
-    private static final double DX = 1e-5;
+    // Using too-small a dx means trouble when the function at hand
+    // is itself discrete, e.g. the integrated Drag model.
+    // See VariableVelocityShootingMethodTest.testJacobian()
+    // Note: using a small DX reduces accuracy somewhat
+    // This value produced nonsense:
+    // private static final double DX = 1e-5;
+    // This value seems to work:
+    private static final double DX = 1e-3;
 
     /**
      * Estimates the Jacobian using symmetric differences around the reference x.

@@ -14,6 +14,7 @@ public class FiringSolutionInterpolator implements Interpolator<FiringSolution> 
     public FiringSolution interpolate(FiringSolution a, FiringSolution b, double t) {
         return new FiringSolution(
                 MathUtil.interpolate(a.range(), b.range(), t),
-                MathUtil.interpolate(a.tof(), b.tof(), t));
+                MathUtil.interpolate(a.tof(), b.tof(), t),
+                MathUtil.interpolate(a.targetElevation(), b.targetElevation(), t));
     }
 }

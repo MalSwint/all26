@@ -134,13 +134,13 @@ public class NewtonsMethodTest {
         if (DEBUG)
             System.out.println(StrUtil.matStr(j0));
         // dx/dq0
-        assertEquals(-1, j0.get(0, 0), 1e-9);
+        assertEquals(-1, j0.get(0, 0), 1e-6);
         // dx/dq1
-        assertEquals(-1, j0.get(0, 1), 1e-9);
+        assertEquals(-1, j0.get(0, 1), 1e-6);
         // dy/dq0
-        assertEquals(1, j0.get(1, 0), 1e-9);
+        assertEquals(1, j0.get(1, 0), 1e-6);
         // dy/dq1
-        assertEquals(0, j0.get(1, 1), 1e-9);
+        assertEquals(0, j0.get(1, 1), 1e-6);
 
         // initial error
         Vector<N2> err0 = err.apply(q0);
@@ -243,18 +243,18 @@ public class NewtonsMethodTest {
         if (DEBUG)
             System.out.println(StrUtil.matStr(j0));
         // dx/dq0
-        assertEquals(-1, j0.get(0, 0), 1e-9);
+        assertEquals(-1, j0.get(0, 0), 1e-6);
         // dx/dq1
-        assertEquals(-1, j0.get(0, 1), 1e-9);
+        assertEquals(-1, j0.get(0, 1), 1e-6);
         // dy/dq0
-        assertEquals(1, j0.get(1, 0), 1e-9);
+        assertEquals(1, j0.get(1, 0), 1e-6);
         // dy/dq1
-        assertEquals(0, j0.get(1, 1), 1e-9);
+        assertEquals(0, j0.get(1, 1), 1e-6);
         // angles just add
         // dt/dq0
-        assertEquals(1, j0.get(2, 0), 1e-9);
+        assertEquals(1, j0.get(2, 0), 1e-6);
         // dt/dq1
-        assertEquals(1, j0.get(2, 1), 1e-9);
+        assertEquals(1, j0.get(2, 1), 1e-6);
 
         Vector<N3> err0 = err.apply(q0);
         Vector<N2> dq1 = new Vector<>(j0.solve(err0));

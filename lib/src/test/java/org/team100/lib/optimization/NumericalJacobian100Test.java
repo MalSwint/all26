@@ -111,16 +111,16 @@ public class NumericalJacobian100Test {
         // radius of rotation for q0 to end, at pi/2, is sqrt(2)
         // dx/dq for unit circle is -sqrt(2)/2
         // dx/dq0
-        assertEquals(-1, j0.get(0, 0), 1e-5);
+        assertEquals(-1, j0.get(0, 0), 1e-3);
         // q1 is opposite to x with unit radius
         // dx/dq1
         assertEquals(-1, j0.get(0, 1), 1e-5);
         // same as first case but positive
         // dy/dq0
-        assertEquals(1, j0.get(1, 0), 1e-5);
+        assertEquals(1, j0.get(1, 0), 1e-3);
         // q1 doesn't change y
         // dy/dq1
-        assertEquals(0, j0.get(1, 1), 1e-5);
+        assertEquals(0, j0.get(1, 1), 1e-3);
     }
 
 }

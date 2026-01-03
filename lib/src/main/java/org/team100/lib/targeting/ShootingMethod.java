@@ -16,8 +16,11 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N2;
 
 /**
- * Solve the intercept problem via the "shooting method" for fixed muzzle
- * velocity and spin.
+ * Solve the intercept problem via the "shooting method" using fixed muzzle
+ * velocity and spin, with two variables:
+ * 
+ * * azimuth
+ * * elevation
  */
 public class ShootingMethod {
     private static final boolean DEBUG = false;
@@ -60,11 +63,13 @@ public class ShootingMethod {
     }
 
     /**
-     * Find a firing solution with Newton's Method. If it is possible to do so, this
-     * solver will find a "nearby" solution to the initial one. Since the problem
-     * often has two solutions ("direct" low elevation and "indirect" high
-     * elevation), you should choose an initial elevation close to the solution you
-     * want.
+     * Given absolute position and velocity for robot and target, produce a
+     * solution for azimuth and elevation.
+     * 
+     * If it is possible to do so, this solver will find a "nearby" solution to the
+     * initial one. Since the problem often has two solutions ("direct" low
+     * elevation and "indirect" high elevation), you should choose an initial
+     * elevation close to the solution you want.
      */
     public Optional<Solution> solve(
             Translation2d robotPosition,

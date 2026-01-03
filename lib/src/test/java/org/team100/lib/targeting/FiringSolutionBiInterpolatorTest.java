@@ -12,10 +12,10 @@ public class FiringSolutionBiInterpolatorTest {
     void test0() {
         RepeatedInterpolator<FiringSolution> fsbi = new RepeatedInterpolator<>(
                 new FiringSolutionInterpolator());
-        FiringSolution v11 = new FiringSolution(1, 1);
-        FiringSolution v12 = new FiringSolution(1, 2);
-        FiringSolution v21 = new FiringSolution(2, 1);
-        FiringSolution v22 = new FiringSolution(2, 2);
+        FiringSolution v11 = new FiringSolution(1, 1, 1);
+        FiringSolution v12 = new FiringSolution(1, 2, 1);
+        FiringSolution v21 = new FiringSolution(2, 1, 1);
+        FiringSolution v22 = new FiringSolution(2, 2, 1);
         FiringSolution i00 = fsbi.interpolate(v11, v12, v21, v22, 0, 0);
         assertEquals(1, i00.range(), DELTA);
         assertEquals(1, i00.tof(), DELTA);

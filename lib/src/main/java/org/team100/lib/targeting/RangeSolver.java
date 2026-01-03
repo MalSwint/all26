@@ -16,7 +16,7 @@ public class RangeSolver {
      * 
      * See RangeSolverTest for choice of DT
      */
-    static final double INTEGRATION_DT = 0.01;
+    static final double INTEGRATION_DT = 0.001;
 
     /**
      * Both range and time-of-flight are always slight underestimates.
@@ -52,10 +52,21 @@ public class RangeSolver {
                 // interpolate using the floor position
                 // more-clever interpolation or integration makes no difference.
                 double prevHeight = prevX.get(1, 0);
-                double lerp = prevHeight / (prevHeight - height);
-                double range = MathUtil.interpolate(prevX.get(0, 0), x.get(0, 0), lerp);
-                double tof = t + dt * lerp;
-                return new FiringSolution(range, tof);
+                double dy = prevHeight - height; // a positive number
+                double lerp = prevHeight / dy;
+                double prevRange = prevX.get(0, 0);
+                double range = x.get(0, 0);
+                double drange = range - prevRange; // a positive number
+                double rangeLerp = MathUtil.interpolate(prevRange, range, lerp);
+                double tofLerp = t + dt * lerp;
+                // to compute the target elevation, look at the last two points.
+                if (DEBUG)
+                    System.out.printf("prevRange %f range %f prevHeight %f height %f\n",
+                            prevRange, range, prevHeight, height);
+                double targetElevation = Math.atan2(dy, drange);
+                if (DEBUG)
+                    System.out.printf("e %f\n", targetElevation);
+                return new FiringSolution(rangeLerp, tofLerp, targetElevation);
             }
             prevX = x;
         }

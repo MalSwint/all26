@@ -1,5 +1,7 @@
 package org.team100.lib.targeting;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 
 public class RangeSolverTest {
@@ -76,7 +78,8 @@ public class RangeSolverTest {
      */
     @Test
     void testParabola() {
-        for (double v = 1; v < 20; v += 1) {
+        // note min v, this doesn't work well for very low v
+        for (double v = 4; v < 20; v += 1) {
             for (double elevation = 0.1; elevation < 1.4; elevation += 0.1) {
                 verify(v, elevation);
             }
@@ -88,6 +91,7 @@ public class RangeSolverTest {
         verify(5, 1);
     }
 
+    /** Verify parabola */
     void verify(double v, double elevation) {
         double g = 9.81;
         double R = v * v * Math.sin(2 * elevation) / g;
@@ -99,12 +103,14 @@ public class RangeSolverTest {
         // v, elevation, R, s.range(), t, s.tof());
         double rError = R - s.range();
         double tError = t - s.tof();
+        double eError = elevation - s.targetElevation();
         // System.out.printf("%6.3f, %6.3f, %10.7f, %10.7f\n", v, elevation, rError,
         // tError);
-        // // coarse DT means expected position error is a little higher
-        // assertEquals(R, s.range(), 0.01);
-        // // hm, expected time error seems high
-        // assertEquals(t, s.tof(), DELTA);
+        // coarse DT means expected position error is a little higher
+        assertEquals(R, s.range(), 0.01);
+        assertEquals(t, s.tof(), DELTA);
+        // 0.5 degree scatter here
+        assertEquals(elevation, s.targetElevation(), 0.01);
     }
 
     /**

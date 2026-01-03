@@ -17,9 +17,12 @@ public class Ballistics {
      */
     public static FiringSolution parabolic(double speed, double elevation) {
         // https://en.wikipedia.org/wiki/Projectile_motion#Time_of_flight_or_total_time_of_the_whole_journey
-        double tof = 2 * speed * Math.sin(elevation) / G;
-        double range = speed * tof * Math.cos(elevation);
-        return new FiringSolution(range, tof);
+        double vy = speed * Math.sin(elevation);
+        double tof = 2 * vy / G;
+        double vx = speed * Math.cos(elevation);
+        double range = tof * vx;
+        // In this case the target elevation is equal to the initial elevation
+        return new FiringSolution(range, tof, elevation);
     }
 
     /**
@@ -45,7 +48,7 @@ public class Ballistics {
      */
     public static FiringSolution newton(double speed, double elevation) {
         // this should use a precomputed lookup table.
-        return new FiringSolution(0, 0);
+        return new FiringSolution(0, 0, 0);
     }
 
 }

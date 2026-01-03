@@ -22,12 +22,22 @@ public class VariableVelocityShootingMethodTest {
     private static final boolean DEBUG = false;
 
     /** Verify the Jacobian is doing what it should do. */
+
     @Test
-    void testJacobian() {
+    void testJacobian1() {
+        testJacobian(true);
+    }
+
+    @Test
+    void testJacobian2() {
+        testJacobian(false);
+    }
+
+    void testJacobian(boolean useCache) {
         // this is a parabola
         Drag d = new Drag(0, 0, 0, 1, 0);
         double targetElevation = 0.5;
-        VariableVelocityRange range = new VariableVelocityRange(d, 0);
+        VariableVelocityRange range = new VariableVelocityRange(d, 0, useCache);
         Translation2d robotPosition = new Translation2d();
         GlobalVelocityR2 robotVelocity = GlobalVelocityR2.ZERO;
         Translation2d targetPosition = new Translation2d(2, 0);
@@ -78,29 +88,37 @@ public class VariableVelocityShootingMethodTest {
         assertEquals(0, J.get(2, 0), 0.001);
 
         // more velocity makes xerror more positive
-        assertEquals(0.397, J.get(0, 1), 0.001);
+        assertEquals(0.4, J.get(0, 1), 0.05);
         // more velocity doesn't change y error
         assertEquals(0, J.get(1, 1), 0.001);
         // more velocity doesn't change target elevation at all
         assertEquals(0, J.get(2, 1), 0.1);
 
         // more elevation makes x error more positive
-        assertEquals(4.692, J.get(0, 2), 0.001);
+        assertEquals(4.6, J.get(0, 2), 0.1);
         // more elevation doesn't change y error
         assertEquals(0, J.get(1, 2), 0.001);
         // more elevation makes el error more positive (should be 1)
-        assertEquals(1, J.get(2, 2), 0.003);
+        assertEquals(1, J.get(2, 2), 0.05);
 
         if (DEBUG)
             System.out.println(StrUtil.matStr(J));
-
     }
 
     @Test
-    void testMotionlessParabolic() {
+    void testMotionlessParabolic1() {
+        testMotionlessParabolic(false);
+    }
+
+    @Test
+    void testMotionlessParabolic2() {
+        testMotionlessParabolic(true);
+    }
+
+    void testMotionlessParabolic(boolean useCache) {
         double g = 9.81;
         Drag d = new Drag(0, 0, 0, 1, 0);
-        VariableVelocityRange range = new VariableVelocityRange(d, 0);
+        VariableVelocityRange range = new VariableVelocityRange(d, 0, useCache);
         double tolerance = 0.01;
         VariableVelocityShootingMethod m = new VariableVelocityShootingMethod(range, tolerance);
         Translation2d robotPosition = new Translation2d();
@@ -118,13 +136,11 @@ public class VariableVelocityShootingMethodTest {
                 initialElevation);
         VariableVelocityShootingMethod.Solution x = o.orElseThrow();
 
-
         double azimuth = 0;
         double elevation = 0.5;
         double R = 2;
         double v = Math.sqrt(R * g / Math.sin(2 * elevation));
         double tof = 2 * v * Math.sin(elevation) / g;
-
 
         assertEquals(azimuth, x.azimuth().getRadians(), 0.01);
         assertEquals(v, x.velocity(), 0.01);

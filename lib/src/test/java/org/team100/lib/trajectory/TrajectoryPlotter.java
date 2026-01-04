@@ -30,12 +30,11 @@ public class TrajectoryPlotter {
         if (!SHOW)
             return;
 
-        XYItemRenderer renderer = new StandardXYItemRenderer(StandardXYItemRenderer.SHAPES);
-
         // "true" means "modal" so wait for close.
         JDialog frame = new JDialog((Frame) null, "plot", true);
         frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
         for (XYDataset dataSet : dataSets) {
+            XYItemRenderer renderer = new StandardXYItemRenderer(StandardXYItemRenderer.SHAPES);
             XYPlot plot = new XYPlot(
                     dataSet, new NumberAxis("X"), new NumberAxis("Y"), renderer);
 

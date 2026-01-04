@@ -121,8 +121,9 @@ public class ChartUtil {
         domain.setRangeWithMargins(xRange);
         range.setRangeWithMargins(yRange);
 
-        ChartPanel panel = new ChartPanel(new JFreeChart(plot));
-        panel.setPreferredSize(new Dimension(SIZE, SIZE));
+        JFreeChart chart = new JFreeChart(null, null, plot, false);
+        ChartPanel panel = new ChartPanel(chart);
+        panel.setPreferredSize(new Dimension((int) (xRange.getLength() * 100), (int) (yRange.getLength() * 100)));
         frame.add(panel);
 
         frame.pack();

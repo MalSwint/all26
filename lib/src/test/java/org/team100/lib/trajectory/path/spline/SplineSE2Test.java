@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jfree.data.xy.VectorSeries;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.GeometryUtil;
@@ -92,7 +93,8 @@ class SplineSE2Test implements Timeless {
                         new DirectionSE2(1, 0, 0), 1));
 
         SplineSE2ToVectorSeries splineConverter = new SplineSE2ToVectorSeries(0.1);
-        ChartUtil.plotOverlay(splineConverter.convert(List.of(s)));
+        List<VectorSeries> series = splineConverter.convert(List.of(s));
+        ChartUtil.plotOverlay(series, 100);
 
         Translation2d t = s.sample(0).waypoint().pose().getTranslation();
         assertEquals(0, t.getX(), DELTA);
@@ -123,7 +125,8 @@ class SplineSE2Test implements Timeless {
                         new DirectionSE2(1, 0, 0), 1));
 
         SplineSE2ToVectorSeries splineConverter = new SplineSE2ToVectorSeries(0.1);
-        ChartUtil.plotOverlay(splineConverter.convert(List.of(s)));
+        List<VectorSeries> series = splineConverter.convert(List.of(s));
+        ChartUtil.plotOverlay(series, 100);
 
         Translation2d t = s.sample(0).waypoint().pose().getTranslation();
         assertEquals(0, t.getX(), DELTA);
@@ -157,7 +160,8 @@ class SplineSE2Test implements Timeless {
                         new DirectionSE2(1, 0, 0), 1.2));
 
         SplineSE2ToVectorSeries splineConverter = new SplineSE2ToVectorSeries(0.1);
-        ChartUtil.plotOverlay(splineConverter.convert(List.of(s)));
+        List<VectorSeries> series = splineConverter.convert(List.of(s));
+        ChartUtil.plotOverlay(series, 100);
 
         // now that the magic numbers apply to the rotational scaling, the heading rate
         // is constant.
@@ -205,7 +209,8 @@ class SplineSE2Test implements Timeless {
                         new DirectionSE2(1, 0, 1), 1));
 
         SplineSE2ToVectorSeries splineConverter = new SplineSE2ToVectorSeries(0.1);
-        ChartUtil.plotOverlay(splineConverter.convert(List.of(s)));
+        List<VectorSeries> series = splineConverter.convert(List.of(s));
+        ChartUtil.plotOverlay(series, 100);
 
         // now that the magic numbers apply to the rotational scaling, the heading rate
         // is constant.
@@ -246,7 +251,8 @@ class SplineSE2Test implements Timeless {
                         new DirectionSE2(1, 0, 0), 1));
 
         SplineSE2ToVectorSeries splineConverter = new SplineSE2ToVectorSeries(0.1);
-        ChartUtil.plotOverlay(splineConverter.convert(List.of(s)));
+        List<VectorSeries> series = splineConverter.convert(List.of(s));
+        ChartUtil.plotOverlay(series, 100);
     }
 
     /** Turning in place splines do not work. */
@@ -296,7 +302,8 @@ class SplineSE2Test implements Timeless {
         SplineSE2 s3 = new SplineSE2(p3, p0);
         List<SplineSE2> splines = List.of(s0, s1, s2, s3);
         checkCircle(splines, 0.008, 0.006);
-        ChartUtil.plotOverlay(new SplineSE2ToVectorSeries(0.1).convert(splines));
+        List<VectorSeries> series = new SplineSE2ToVectorSeries(0.1).convert(splines);
+        ChartUtil.plotOverlay(series, 100);
     }
 
     @Test
@@ -399,7 +406,8 @@ class SplineSE2Test implements Timeless {
         List<SplineSE2> splines = new ArrayList<>();
         splines.add(s0);
         splines.add(s1);
-        ChartUtil.plotOverlay(new SplineSE2ToVectorSeries(0.1).convert(splines));
+        List<VectorSeries> series = new SplineSE2ToVectorSeries(0.1).convert(splines);
+        ChartUtil.plotOverlay(series, 100);
     }
 
     /**
@@ -439,7 +447,8 @@ class SplineSE2Test implements Timeless {
         List<SplineSE2> splines = new ArrayList<>();
         splines.add(s01);
         splines.add(s12);
-        ChartUtil.plotOverlay(new SplineSE2ToVectorSeries(0.1).convert(splines));
+        List<VectorSeries> series = new SplineSE2ToVectorSeries(0.1).convert(splines);
+        ChartUtil.plotOverlay(series, 100);
     }
 
     @Test
@@ -477,7 +486,8 @@ class SplineSE2Test implements Timeless {
         splines.add(s0);
         splines.add(s1);
 
-        ChartUtil.plotOverlay(new SplineSE2ToVectorSeries(0.1).convert(splines));
+        List<VectorSeries> series = new SplineSE2ToVectorSeries(0.1).convert(splines);
+        ChartUtil.plotOverlay(series, 100);
 
         for (SplineSE2 s : splines) {
             if (DEBUG)
@@ -493,7 +503,8 @@ class SplineSE2Test implements Timeless {
         TrajectorySE2 traj = trajectoryFactory.fromPath(path, 0, 0);
         if (DEBUG)
             traj.dump();
-        ChartUtil.plotOverlay(new TrajectorySE2ToVectorSeries(0.1).convert(traj));
+        List<VectorSeries> series2 = new TrajectorySE2ToVectorSeries(0.1).convert(traj);
+        ChartUtil.plotOverlay(series2, 100);
     }
 
     @Test
@@ -521,7 +532,8 @@ class SplineSE2Test implements Timeless {
         List<SplineSE2> splines = List.of(s0);
 
         SplineSE2ToVectorSeries splineConverter = new SplineSE2ToVectorSeries(0.1);
-        ChartUtil.plotOverlay(splineConverter.convert(splines));
+        List<VectorSeries> series = splineConverter.convert(splines);
+        ChartUtil.plotOverlay(series, 100);
 
         PathFactorySE2 pathFactory = new PathFactorySE2(0.1, 0.05, 0.05, 0.05);
         List<PathPointSE2> motion = pathFactory.samplesFromSplines(splines);
@@ -554,7 +566,8 @@ class SplineSE2Test implements Timeless {
 
         TrajectorySE2ToVectorSeries converter = new TrajectorySE2ToVectorSeries(0.1);
 
-        ChartUtil.plotOverlay(converter.convert(trajectory));
+        List<VectorSeries> series2 = converter.convert(trajectory);
+        ChartUtil.plotOverlay(series2, 100);
 
         if (DEBUG)
             System.out.printf("trajectory %s\n", trajectory);

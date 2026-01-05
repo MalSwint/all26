@@ -3,6 +3,7 @@ package org.team100.lib.trajectory.path.spline;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jfree.data.xy.VectorSeries;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.WaypointSE2;
@@ -30,7 +31,8 @@ public class QuinticHermiteOptimizerTest {
         splines.add(new SplineSE2(a, b));
         splines.add(new SplineSE2(b, c));
 
-        ChartUtil.plotOverlay(new SplineSE2ToVectorSeries(5).convert(splines));
+        List<VectorSeries> series = new SplineSE2ToVectorSeries(5).convert(splines);
+        ChartUtil.plotOverlay(series, 100);
 
     }
 
@@ -57,7 +59,8 @@ public class QuinticHermiteOptimizerTest {
         splines.add(new SplineSE2(e, f));
         splines.add(new SplineSE2(f, g));
 
-        ChartUtil.plotOverlay(new SplineSE2ToVectorSeries(5).convert(splines));
+        List<VectorSeries> series = new SplineSE2ToVectorSeries(5).convert(splines);
+        ChartUtil.plotOverlay(series, 100);
 
     }
 
@@ -79,13 +82,13 @@ public class QuinticHermiteOptimizerTest {
                 new Pose2d(new Translation2d(150, -50), new Rotation2d()),
                 new DirectionSE2(0, -1, 0), 1);
 
-        List<SplineSE2> splines2 = new ArrayList<>();
-        splines2.add(new SplineSE2(h, i));
-        splines2.add(new SplineSE2(i, j));
-        splines2.add(new SplineSE2(j, k));
-        splines2.add(new SplineSE2(k, l));
+        List<SplineSE2> splines = new ArrayList<>();
+        splines.add(new SplineSE2(h, i));
+        splines.add(new SplineSE2(i, j));
+        splines.add(new SplineSE2(j, k));
+        splines.add(new SplineSE2(k, l));
 
-        ChartUtil.plotOverlay(new SplineSE2ToVectorSeries(5).convert(splines2));
+        ChartUtil.plotOverlay(new SplineSE2ToVectorSeries(5).convert(splines), 100);
 
     }
 
@@ -105,7 +108,8 @@ public class QuinticHermiteOptimizerTest {
         splines.add(new SplineSE2(a, b));
         splines.add(new SplineSE2(b, c));
 
-        ChartUtil.plotOverlay(new SplineSE2ToVectorSeries(5).convert(splines));
+        List<VectorSeries> series = new SplineSE2ToVectorSeries(5).convert(splines);
+        ChartUtil.plotOverlay(series, 100);
 
     }
 
@@ -130,7 +134,8 @@ public class QuinticHermiteOptimizerTest {
         splines.add(new SplineSE2(e, f));
         splines.add(new SplineSE2(f, g));
 
-        ChartUtil.plotOverlay(new SplineSE2ToVectorSeries(5).convert(splines));
+        List<VectorSeries> series = new SplineSE2ToVectorSeries(5).convert(splines);
+        ChartUtil.plotOverlay(series, 100);
     }
 
     @Test
@@ -158,7 +163,8 @@ public class QuinticHermiteOptimizerTest {
         splines.add(new SplineSE2(j, k));
         splines.add(new SplineSE2(k, l));
 
-        ChartUtil.plotOverlay(new SplineSE2ToVectorSeries(5).convert(splines));
+        List<VectorSeries> series = new SplineSE2ToVectorSeries(5).convert(splines);
+        ChartUtil.plotOverlay(series, 100);
 
     }
 }

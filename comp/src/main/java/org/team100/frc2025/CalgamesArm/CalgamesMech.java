@@ -84,12 +84,12 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
     /// These are used with trajectories.
     ///
      public static final Pose2d L2 = new Pose2d(0.56, 0.54, rad(2.0));
-    private static final Pose2d L3 = new Pose2d(0.94, 0.56, rad(1.7));
-    private static final Pose2d L4 = new Pose2d(1.57, 0.54, rad(2.0));
+    public static final Pose2d L3 = new Pose2d(0.94, 0.56, rad(1.7));
+    public static final Pose2d L4 = new Pose2d(1.57, 0.54, rad(2.0));
     private static final Pose2d L4_BACK = new Pose2d(1.92, -.54, rad(.75));
-    private static final Pose2d ALGAE_L2 = new Pose2d(0.85, 0.7, rad(1.5));
-    private static final Pose2d ALGAE_L3 = new Pose2d(1.15, 0.7, rad(1.5));
-    private static final Pose2d BARGE = new Pose2d(2.3, -0.5, rad(-1.5));
+    public static final Pose2d ALGAE_L2 = new Pose2d(0.85, 0.7, rad(1.5));
+    public static final Pose2d ALGAE_L3 = new Pose2d(1.15, 0.7, rad(1.5));
+    public static final Pose2d BARGE = new Pose2d(2.3, -0.5, rad(-1.5));
 
     private final double m_armLengthM;
     private final double m_wristLengthM;

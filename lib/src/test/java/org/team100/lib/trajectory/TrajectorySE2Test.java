@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
+import org.jfree.data.xy.VectorSeries;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.WaypointSE2;
@@ -216,8 +217,8 @@ class TrajectorySE2Test implements Timeless {
         TrajectorySE2Factory generator = new TrajectorySE2Factory(constraints);
 
         TrajectorySE2 trajectory = generator.fromPath(path, 0, 0);
-        ChartUtil.plotOverlay(
-            new TrajectorySE2ToVectorSeries(1).convert(trajectory));
+        List<VectorSeries> series = new TrajectorySE2ToVectorSeries(1).convert(trajectory);
+        ChartUtil.plotOverlay(series, 100);
 
         assertEquals(313, trajectory.length());
 

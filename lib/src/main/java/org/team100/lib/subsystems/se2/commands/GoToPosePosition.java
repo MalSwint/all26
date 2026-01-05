@@ -12,8 +12,6 @@ import org.team100.lib.subsystems.se2.commands.helper.PositionReferenceControlle
 import org.team100.lib.trajectory.TrajectorySE2;
 import org.team100.lib.trajectory.TrajectorySE2Planner;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-
 /**
  * Using the pose at initialization time, and the specified course, construct a
  * rest-to-rest trajectory to the goal and follow it.

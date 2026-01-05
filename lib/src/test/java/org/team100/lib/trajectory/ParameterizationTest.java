@@ -2,6 +2,7 @@ package org.team100.lib.trajectory;
 
 import java.util.List;
 
+import org.jfree.data.xy.VectorSeries;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -48,7 +49,8 @@ public class ParameterizationTest {
                                 new Rotation2d(0)),
                         new DirectionSE2(1, 0, 0), 0.001));
         SplineSE2ToVectorSeries splineConverter = new SplineSE2ToVectorSeries(0.1);
-        ChartUtil.plotOverlay(splineConverter.convert(List.of(spline)));
+        List<VectorSeries> series = splineConverter.convert(List.of(spline));
+        ChartUtil.plotOverlay(series, 100);
 
         XYSeries sx = SplineSE2ToVectorSeries.x("x", List.of(spline));
         XYSeries sxPrime = SplineSE2ToVectorSeries.xPrime("xprime", List.of(spline));
@@ -81,7 +83,8 @@ public class ParameterizationTest {
                         new DirectionSE2(0, 1, 0), 1));
 
         SplineSE2ToVectorSeries splineConverter = new SplineSE2ToVectorSeries(0.1);
-        ChartUtil.plotOverlay(splineConverter.convert(List.of(spline)));
+        List<VectorSeries> series = splineConverter.convert(List.of(spline));
+        ChartUtil.plotOverlay(series, 100);
 
         XYSeries sx = SplineSE2ToVectorSeries.x("x", List.of(spline));
         XYSeries sxPrime = SplineSE2ToVectorSeries.xPrime("xprime", List.of(spline));
@@ -147,7 +150,8 @@ public class ParameterizationTest {
             System.out.printf("TRAJECTORY\n%s\n", trajectory);
 
         TrajectorySE2ToVectorSeries converter = new TrajectorySE2ToVectorSeries(0.1);
-        ChartUtil.plotOverlay(converter.convert(trajectory));
+        List<VectorSeries> series = converter.convert(trajectory);
+        ChartUtil.plotOverlay(series, 100);
 
         // XYSeries tx = TrajectoryToVectorSeries.x("x", trajectory);
         // XYSeries txDot = TrajectoryToVectorSeries.xdot("xdot", trajectory);

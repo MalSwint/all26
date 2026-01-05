@@ -85,7 +85,7 @@ public class ChartUtil {
     }
 
     /** Plot multiple vector series on the same axes. */
-    public static void plotOverlay(List<VectorSeries> seriesList) {
+    public static void plotOverlay(List<VectorSeries> seriesList, double scale) {
         if (!SHOW)
             return;
 
@@ -123,7 +123,9 @@ public class ChartUtil {
 
         JFreeChart chart = new JFreeChart(null, null, plot, false);
         ChartPanel panel = new ChartPanel(chart);
-        panel.setPreferredSize(new Dimension((int) (xRange.getLength() * 100), (int) (yRange.getLength() * 100)));
+        panel.setPreferredSize(new Dimension(
+                (int) (xRange.getLength() * scale),
+                (int) (yRange.getLength() * scale)));
         frame.add(panel);
 
         frame.pack();

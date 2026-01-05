@@ -42,13 +42,13 @@ public class TrajectoryGallery {
     @Test
     void testGoToCoralStation1() {
         List<VectorSeries> right = series(CoralStation.RIGHT, ReefPoint.F, ScoringLevel.L4);
-        ChartUtil.plotOverlay(right);
+        ChartUtil.plotOverlay(right, 100);
     }
 
     @Test
     void testGoToCoralStation2() {
         List<VectorSeries> left = series(CoralStation.LEFT, ReefPoint.I, ScoringLevel.L4);
-        ChartUtil.plotOverlay(left);
+        ChartUtil.plotOverlay(left, 100);
     }
 
     @Test
@@ -60,14 +60,39 @@ public class TrajectoryGallery {
         List<VectorSeries> dRight = series(CoralStation.RIGHT, ReefPoint.D, ScoringLevel.L4);
         List<VectorSeries> cRight = series(CoralStation.RIGHT, ReefPoint.C, ScoringLevel.L4);
         ChartUtil.plotOverlay(Stream.of(iLeft, kLeft, lLeft, fRight, dRight, cRight)
-                .flatMap(Collection::stream).toList());
+                .flatMap(Collection::stream).toList(), 100);
     }
 
     @Test
     void testCalgames() {
+        List<VectorSeries> homeToL2 = series(
+                DirectionSE2.irrotational(1.5),
+                WaypointSE2.irrotational(CalgamesMech.L2, 1.5, 1.2));
+        List<VectorSeries> homeToL3 = series(
+                DirectionSE2.irrotational(0.8),
+                WaypointSE2.irrotational(CalgamesMech.L3, 1.5, 1.2));
+        List<VectorSeries> homeToL4 = series(
+                DirectionSE2.irrotational(0.1),
+                WaypointSE2.irrotational(CalgamesMech.L4, 1.5, 1.2));
+        List<VectorSeries> homeToAlgaeL2 = series(
+                DirectionSE2.irrotational(1.5),
+                WaypointSE2.irrotational(CalgamesMech.ALGAE_L2, 1.5, 1.2));
+        List<VectorSeries> homeToAlgaeL3 = series(
+                DirectionSE2.irrotational(0),
+                WaypointSE2.irrotational(CalgamesMech.ALGAE_L3, 1.5, 1.2));
+        List<VectorSeries> homeToBarge = series(
+                DirectionSE2.irrotational(0),
+                WaypointSE2.irrotational(CalgamesMech.BARGE, -1, 1.2));
+
+        ChartUtil.plotOverlay(Stream.of(
+                homeToL2, homeToL3, homeToL4, homeToAlgaeL2, homeToAlgaeL3, homeToBarge)
+                .flatMap(Collection::stream).toList(), 500);
+
+    }
+
+    private List<VectorSeries> series(DirectionSE2 m_course, WaypointSE2 m_goal) {
         // homeToL2
         List<TimingConstraint> c = new ArrayList<>();
-
         // These are known to work, but suboptimal.
         c.add(new ConstantConstraint(log, 10, 5));
         c.add(new YawRateConstraint(log, 10, 5));
@@ -79,15 +104,10 @@ public class TrajectoryGallery {
 
         ElevatorArmWristKinematics m_kinematics = new ElevatorArmWristKinematics(0.5, 0.343);
         Pose2d m_home = m_kinematics.forward(CalgamesMech.HOME);
-
-        WaypointSE2 m_goal = WaypointSE2.irrotational(CalgamesMech.L2, 1.5, 1.2);
-
-        DirectionSE2 m_course = DirectionSE2.irrotational(1.5);
-        WaypointSE2 m_currentPose = new WaypointSE2(m_home, m_course, 1);
-        TrajectorySE2 m_trajectory = m_planner.restToRest(List.of(m_currentPose, m_goal));
+        WaypointSE2 start = new WaypointSE2(m_home, m_course, 1);
+        TrajectorySE2 m_trajectory = m_planner.restToRest(List.of(start, m_goal));
         List<VectorSeries> series = new TrajectorySE2ToVectorSeries(0.1).convert(m_trajectory);
-        ChartUtil.plotOverlay(series);
-
+        return series;
     }
 
     private List<VectorSeries> series(CoralStation coralStation, ReefPoint reefPoint, ScoringLevel scoringLevel) {

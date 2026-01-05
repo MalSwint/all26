@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jfree.data.xy.VectorSeries;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.GeometryUtil;
@@ -153,7 +154,8 @@ public class PathFactorySE2Test implements Timeless {
                         new DirectionSE2(1, 0, 0), 1));
         PathFactorySE2 pathFactory = new PathFactorySE2(0.1, 0.01, 0.01, 0.1);
         PathSE2 path = pathFactory.fromWaypoints(waypoints);
-        ChartUtil.plotOverlay(new PathToVectorSeries(0.1).convert(path));
+        List<VectorSeries> series = new PathToVectorSeries(0.1).convert(path);
+        ChartUtil.plotOverlay(series, 100);
         assertEquals(59, path.length(), 0.001);
     }
 

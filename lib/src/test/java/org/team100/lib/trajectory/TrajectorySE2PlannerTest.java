@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jfree.data.xy.VectorSeries;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.Metrics;
@@ -355,7 +356,8 @@ class TrajectorySE2PlannerTest implements Timeless {
                 new Pose2d(10, 1, new Rotation2d()));
 
         TrajectorySE2ToVectorSeries converter = new TrajectorySE2ToVectorSeries(0.5);
-        ChartUtil.plotOverlay(converter.convert(t));
+        List<VectorSeries> series = converter.convert(t);
+        ChartUtil.plotOverlay(series, 100);
     }
 
     /** Turning in place does not work */
@@ -400,7 +402,8 @@ class TrajectorySE2PlannerTest implements Timeless {
         TrajectorySE2Planner planner = new TrajectorySE2Planner(pathFactory, trajectoryFactory);
         TrajectorySE2 trajectory = planner.generateTrajectory(waypoints, 0, 0);
 
-        ChartUtil.plotOverlay(new TrajectorySE2ToVectorSeries(0.25).convert(trajectory));
+        List<VectorSeries> series = new TrajectorySE2ToVectorSeries(0.25).convert(trajectory);
+        ChartUtil.plotOverlay(series, 100);
     }
 
     @Test
@@ -454,7 +457,8 @@ class TrajectorySE2PlannerTest implements Timeless {
             p0 = p1;
         }
 
-        ChartUtil.plotOverlay(new TrajectorySE2ToVectorSeries(0.25).convert(trajectory));
+        List<VectorSeries> series = new TrajectorySE2ToVectorSeries(0.25).convert(trajectory);
+        ChartUtil.plotOverlay(series, 100);
     }
 
     /**
@@ -488,7 +492,8 @@ class TrajectorySE2PlannerTest implements Timeless {
         TrajectorySE2 t = p.restToRest(waypoints);
 
         TrajectorySE2ToVectorSeries converter = new TrajectorySE2ToVectorSeries(0.5);
-        ChartUtil.plotOverlay(converter.convert(t));
+        List<VectorSeries> series = converter.convert(t);
+        ChartUtil.plotOverlay(series, 100);
     }
 
     /**
@@ -524,7 +529,8 @@ class TrajectorySE2PlannerTest implements Timeless {
 
         TrajectorySE2ToVectorSeries converter = new TrajectorySE2ToVectorSeries(0.3);
 
-        ChartUtil.plotOverlay(converter.convert(t));
+        List<VectorSeries> series = converter.convert(t);
+        ChartUtil.plotOverlay(series, 100);
     }
 
 }

@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.trajectory.path.PathSE2;
+import org.team100.lib.trajectory.path.spline.SplineFactorySE2;
+import org.team100.lib.trajectory.path.spline.SplineSE2;
 import org.team100.lib.trajectory.path.PathFactorySE2;
 import org.team100.lib.trajectory.timing.TrajectorySE2Factory;
 
@@ -40,7 +42,7 @@ public class TrajectorySE2Planner {
     /////////////////////////////////////////////////////////////////////////////////////
     ///
     /// DANGER ZONE
-    /// 
+    ///
     /// Only use this if you know what you're doing.
 
     /**
@@ -50,8 +52,10 @@ public class TrajectorySE2Planner {
     public TrajectorySE2 generateTrajectory(
             List<WaypointSE2> waypoints, double start_vel, double end_vel) {
         try {
+            // Create splines from waypoints.
+            List<SplineSE2> splines = SplineFactorySE2.splinesFromWaypoints(waypoints);
             // Create a path from splines.
-            PathSE2 path = m_pathFactory.fromWaypoints(waypoints);
+            PathSE2 path = m_pathFactory.get(splines);
             if (DEBUG)
                 System.out.printf("PATH\n%s\n", path);
             // Generate the timed trajectory.

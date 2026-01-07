@@ -8,7 +8,6 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE2;
-import org.team100.lib.geometry.PathPointSE2;
 import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
@@ -96,32 +95,6 @@ public class ParameterizationTest {
         XYDataset d3 = new XYSeriesCollection(sxPrimePrime);
 
         ChartUtil.plotStacked(d1, d2, d3);
-    }
-
-    /**
-     * Show x as a function of the pose list index.
-     * The pose list has no parameter, it's just a list
-     */
-    @Test
-    void testPoses() {
-        SplineSE2 spline = new SplineSE2(
-                new WaypointSE2(
-                        new Pose2d(
-                                new Translation2d(0, 0),
-                                new Rotation2d(0)),
-                        new DirectionSE2(1, 0, 0), 1),
-                new WaypointSE2(
-                        new Pose2d(
-                                new Translation2d(1, 0),
-                                new Rotation2d(0)),
-                        new DirectionSE2(1, 0, 0), 1));
-
-        PathFactorySE2 pathFactory = new PathFactorySE2(0.1, 0.02, 0.2, 0.1);
-        List<PathPointSE2> poses = pathFactory.samplesFromSplines(List.of(spline));
-
-        XYSeries sx = PathToVectorSeries.x("spline", poses);
-        XYDataset dataSet = new XYSeriesCollection(sx);
-        ChartUtil.plotStacked(dataSet);
     }
 
     @Test

@@ -6,7 +6,6 @@ import java.util.List;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.Metrics;
 import org.team100.lib.geometry.PathPointSE2;
-import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.trajectory.path.spline.SplineSE2;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -34,10 +33,10 @@ public class PathFactorySE2 {
      */
     private static final double TRAJECTORY_STEP_M = 0.1;
 
-    private final double maxNorm;
-    private final double maxDx;
-    private final double maxDy;
-    private final double maxDTheta;
+    private final double m_maxNorm;
+    private final double m_maxDx;
+    private final double m_maxDy;
+    private final double m_maxDTheta;
 
     public PathFactorySE2() {
         this(TRAJECTORY_STEP_M,
@@ -51,38 +50,14 @@ public class PathFactorySE2 {
             double maxDx,
             double maxDy,
             double maxDTheta) {
-        this.maxNorm = maxNorm;
-        this.maxDx = maxDx;
-        this.maxDy = maxDy;
-        this.maxDTheta = maxDTheta;
+        m_maxNorm = maxNorm;
+        m_maxDx = maxDx;
+        m_maxDy = maxDy;
+        m_maxDTheta = maxDTheta;
     }
 
     /**
-     * A path that passes through the waypoints and control directions.
-     */
-    public PathSE2 fromWaypoints(List<WaypointSE2> waypoints) {
-        List<SplineSE2> splines = splinesFromWaypoints(waypoints);
-        return fromSplines(splines);
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////
-    ///
-    ///
-    ///
-
-    /**
-     * Make a list of splines with the waypoints as knots.
-     */
-    private List<SplineSE2> splinesFromWaypoints(List<WaypointSE2> waypoints) {
-        List<SplineSE2> splines = new ArrayList<>(waypoints.size() - 1);
-        for (int i = 1; i < waypoints.size(); ++i) {
-            splines.add(new SplineSE2(waypoints.get(i - 1), waypoints.get(i)));
-        }
-        return splines;
-    }
-
-    /**
-     * Converts a spline into a list of PathPoint.
+     * Converts a list of SplineSE2 into a PathSE2.
      * 
      * The points are chosen so that the secant line between the points is within
      * the specified tolerance (dx, dy, dtheta) of the actual spline.
@@ -90,40 +65,23 @@ public class PathFactorySE2 {
      * The trajectory scheduler consumes these points, interpolating between them
      * with straight lines.
      */
-    List<PathPointSE2> samplesFromSpline(SplineSE2 spline) {
-        List<PathPointSE2> result = new ArrayList<>();
-        result.add(spline.sample(0.0));
-        getSegmentArc(spline, result, 0, 1);
-        return result;
-    }
-
-    /**
-     * For testing only. Do not call this directly
-     */
-    public PathSE2 fromSplines(List<? extends SplineSE2> splines) {
-        return new PathSE2(samplesFromSplines(splines));
-    }
-
-    /**
-     * For testing only. Do not call this directly
-     */
-    public List<PathPointSE2> samplesFromSplines(List<? extends SplineSE2> splines) {
+    public PathSE2 get(List<? extends SplineSE2> splines) {
         List<PathPointSE2> result = new ArrayList<>();
         if (splines.isEmpty())
-            return result;
+            return new PathSE2(result);
         result.add(splines.get(0).sample(0.0));
         for (int i = 0; i < splines.size(); i++) {
             SplineSE2 s = splines.get(i);
             if (DEBUG)
                 System.out.printf("SPLINE:\n%d\n%s\n", i, s);
-            List<PathPointSE2> samples = samplesFromSpline(s);
-            // the sample at the end of the previous spline is the same as the one for the
-            // beginning of the next, so don't include it twice.
-            samples.remove(0);
-            result.addAll(samples);
+            addEndpointOrBisect(s, result, 0, 1);
         }
-        return result;
+        return new PathSE2(result);
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////
+    ///
+    ///
 
     /**
      * Recursive bisection to find a series of secant lines close to the real curve,
@@ -132,7 +90,7 @@ public class PathFactorySE2 {
      * 
      * Note if the path is s-shaped, then bisection can find the middle :-)
      */
-    private void getSegmentArc(
+    void addEndpointOrBisect(
             SplineSE2 spline,
             List<PathPointSE2> rv,
             double s0,
@@ -159,15 +117,15 @@ public class PathFactorySE2 {
         // note the extra conditions to avoid points too far apart.
         // checks both translational and l2 norms
         // also checks change in course
-        if (Math.abs(error.getTranslation().getX()) > maxDx
-                || Math.abs(error.getTranslation().getY()) > maxDy
-                || Math.abs(error.getRotation().getRadians()) > maxDTheta
-                || Metrics.translationalNorm(twist_full) > maxNorm
-                || Metrics.l2Norm(twist_full) > maxNorm
-                || Metrics.l2Norm(p2t) > maxNorm) {
+        if (Math.abs(error.getTranslation().getX()) > m_maxDx
+                || Math.abs(error.getTranslation().getY()) > m_maxDy
+                || Math.abs(error.getRotation().getRadians()) > m_maxDTheta
+                || Metrics.translationalNorm(twist_full) > m_maxNorm
+                || Metrics.l2Norm(twist_full) > m_maxNorm
+                || Metrics.l2Norm(p2t) > m_maxNorm) {
             // add a point in between
-            getSegmentArc(spline, rv, s0, shalf);
-            getSegmentArc(spline, rv, shalf, s1);
+            addEndpointOrBisect(spline, rv, s0, shalf);
+            addEndpointOrBisect(spline, rv, shalf, s1);
         } else {
             // midpoint is close enough, so add the endpoint
             rv.add(spline.sample(s1));

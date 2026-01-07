@@ -1,10 +1,8 @@
 package org.team100.lib.geometry;
 
-import org.team100.lib.trajectory.path.spline.SplineSE2;
 import org.team100.lib.trajectory.path.spline.SplineSE3;
 import org.team100.lib.util.Math100;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.numbers.N3;
 

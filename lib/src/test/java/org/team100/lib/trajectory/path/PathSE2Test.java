@@ -3,7 +3,6 @@ package org.team100.lib.trajectory.path;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -11,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.PathPointSE2;
 import org.team100.lib.geometry.WaypointSE2;
-import org.team100.lib.trajectory.path.spline.SplineSE2;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -42,13 +40,7 @@ class PathSE2Test {
                             new Pose2d(60, 12, new Rotation2d(Math.toRadians(90))), 0, 1.2),
                     0, 0));
 
-    @Test
-    void testEmpty() {
-        List<SplineSE2> splines = new ArrayList<>();
-        PathFactorySE2 pathFactory = new PathFactorySE2(0.1, 0.1, 0.1, 0.1);
-        PathSE2 path = pathFactory.fromSplines(splines);
-        assertEquals(0, path.length(), 0.001);
-    }
+
 
     @Test
     void testConstruction() {

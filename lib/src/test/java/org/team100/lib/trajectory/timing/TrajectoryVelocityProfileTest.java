@@ -1,11 +1,9 @@
 package org.team100.lib.trajectory.timing;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.geometry.PathPointSE2;
 import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
@@ -16,6 +14,8 @@ import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.TrajectorySE2;
 import org.team100.lib.trajectory.path.PathFactorySE2;
 import org.team100.lib.trajectory.path.PathSE2;
+import org.team100.lib.trajectory.path.spline.SplineFactorySE2;
+import org.team100.lib.trajectory.path.spline.SplineSE2;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -30,17 +30,14 @@ public class TrajectoryVelocityProfileTest implements Timeless {
     private static final LoggerFactory logger = new TestLoggerFactory(new TestPrimitiveLogger());
 
     // A five-meter straight line.
-    private static final PathPointSE2[] WAYPOINTS = new PathPointSE2[] {
-            new PathPointSE2(WaypointSE2.irrotational(
-                    new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2), 0, 0),
-            new PathPointSE2(WaypointSE2.irrotational(
-                    new Pose2d(2.5, 0, new Rotation2d(0)), 0, 1.2), 0, 0),
-            new PathPointSE2(WaypointSE2.irrotational(
-                    new Pose2d(5, 0, new Rotation2d(0)), 0, 1.2), 0, 0) };
+    static WaypointSE2 w0 = WaypointSE2.irrotational(new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2);
+    static WaypointSE2 w1 = WaypointSE2.irrotational(new Pose2d(2.5, 0, new Rotation2d(0)), 0, 1.2);
+    static WaypointSE2 w2 = WaypointSE2.irrotational(new Pose2d(5, 0, new Rotation2d(0)), 0, 1.2);
+    private static final List<WaypointSE2> waypoints = List.of(w0, w1, w2);
+    static List<SplineSE2> splines = SplineFactorySE2.splinesFromWaypoints(waypoints);
 
-    private static List<WaypointSE2> waypointList = Arrays.asList(WAYPOINTS).stream().map(p -> p.waypoint()).toList();
     private static PathFactorySE2 pathFactory = new PathFactorySE2(0.1, 0.1, 0.1, 0.1);
-    private static PathSE2 path = pathFactory.fromWaypoints(waypointList);
+    private static PathSE2 path = pathFactory.get(splines);
 
     /**
      * Default max accel and velocity makes a very fast triangle profile.

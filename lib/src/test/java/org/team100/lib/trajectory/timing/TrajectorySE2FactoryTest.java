@@ -22,6 +22,8 @@ import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.trajectory.TrajectorySE2;
 import org.team100.lib.trajectory.path.PathFactorySE2;
 import org.team100.lib.trajectory.path.PathSE2;
+import org.team100.lib.trajectory.path.spline.SplineFactorySE2;
+import org.team100.lib.trajectory.path.spline.SplineSE2;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -250,6 +252,7 @@ public class TrajectorySE2FactoryTest {
      */
     @Test
     void testPerformance() {
+
         List<WaypointSE2> waypoints = List.of(
                 new WaypointSE2(
                         new Pose2d(
@@ -261,23 +264,28 @@ public class TrajectorySE2FactoryTest {
                                 new Translation2d(1, 1),
                                 new Rotation2d()),
                         new DirectionSE2(0, 1, 0), 1.2));
+        List<SplineSE2> splines = SplineFactorySE2.splinesFromWaypoints(waypoints);
+
+        PathFactorySE2 pathFactory = new PathFactorySE2(0.1, 0.05, 0.05, 0.2);
+        PathSE2 path = pathFactory.get(splines);
+
+        TrajectorySE2 trajectory = new TrajectorySE2();
+        TrajectorySE2Factory m_trajectoryFactory = new TrajectorySE2Factory(new ArrayList<>());
+
         long startTimeNs = System.nanoTime();
         final int iterations = 100;
-        PathFactorySE2 pathFactory = new PathFactorySE2(0.1, 0.05, 0.05, 0.2);
-        PathSE2 path = pathFactory.fromWaypoints(waypoints);
-        TrajectorySE2 t = new TrajectorySE2();
-        TrajectorySE2Factory m_trajectoryFactory = new TrajectorySE2Factory(new ArrayList<>());
         for (int i = 0; i < iterations; ++i) {
-            t = m_trajectoryFactory.fromPath(path, 0, 0);
+            trajectory = m_trajectoryFactory.fromPath(path, 0, 0);
         }
         long endTimeNs = System.nanoTime();
+
         double totalDurationMs = (endTimeNs - startTimeNs) / 1000000.0;
         if (DEBUG) {
             System.out.printf("total duration ms: %5.3f\n", totalDurationMs);
             System.out.printf("duration per iteration ms: %5.3f\n", totalDurationMs / iterations);
         }
-        assertEquals(33, t.length());
-        TimedStateSE2 p = t.getPoint(12);
+        assertEquals(33, trajectory.length());
+        TimedStateSE2 p = trajectory.getPoint(12);
         assertEquals(0.605, p.point().waypoint().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.point().getHeadingRateRad_M(), DELTA);
 

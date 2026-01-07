@@ -458,30 +458,22 @@ class SplineSE2Test implements Timeless {
 
         // this goes straight ahead to (1,0)
         // derivatives point straight ahead
-        SplineSE2 s0 = new SplineSE2(
-                new WaypointSE2(
-                        new Pose2d(
-                                new Translation2d(0, 0),
-                                Rotation2d.kZero),
-                        new DirectionSE2(1, 0, 0), 1),
-                new WaypointSE2(
-                        new Pose2d(
-                                new Translation2d(1, 0),
-                                Rotation2d.kZero),
-                        new DirectionSE2(1, 0, 0), 1));
+        WaypointSE2 w0 = new WaypointSE2(
+                new Pose2d(new Translation2d(0, 0), Rotation2d.kZero),
+                new DirectionSE2(1, 0, 0), 1);
+        WaypointSE2 w1 = new WaypointSE2(
+                new Pose2d(new Translation2d(1, 0), Rotation2d.kZero),
+                new DirectionSE2(1, 0, 0), 1);
+        SplineSE2 s0 = new SplineSE2(w0, w1);
         // this is a sharp turn to the left
         // derivatives point to the left
-        SplineSE2 s1 = new SplineSE2(
-                new WaypointSE2(
-                        new Pose2d(
-                                new Translation2d(1, 0),
-                                Rotation2d.kZero),
-                        new DirectionSE2(0, 1, 0), 1),
-                new WaypointSE2(
-                        new Pose2d(
-                                new Translation2d(1, 1),
-                                Rotation2d.kZero),
-                        new DirectionSE2(0, 1, 0), 1));
+        WaypointSE2 w2 = new WaypointSE2(
+                new Pose2d(new Translation2d(1, 0), Rotation2d.kZero),
+                new DirectionSE2(0, 1, 0), 1);
+        WaypointSE2 w3 = new WaypointSE2(
+                new Pose2d(new Translation2d(1, 1), Rotation2d.kZero),
+                new DirectionSE2(0, 1, 0), 1);
+        SplineSE2 s1 = new SplineSE2(w2, w3);
         List<SplineSE2> splines = new ArrayList<>();
         splines.add(s0);
         splines.add(s1);
@@ -495,7 +487,7 @@ class SplineSE2Test implements Timeless {
         }
 
         PathFactorySE2 pathFactory = new PathFactorySE2(0.1, 0.05, 0.05, 0.05);
-        PathSE2 path = pathFactory.fromSplines(splines);
+        PathSE2 path = pathFactory.get(splines);
         if (DEBUG)
             System.out.printf("path %s\n", path);
         List<TimingConstraint> constraints = List.of(new ConstantConstraint(logger, 1, 1));
@@ -536,14 +528,14 @@ class SplineSE2Test implements Timeless {
         ChartUtil.plotOverlay(series, 100);
 
         PathFactorySE2 pathFactory = new PathFactorySE2(0.1, 0.05, 0.05, 0.05);
-        List<PathPointSE2> motion = pathFactory.samplesFromSplines(splines);
+        PathSE2 path = pathFactory.get(splines);
         if (DEBUG) {
-            for (PathPointSE2 p : motion) {
+            for (int i = 0; i < path.length(); ++i) {
+                PathPointSE2 p = path.getPoint(i);
                 System.out.printf("%5.3f %5.3f\n", p.waypoint().pose().getTranslation().getX(),
                         p.waypoint().pose().getTranslation().getY());
             }
         }
-        PathSE2 path = new PathSE2(motion);
         if (DEBUG) {
             for (int i = 0; i < path.length(); ++i) {
                 System.out.printf("%5.3f %5.3f\n",

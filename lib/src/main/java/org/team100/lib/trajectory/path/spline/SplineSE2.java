@@ -142,7 +142,7 @@ public class SplineSE2 {
         return m_y.getVelocity(s);
     }
 
-    private double dheading(double s) {
+    double dheading(double s) {
         return m_heading.getVelocity(s);
     }
 
@@ -162,8 +162,8 @@ public class SplineSE2 {
         return Math.hypot(dx, dy);
     }
 
-    /** Heading angular velocity with respect to s. */
-    private double headingRate(double s) {
+    /** Heading angular velocity with respect to translatoin. */
+    double headingRate(double s) {
         double dheading = dheading(s);
         double v = pprimeTranslationNorm(s);
         return dheading / v;
@@ -179,6 +179,10 @@ public class SplineSE2 {
 
     private double ddy(double s) {
         return m_y.getAcceleration(s);
+    }
+
+    double ddheading(double s) {
+        return m_heading.getAcceleration(s);
     }
 
     /**
@@ -203,14 +207,14 @@ public class SplineSE2 {
     /**
      * dr/ds, derivative of position with respect to parameter, s
      */
-    private Vector<N2> rprime(double s) {
+    Vector<N2> rprime(double s) {
         return VecBuilder.fill(dx(s), dy(s));
     }
 
     /**
      * d^2r/ds^2, second derivative of position with respect to parameter, s
      */
-    private Vector<N2> rprimeprime(double s) {
+    Vector<N2> rprimeprime(double s) {
         return VecBuilder.fill(ddx(s), ddy(s));
     }
 

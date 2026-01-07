@@ -16,6 +16,7 @@ import org.jfree.chart.renderer.xy.StandardXYItemRenderer;
 import org.jfree.chart.renderer.xy.VectorRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.Range;
+import org.jfree.data.xy.Vector;
 import org.jfree.data.xy.VectorSeries;
 import org.jfree.data.xy.VectorSeriesCollection;
 import org.jfree.data.xy.XYDataset;
@@ -24,15 +25,38 @@ public class ChartUtil {
     public static final boolean SHOW = false;
     public static final int SIZE = 500;
 
-    public static Range yRange(XYDataset dataset) {
+    public static Range xRange(VectorSeriesCollection dataset) {
+        double max = Double.NEGATIVE_INFINITY;
+        double min = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < dataset.getItemCount(0); ++i) {
+            double x = dataset.getXValue(0, i);
+            Vector v = dataset.getVector(0, i);
+            if (x + 0.1 > max)
+                max = x + 0.1;
+            if (x + v.getX() + 0.1 > max)
+                max = x + v.getX() + 0.1;
+            if (x - 0.1 < min)
+                min = x - 0.1;
+            if (x + v.getX() - 0.1 < min)
+                min = x + v.getX() - 0.1;
+        }
+        return new Range(min, max);
+    }
+
+    public static Range yRange(VectorSeriesCollection dataset) {
         double max = Double.NEGATIVE_INFINITY;
         double min = Double.POSITIVE_INFINITY;
         for (int i = 0; i < dataset.getItemCount(0); ++i) {
             double y = dataset.getYValue(0, i);
+            Vector v = dataset.getVector(0, i);
             if (y + 0.1 > max)
                 max = y + 0.1;
+            if (y + v.getY() + 0.1 > max)
+                max = y + v.getY() + 0.1;
             if (y - 0.1 < min)
                 min = y - 0.1;
+            if (y + v.getY() - 0.1 < min)
+                min = y + v.getY() - 0.1;
         }
         return new Range(min, max);
     }
@@ -46,6 +70,19 @@ public class ChartUtil {
                 max = x + 0.1;
             if (x - 0.1 < min)
                 min = x - 0.1;
+        }
+        return new Range(min, max);
+    }
+
+    public static Range yRange(XYDataset dataset) {
+        double max = Double.NEGATIVE_INFINITY;
+        double min = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < dataset.getItemCount(0); ++i) {
+            double y = dataset.getYValue(0, i);
+            if (y + 0.1 > max)
+                max = y + 0.1;
+            if (y - 0.1 < min)
+                min = y - 0.1;
         }
         return new Range(min, max);
     }

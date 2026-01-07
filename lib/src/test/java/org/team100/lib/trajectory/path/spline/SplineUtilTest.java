@@ -1,0 +1,111 @@
+package org.team100.lib.trajectory.path.spline;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
+
+import org.jfree.data.xy.VectorSeries;
+import org.junit.jupiter.api.Test;
+import org.team100.lib.geometry.DirectionSE2;
+import org.team100.lib.geometry.WaypointSE2;
+import org.team100.lib.util.ChartUtil;
+import org.team100.lib.util.StrUtil;
+
+import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.numbers.N2;
+
+public class SplineUtilTest {
+    private static final double DELTA = 0.001;
+
+    /**
+     * We commonly want to draw the toolpoint path but actuate the mechanism path,
+     * which is offset. If the offset is a pure rotation, then the path schedule can
+     * be the same, but if the offset includes translation (e.g. for an extended
+     * arm) then the mechanism (drivetrain) path is different, and needs to be
+     * scheduled differently.
+     * 
+     * The curvature of the offset path is easy to compute from the derivatives of
+     * the toolpoint path and the derivatives of the offset. Remember the offset
+     * varies due to the rotation of the toolpoint, which is otherwise not included
+     * in the curvature calculation.
+     * 
+     * An offset might have fixed length, or the length might vary, e.g. if an arm
+     * is extended during the spline motion.
+     */
+    @Test
+    void testOffset() {
+        // toolpoint goes in a straight line but with rotation
+        // so the offset (shown here with the vector) makes a quarter cyloid
+        // velocity is +x the whole time
+        // heading rate is -1 the whole time
+        SplineSE2 toolpoint = new SplineSE2(
+                new WaypointSE2(
+                        new Pose2d(
+                                new Translation2d(),
+                                new Rotation2d(Math.PI / 2)),
+                        new DirectionSE2(1, 0, -1), 1),
+                new WaypointSE2(
+                        new Pose2d(
+                                new Translation2d(Math.PI / 2, 0),
+                                new Rotation2d(0)),
+                        new DirectionSE2(1, 0, -1), 1));
+
+        // the toolpoint path has no curvature
+        for (double s = 0; s <= 1; s += 0.1) {
+            assertEquals(0, toolpoint.sample(s).getCurvatureRad_M(), DELTA);
+        }
+        double l = 1.0;
+
+        // initial offset is -y
+        Vector<N2> or0 = SplineUtil.offsetR(toolpoint, l, 0);
+        assertEquals(0, or0.get(0), DELTA);
+        assertEquals(-1, or0.get(1), DELTA);
+        // offset itself is rotating like heading (-theta)
+        // though this is not the net motion of the offset endpoint
+        Vector<N2> orp0 = SplineUtil.offsetRprime(toolpoint, l, 0);
+        assertEquals(-1.111, orp0.get(0), DELTA);
+        assertEquals(0, orp0.get(1), DELTA);
+
+        SplineSE2ToVectorSeries splineConverter = new SplineSE2ToVectorSeries(0.1);
+        List<VectorSeries> series = splineConverter.convert(List.of(toolpoint));
+
+        VectorSeries v = new VectorSeries("endpoints");
+        VectorSeries a = new VectorSeries("endpoints");
+        for (double s = 0; s < 1.001; s += 0.05) {
+            Vector<N2> p = SplineUtil.offsetR(toolpoint, l, s);
+            Vector<N2> pprime = SplineUtil.offsetRprime(toolpoint, l, s);
+            Vector<N2> pprimeprime = SplineUtil.offsetRprimeprime(toolpoint, l, s);
+            Vector<N2> rprime = toolpoint.rprime(s);
+            Vector<N2> rprimeprime = toolpoint.rprimeprime(s);
+            // System.out.printf("s %f pprime %s rprime %s\n", s, StrUtil.vecStr(pprime),
+            // StrUtil.vecStr(rprime));
+            // System.out.printf("s %f p'' %s r'' %s\n", s,
+            // StrUtil.vecStr(pprimeprime), StrUtil.vecStr(rprimeprime));
+            double dx = pprime.get(0) + rprime.get(0);
+            double dy = pprime.get(1) + rprime.get(1);
+            v.add(p.get(0), p.get(1), dx * 0.05, dy * 0.05);
+            double ax = pprimeprime.get(0) + rprimeprime.get(0);
+            double ay = pprimeprime.get(1) + rprimeprime.get(1);
+            a.add(p.get(0), p.get(1), ax * 0.05, ay * 0.05);
+        }
+        series.add(v);
+        series.add(a);
+
+        ChartUtil.plotOverlay(series, 500);
+    }
+
+    @Test
+    void testTransform() {
+        // Pose2d.transformBy() applies the transform in the pose frame.
+        Pose2d p = new Pose2d(0, 0, Rotation2d.kCCW_Pi_2);
+        Pose2d p2 = p.transformBy(new Transform2d(1, 0, new Rotation2d()));
+        assertEquals(0, p2.getX(), DELTA);
+        assertEquals(1, p2.getY(), DELTA);
+        assertEquals(Rotation2d.kCCW_Pi_2.getRadians(), p2.getRotation().getRadians(), DELTA);
+    }
+
+}

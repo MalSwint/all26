@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.AccelerationSE2;
-import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.geometry.VelocitySE2;
+import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -17,10 +17,11 @@ import org.team100.lib.subsystems.prr.JointAccelerations;
 import org.team100.lib.subsystems.prr.JointVelocities;
 import org.team100.lib.trajectory.TrajectorySE2;
 import org.team100.lib.trajectory.TrajectorySE2Planner;
-import org.team100.lib.trajectory.path.PathFactorySE2;
+import org.team100.lib.trajectory.path.PathSE2Factory;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
-import org.team100.lib.trajectory.timing.TrajectorySE2Factory;
+import org.team100.lib.trajectory.timing.TimedStateSE2;
 import org.team100.lib.trajectory.timing.TimingConstraint;
+import org.team100.lib.trajectory.timing.TrajectorySE2Factory;
 import org.team100.lib.trajectory.timing.YawRateConstraint;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -50,7 +51,7 @@ public class TrajectoryJointTest {
                 new ConstantConstraint(log, 1, 1),
                 new YawRateConstraint(log, 1, 1));
         TrajectorySE2Factory trajectoryFactory = new TrajectorySE2Factory(c);
-        PathFactorySE2 pathFactory = new PathFactorySE2();
+        PathSE2Factory pathFactory = new PathSE2Factory();
         TrajectorySE2Planner m_planner = new TrajectorySE2Planner(pathFactory, trajectoryFactory);
 
         TrajectorySE2 t = m_planner.restToRest(List.of(
@@ -67,7 +68,9 @@ public class TrajectoryJointTest {
                     .println(
                             "t, x, y, r, vx, vy, vr, ax, ay, ar, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
         for (double tt = 0; tt < t.duration(); tt += 0.02) {
-            ControlSE2 m = ControlSE2.fromTimedState(t.sample(tt));
+            TimedStateSE2 sample = t.sample(tt);
+            ControlSE2 m = ControlSE2.fromMovingPathSE2Point(
+                    sample.point(), sample.velocityM_S(), sample.acceleration());
             Pose2d p = m.pose();
             VelocitySE2 v = m.velocity();
             AccelerationSE2 a = m.acceleration();

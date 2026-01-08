@@ -14,7 +14,7 @@ import org.team100.lib.subsystems.se2.MockSubsystemSE2;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.TrajectorySE2;
 import org.team100.lib.trajectory.TrajectorySE2Planner;
-import org.team100.lib.trajectory.path.PathFactorySE2;
+import org.team100.lib.trajectory.path.PathSE2Factory;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TrajectorySE2Factory;
@@ -41,7 +41,7 @@ public class DriveWithTrajectoryFunctionTest implements Timeless {
     List<TimingConstraint> constraints = List.of(
             new ConstantConstraint(log, 2, 2),
             new YawRateConstraint(log, 1, 1));
-    PathFactorySE2 pathFactory = new PathFactorySE2();
+    PathSE2Factory pathFactory = new PathSE2Factory();
     TrajectorySE2Factory trajectoryFactory = new TrajectorySE2Factory(constraints);
     TrajectorySE2Planner planner = new TrajectorySE2Planner(pathFactory, trajectoryFactory);
 

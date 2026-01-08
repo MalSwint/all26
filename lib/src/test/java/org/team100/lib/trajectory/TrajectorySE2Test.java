@@ -14,7 +14,7 @@ import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.testing.Timeless;
-import org.team100.lib.trajectory.path.PathFactorySE2;
+import org.team100.lib.trajectory.path.PathSE2Factory;
 import org.team100.lib.trajectory.path.PathSE2;
 import org.team100.lib.trajectory.path.spline.SplineFactorySE2;
 import org.team100.lib.trajectory.path.spline.SplineSE2;
@@ -50,7 +50,7 @@ class TrajectorySE2Test implements Timeless {
 
         List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
         TrajectorySE2Factory trajectoryFactory = new TrajectorySE2Factory(constraints);
-        PathFactorySE2 pathFactory = new PathFactorySE2();
+        PathSE2Factory pathFactory = new PathSE2Factory();
         TrajectorySE2Planner planner = new TrajectorySE2Planner(pathFactory, trajectoryFactory);
 
         TrajectorySE2 trajectory = planner.restToRest(waypoints);
@@ -84,7 +84,7 @@ class TrajectorySE2Test implements Timeless {
 
         List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
         TrajectorySE2Factory trajectoryFactory = new TrajectorySE2Factory(constraints);
-        PathFactorySE2 pathFactory = new PathFactorySE2();
+        PathSE2Factory pathFactory = new PathSE2Factory();
         TrajectorySE2Planner planner = new TrajectorySE2Planner(pathFactory, trajectoryFactory);
 
         TrajectorySE2 trajectory = planner.restToRest(waypoints);
@@ -120,7 +120,7 @@ class TrajectorySE2Test implements Timeless {
         SwerveKinodynamics limits = SwerveKinodynamicsFactory.forTest3(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(limits).fast(logger);
         TrajectorySE2Factory trajectoryFactory = new TrajectorySE2Factory(constraints);
-        PathFactorySE2 pathFactory = new PathFactorySE2();
+        PathSE2Factory pathFactory = new PathSE2Factory();
         TrajectorySE2Planner planner = new TrajectorySE2Planner(pathFactory, trajectoryFactory);
 
         TrajectorySE2 trajectory = planner.restToRest(waypoints);
@@ -195,7 +195,7 @@ class TrajectorySE2Test implements Timeless {
 
         // INTERPOLATE SPLINE POINTS (170 ns)
 
-        PathFactorySE2 pathFactory = new PathFactorySE2(0.1, 0.02, 0.2, 0.1);
+        PathSE2Factory pathFactory = new PathSE2Factory(0.1, 0.02, 0.2, 0.1);
         PathSE2 path = pathFactory.get(splines);
         assertEquals(22.734, path.getMaxDistance(), 0.001);
 

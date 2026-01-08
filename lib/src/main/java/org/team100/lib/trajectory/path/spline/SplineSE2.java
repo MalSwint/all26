@@ -3,8 +3,9 @@ package org.team100.lib.trajectory.path.spline;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.Metrics;
 import org.team100.lib.geometry.WaypointSE2;
-import org.team100.lib.trajectory.path.PathEntrySE2;
-import org.team100.lib.trajectory.path.PathPointSE2;
+import org.team100.lib.trajectory.path.PathSE2Entry;
+import org.team100.lib.trajectory.path.PathSE2Point;
+import org.team100.lib.trajectory.path.PathSE2Parameter;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
@@ -104,19 +105,25 @@ public class SplineSE2 {
      * 
      * @param s [0,1]
      */
-    public PathPointSE2 sample(double s) {
-        Pose2d pose = new Pose2d(new Translation2d(x(s), y(s)), heading(s));
-        DirectionSE2 course = course(s);
-        WaypointSE2 waypoint = new WaypointSE2(pose, course, 1);
-        return new PathPointSE2(
-                waypoint,
-                this, s,
+    public PathSE2Point sample(double s) {
+        return new PathSE2Point(
+                waypoint(s),
                 headingRate(s),
                 curvature(s));
     }
 
-    public PathEntrySE2 entry(double s) {
-        return new PathEntrySE2(new PathEntrySE2.Parameter(this, s), sample(s));
+    public WaypointSE2 waypoint(double s) {
+        Pose2d pose = pose(s);
+        DirectionSE2 course = course(s);
+        return new WaypointSE2(pose, course, 1);
+    }
+
+    public Pose2d pose(double s) {
+        return new Pose2d(new Translation2d(x(s), y(s)), heading(s));
+    }
+
+    public PathSE2Entry entry(double s) {
+        return new PathSE2Entry(new PathSE2Parameter(this, s), sample(s));
     }
 
     ////////////////////////////////////////////////////////////

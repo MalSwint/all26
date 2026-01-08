@@ -12,7 +12,7 @@ import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.TrajectorySE2;
-import org.team100.lib.trajectory.path.PathFactorySE2;
+import org.team100.lib.trajectory.path.PathSE2Factory;
 import org.team100.lib.trajectory.path.PathSE2;
 import org.team100.lib.trajectory.path.spline.SplineFactorySE2;
 import org.team100.lib.trajectory.path.spline.SplineSE2;
@@ -36,7 +36,7 @@ public class TrajectoryVelocityProfileTest implements Timeless {
     private static final List<WaypointSE2> waypoints = List.of(w0, w1, w2);
     static List<SplineSE2> splines = SplineFactorySE2.splinesFromWaypoints(waypoints);
 
-    private static PathFactorySE2 pathFactory = new PathFactorySE2(0.1, 0.1, 0.1, 0.1);
+    private static PathSE2Factory pathFactory = new PathSE2Factory(0.1, 0.1, 0.1, 0.1);
     private static PathSE2 path = pathFactory.get(splines);
 
     /**

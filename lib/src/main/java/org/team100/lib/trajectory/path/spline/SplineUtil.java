@@ -1,7 +1,7 @@
 package org.team100.lib.trajectory.path.spline;
 
 import org.team100.lib.geometry.WaypointSE2;
-import org.team100.lib.trajectory.path.PathPointSE2;
+import org.team100.lib.trajectory.path.PathSE2Point;
 
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.VecBuilder;
@@ -18,7 +18,7 @@ public class SplineUtil {
      * The offset is a fixed length behind the toolpoint.
      */
     public static Vector<N2> offsetR(SplineSE2 spline, double l, double s) {
-        PathPointSE2 sample = spline.entry(s).point();
+        PathSE2Point sample = spline.entry(s).point();
         WaypointSE2 waypoint = sample.waypoint();
         Pose2d pose = waypoint.pose();
         // negative length here because the offset is "behind" the toolpoint.
@@ -33,7 +33,7 @@ public class SplineUtil {
      * heading rate.
      */
     public static Vector<N2> offsetRprime(SplineSE2 spline, double l, double s) {
-        PathPointSE2 sample = spline.entry(s).point();
+        PathSE2Point sample = spline.entry(s).point();
         WaypointSE2 waypoint = sample.waypoint();
         Pose2d pose = waypoint.pose();
         Rotation2d radial = pose.getRotation().plus(Rotation2d.k180deg);
@@ -51,7 +51,7 @@ public class SplineUtil {
      * The offset point acceleration has two components: tangential and centripetal.
      */
     public static Vector<N2> offsetRprimeprime(SplineSE2 spline, double l, double s) {
-        PathPointSE2 sample = spline.entry(s).point();
+        PathSE2Point sample = spline.entry(s).point();
         WaypointSE2 waypoint = sample.waypoint();
         Pose2d pose = waypoint.pose();
         Rotation2d radial = pose.getRotation().plus(Rotation2d.k180deg);

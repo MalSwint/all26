@@ -20,8 +20,8 @@ import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.TrajectorySE2;
 import org.team100.lib.trajectory.TrajectorySE2ToVectorSeries;
-import org.team100.lib.trajectory.path.PathFactorySE2;
-import org.team100.lib.trajectory.path.PathPointSE2;
+import org.team100.lib.trajectory.path.PathSE2Factory;
+import org.team100.lib.trajectory.path.PathSE2Point;
 import org.team100.lib.trajectory.path.PathSE2;
 import org.team100.lib.trajectory.timing.CapsizeAccelerationConstraint;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
@@ -100,7 +100,7 @@ class SplineSE2Test implements Timeless {
         assertEquals(0, t.getX(), DELTA);
         t = s.entry(1).point().waypoint().pose().getTranslation();
         assertEquals(1, t.getX(), DELTA);
-        PathPointSE2 p = s.entry(0).point();
+        PathSE2Point p = s.entry(0).point();
         assertEquals(0, p.waypoint().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.waypoint().pose().getRotation().getRadians(), DELTA);
         assertEquals(0, p.getHeadingRateRad_M(), DELTA);
@@ -132,7 +132,7 @@ class SplineSE2Test implements Timeless {
         assertEquals(0, t.getX(), DELTA);
         t = s.entry(1).point().waypoint().pose().getTranslation();
         assertEquals(2, t.getX(), DELTA);
-        PathPointSE2 p = s.entry(0).point();
+        PathSE2Point p = s.entry(0).point();
         assertEquals(0, p.waypoint().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.waypoint().pose().getRotation().getRadians(), DELTA);
         assertEquals(0, p.getHeadingRateRad_M(), DELTA);
@@ -170,7 +170,7 @@ class SplineSE2Test implements Timeless {
         t = s.entry(1).point().waypoint().pose().getTranslation();
         assertEquals(1, t.getX(), DELTA);
 
-        PathPointSE2 p = s.entry(0).point();
+        PathSE2Point p = s.entry(0).point();
         assertEquals(0, p.waypoint().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.waypoint().pose().getRotation().getRadians(), DELTA);
         // initial rotation rate is zero
@@ -219,7 +219,7 @@ class SplineSE2Test implements Timeless {
         t = s.entry(1).point().waypoint().pose().getTranslation();
         assertEquals(1, t.getX(), DELTA);
 
-        PathPointSE2 p = s.entry(0).point();
+        PathSE2Point p = s.entry(0).point();
         assertEquals(0, p.waypoint().pose().getTranslation().getX(), DELTA);
         assertEquals(0, p.waypoint().pose().getRotation().getRadians(), DELTA);
         assertEquals(1, p.getHeadingRateRad_M(), DELTA);
@@ -317,12 +317,12 @@ class SplineSE2Test implements Timeless {
                 new Pose2d(new Translation2d(0, 1), Rotation2d.kCW_90deg),
                 new DirectionSE2(-1, 0, 1), scale);
         SplineSE2 spline = new SplineSE2(w0, w1);
-        PathPointSE2 p0 = spline.entry(0.0).point();
+        PathSE2Point p0 = spline.entry(0.0).point();
         if (DEBUG)
             System.out.println(
                     "s, p0_heading_rate, p0_curvature, distance, post_hoc_heading_rate, post_hoc_curvature, post_hoc_heading_rate2, post_hoc_curvature2");
         for (double s = 0.01; s <= 1.0; s += 0.01) {
-            PathPointSE2 p1 = spline.entry(s).point();
+            PathSE2Point p1 = spline.entry(s).point();
             double cartesianDistance = p1.distanceCartesian(p0);
             Rotation2d heading0 = p0.waypoint().pose().getRotation();
             Rotation2d heading1 = p1.waypoint().pose().getRotation();
@@ -486,7 +486,7 @@ class SplineSE2Test implements Timeless {
                 System.out.printf("spline %s\n", s);
         }
 
-        PathFactorySE2 pathFactory = new PathFactorySE2(0.1, 0.05, 0.05, 0.05);
+        PathSE2Factory pathFactory = new PathSE2Factory(0.1, 0.05, 0.05, 0.05);
         PathSE2 path = pathFactory.get(splines);
         if (DEBUG)
             System.out.printf("path %s\n", path);
@@ -527,11 +527,11 @@ class SplineSE2Test implements Timeless {
         List<VectorSeries> series = splineConverter.convert(splines);
         ChartUtil.plotOverlay(series, 100);
 
-        PathFactorySE2 pathFactory = new PathFactorySE2(0.1, 0.05, 0.05, 0.05);
+        PathSE2Factory pathFactory = new PathSE2Factory(0.1, 0.05, 0.05, 0.05);
         PathSE2 path = pathFactory.get(splines);
         if (DEBUG) {
             for (int i = 0; i < path.length(); ++i) {
-                PathPointSE2 p = path.getPoint(i);
+                PathSE2Point p = path.getEntry(i).point();
                 System.out.printf("%5.3f %5.3f\n", p.waypoint().pose().getTranslation().getX(),
                         p.waypoint().pose().getTranslation().getY());
             }
@@ -539,8 +539,8 @@ class SplineSE2Test implements Timeless {
         if (DEBUG) {
             for (int i = 0; i < path.length(); ++i) {
                 System.out.printf("%5.3f %5.3f\n",
-                        path.getPoint(i).waypoint().pose().getTranslation().getX(),
-                        path.getPoint(i).waypoint().pose().getTranslation().getY());
+                        path.getEntry(i).point().waypoint().pose().getTranslation().getX(),
+                        path.getEntry(i).point().waypoint().pose().getTranslation().getY());
             }
         }
 

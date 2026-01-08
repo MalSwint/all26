@@ -1,6 +1,6 @@
 package org.team100.lib.trajectory.timing;
 
-import org.team100.lib.trajectory.path.PathPointSE2;
+import org.team100.lib.trajectory.path.PathSE2Point;
 
 /**
  * Timing constraints govern the assignment of a schedule to a path, creating a
@@ -20,19 +20,19 @@ public interface TimingConstraint {
      * 
      * Always positive.
      */
-    double maxV(PathPointSE2 state);
+    double maxV(PathSE2Point state);
 
     /**
      * Maximum allowed pathwise acceleration, m/s^2.
      * 
      * Always positive.
      */
-    double maxAccel(PathPointSE2 state, double velocityM_S);
+    double maxAccel(PathSE2Point state, double velocityM_S);
 
     /**
      * Maximum allowed pathwise deceleration, m/s^2.
      * 
      * Always negative.
      */
-    double maxDecel(PathPointSE2 state, double velocityM_S);
+    double maxDecel(PathSE2Point state, double velocityM_S);
 }

@@ -9,7 +9,7 @@ import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
-import org.team100.lib.trajectory.path.PathPointSE2;
+import org.team100.lib.trajectory.path.PathSE2Point;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,14 +24,14 @@ class SwerveDriveDynamicsConstraintTest {
         SwerveDriveDynamicsConstraint c = new SwerveDriveDynamicsConstraint(logger, kinodynamics, 1, 1);
 
         // motionless
-        double m = c.maxV(new PathPointSE2(
+        double m = c.maxV(new PathSE2Point(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 0, 0));
         assertEquals(5, m, DELTA);
 
         // moving in +x, no curvature, no rotation
-        m = c.maxV(new PathPointSE2(
+        m = c.maxV(new PathSE2Point(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 0, 0));
@@ -39,7 +39,7 @@ class SwerveDriveDynamicsConstraintTest {
         assertEquals(5, m, DELTA);
 
         // moving in +x, 5 rad/meter
-        m = c.maxV(new PathPointSE2(
+        m = c.maxV(new PathSE2Point(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 5, 0));
@@ -51,7 +51,7 @@ class SwerveDriveDynamicsConstraintTest {
         // so radius to center is 0.25 * sqrt(2) = 0.356
         // traveling 1 m/s, there are 4 m/s available for the fastest wheel
         // which means 11.314 rad/s, and also 11.314 rad/m since we're going 1 m/s.
-        PathPointSE2 state = new PathPointSE2(
+        PathSE2Point state = new PathSE2Point(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 11.313708, 0);
@@ -69,7 +69,7 @@ class SwerveDriveDynamicsConstraintTest {
         SwerveDriveDynamicsConstraint c = new SwerveDriveDynamicsConstraint(logger, kinodynamics, 1, 1);
         // this is constant
         Pose2d p = new Pose2d(0, 0, new Rotation2d(0));
-        PathPointSE2 p2 = new PathPointSE2(
+        PathSE2Point p2 = new PathSE2Point(
                 WaypointSE2.irrotational(p, 0, 1.2), 0, 0);
         assertEquals(-20, c.maxDecel(p2, 0), DELTA);
         assertEquals(10, c.maxAccel(p2, 0), DELTA);

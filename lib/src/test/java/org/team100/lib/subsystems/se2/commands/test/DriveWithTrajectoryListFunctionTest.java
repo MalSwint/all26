@@ -21,7 +21,7 @@ import org.team100.lib.subsystems.swerve.Fixture;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.TrajectorySE2Planner;
 import org.team100.lib.trajectory.examples.TrajectoryExamples;
-import org.team100.lib.trajectory.path.PathFactorySE2;
+import org.team100.lib.trajectory.path.PathSE2Factory;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraintFactory;
 import org.team100.lib.trajectory.timing.TrajectorySE2Factory;
@@ -45,7 +45,7 @@ class DriveWithTrajectoryListFunctionTest implements Timeless {
         Fixture fixture = new Fixture();
         List<TimingConstraint> constraints = new TimingConstraintFactory(fixture.swerveKinodynamics).allGood(logger);
         TrajectorySE2Factory trajectoryFactory = new TrajectorySE2Factory(constraints);
-        PathFactorySE2 pathFactory = new PathFactorySE2();
+        PathSE2Factory pathFactory = new PathSE2Factory();
         TrajectorySE2Planner planner = new TrajectorySE2Planner(pathFactory, trajectoryFactory);
         TrajectoryExamples ex = new TrajectoryExamples(planner);
         // this initial step is required since the timebase is different?

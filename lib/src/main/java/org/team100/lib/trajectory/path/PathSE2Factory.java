@@ -3,6 +3,7 @@ package org.team100.lib.trajectory.path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.Metrics;
 import org.team100.lib.trajectory.path.spline.SplineSE2;
@@ -11,7 +12,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Twist2d;
 
-public class PathFactorySE2 {
+public class PathSE2Factory {
     private static final boolean DEBUG = false;
     /*
      * Maximum distance of the secant lines to the continuous spline. The resulting
@@ -37,14 +38,14 @@ public class PathFactorySE2 {
     private final double m_maxDy;
     private final double m_maxDTheta;
 
-    public PathFactorySE2() {
+    public PathSE2Factory() {
         this(TRAJECTORY_STEP_M,
                 SPLINE_SAMPLE_TOLERANCE_M,
                 SPLINE_SAMPLE_TOLERANCE_M,
                 SPLINE_SAMPLE_TOLERANCE_RAD);
     }
 
-    public PathFactorySE2(
+    public PathSE2Factory(
             double maxNorm,
             double maxDx,
             double maxDy,
@@ -67,7 +68,7 @@ public class PathFactorySE2 {
      * TODO: explore performance of this part, it could be faster.
      */
     public PathSE2 get(List<? extends SplineSE2> splines) {
-        List<PathEntrySE2> result = new ArrayList<>();
+        List<PathSE2Entry> result = new ArrayList<>();
         if (splines.isEmpty())
             return new PathSE2(result);
         result.add(splines.get(0).entry(0.0));
@@ -89,17 +90,18 @@ public class PathFactorySE2 {
      * and with the points closer than maxNorm to each other, measured in L2 norm
      * (i.e. x, y, heading), and also course.
      * 
-     * Note if the path is s-shaped, then bisection can find the middle :-)
+     * Note if the path is s-shaped, then bisection can find the middle, and then
+     * believe that the secant is "close" ... which is wrong. :-)
      */
     void addEndpointOrBisect(
             SplineSE2 spline,
-            List<PathEntrySE2> rv,
+            List<PathSE2Entry> rv,
             double s0,
             double s1) {
-        Pose2d p0 = spline.sample(s0).waypoint().pose();
         double shalf = (s0 + s1) / 2;
-        Pose2d phalf = spline.sample(shalf).waypoint().pose();
-        Pose2d p1 = spline.sample(s1).waypoint().pose();
+        Pose2d p0 = spline.pose(s0);
+        Pose2d phalf = spline.pose(shalf);
+        Pose2d p1 = spline.pose(s1);
 
         // twist from p0 to p1
         Twist2d twist_full = p0.log(p1);
@@ -111,9 +113,9 @@ public class PathFactorySE2 {
         Transform2d error = phalf_predicted.minus(phalf);
 
         // also prohibit large changes in direction between points
-        PathPointSE2 p20 = spline.sample(s0);
-        PathPointSE2 p21 = spline.sample(s1);
-        Twist2d p2t = p20.waypoint().course().minus(p21.waypoint().course());
+        DirectionSE2 course0 = spline.waypoint(s0).course();
+        DirectionSE2 course1 = spline.waypoint(s1).course();
+        Twist2d courseChange = course0.minus(course1);
 
         // note the extra conditions to avoid points too far apart.
         // checks both translational and l2 norms
@@ -123,7 +125,7 @@ public class PathFactorySE2 {
                 || Math.abs(error.getRotation().getRadians()) > m_maxDTheta
                 || Metrics.translationalNorm(twist_full) > m_maxNorm
                 || Metrics.l2Norm(twist_full) > m_maxNorm
-                || Metrics.l2Norm(p2t) > m_maxNorm) {
+                || Metrics.l2Norm(courseChange) > m_maxNorm) {
             // add a point in between
             addEndpointOrBisect(spline, rv, s0, shalf);
             addEndpointOrBisect(spline, rv, shalf, s1);

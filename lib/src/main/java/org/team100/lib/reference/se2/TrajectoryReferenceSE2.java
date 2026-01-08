@@ -11,6 +11,7 @@ import org.team100.lib.logging.LoggerFactory.ModelSE2Logger;
 import org.team100.lib.state.ControlSE2;
 import org.team100.lib.state.ModelSE2;
 import org.team100.lib.trajectory.TrajectorySE2;
+import org.team100.lib.trajectory.timing.TimedStateSE2;
 
 /** Produces references based on a trajectory. */
 public class TrajectoryReferenceSE2 implements ReferenceSE2 {
@@ -64,7 +65,9 @@ public class TrajectoryReferenceSE2 implements ReferenceSE2 {
 
     @Override
     public ModelSE2 goal() {
-        ModelSE2 goal = ControlSE2.fromTimedState(m_trajectory.getLastPoint()).model();
+        TimedStateSE2 lastPoint = m_trajectory.getLastPoint();
+        ModelSE2 goal = ControlSE2.fromMovingPathSE2Point(
+                lastPoint.point(), lastPoint.velocityM_S(), lastPoint.acceleration()).model();
         m_log_goal.log(() -> goal);
         return goal;
     }
@@ -78,6 +81,8 @@ public class TrajectoryReferenceSE2 implements ReferenceSE2 {
     }
 
     private ControlSE2 sample(double t) {
-        return ControlSE2.fromTimedState(m_trajectory.sample(t));
+        TimedStateSE2 sample = m_trajectory.sample(t);
+        return ControlSE2.fromMovingPathSE2Point(
+                sample.point(), sample.velocityM_S(), sample.acceleration());
     }
 }

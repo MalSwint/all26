@@ -24,7 +24,7 @@ import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.trajectory.TrajectorySE2;
 import org.team100.lib.trajectory.TrajectorySE2Planner;
 import org.team100.lib.trajectory.TrajectorySE2ToVectorSeries;
-import org.team100.lib.trajectory.path.PathFactorySE2;
+import org.team100.lib.trajectory.path.PathSE2Factory;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
 import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.trajectory.timing.TorqueConstraint;
@@ -99,7 +99,7 @@ public class TrajectoryGallery {
         // This is new
         c.add(new TorqueConstraint(20));
         TrajectorySE2Factory trajectoryFactory = new TrajectorySE2Factory(c);
-        PathFactorySE2 pathFactory = new PathFactorySE2(0.05, 0.01, 0.01, 0.1);
+        PathSE2Factory pathFactory = new PathSE2Factory(0.05, 0.01, 0.01, 0.1);
         TrajectorySE2Planner m_planner = new TrajectorySE2Planner(pathFactory, trajectoryFactory);
 
         ElevatorArmWristKinematics m_kinematics = new ElevatorArmWristKinematics(0.5, 0.343);

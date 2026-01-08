@@ -12,7 +12,7 @@ import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
-import org.team100.lib.trajectory.path.PathFactorySE2;
+import org.team100.lib.trajectory.path.PathSE2Factory;
 import org.team100.lib.trajectory.path.spline.SplineSE2;
 import org.team100.lib.trajectory.path.spline.SplineSE2ToVectorSeries;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
@@ -103,7 +103,7 @@ public class ParameterizationTest {
                 new ConstantConstraint(log, 2, 0.5),
                 new YawRateConstraint(log, 1, 1));
         TrajectorySE2Factory trajectoryFactory = new TrajectorySE2Factory(c);
-        PathFactorySE2 pathFactory = new PathFactorySE2();
+        PathSE2Factory pathFactory = new PathSE2Factory();
         TrajectorySE2Planner p = new TrajectorySE2Planner(pathFactory, trajectoryFactory);
         List<WaypointSE2> waypoints = List.of(
                 new WaypointSE2(

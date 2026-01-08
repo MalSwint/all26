@@ -8,7 +8,7 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.testing.Timeless;
-import org.team100.lib.trajectory.path.PathPointSE2;
+import org.team100.lib.trajectory.path.PathSE2Point;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -20,7 +20,7 @@ public class ConstantConstraintTest implements Timeless {
     @Test
     void testVelocity() {
         ConstantConstraint c = new ConstantConstraint(logger, 2, 3);
-        PathPointSE2 state = new PathPointSE2(
+        PathSE2Point state = new PathSE2Point(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 0, 0);
@@ -30,7 +30,7 @@ public class ConstantConstraintTest implements Timeless {
     @Test
     void testAccel() {
         ConstantConstraint c = new ConstantConstraint(logger, 2, 3);
-        PathPointSE2 state = new PathPointSE2(
+        PathSE2Point state = new PathSE2Point(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 0, 0);

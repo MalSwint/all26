@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.jfree.data.xy.VectorSeries;
 import org.jfree.data.xy.XYSeries;
-import org.team100.lib.trajectory.path.PathPointSE2;
+import org.team100.lib.trajectory.path.PathSE2Point;
 import org.team100.lib.trajectory.path.PathSE2;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -27,7 +27,7 @@ public class PathToVectorSeries {
         for (double d = 0; d < l; d += dl) {
             if (DEBUG)
                 System.out.printf("%f\n", d);
-            PathPointSE2 pwm;
+            PathSE2Point pwm;
             pwm = path.sample(d);
             Pose2d p = pwm.waypoint().pose();
             double x = p.getX();
@@ -40,10 +40,10 @@ public class PathToVectorSeries {
         return List.of(s);
     }
 
-    public static XYSeries x(String name, List<PathPointSE2> poses) {
+    public static XYSeries x(String name, List<PathSE2Point> poses) {
         XYSeries series = new XYSeries(name);
         for (int i = 0; i < poses.size(); ++i) {
-            PathPointSE2 pose = poses.get(i);
+            PathSE2Point pose = poses.get(i);
             series.add(i, pose.waypoint().pose().getX());
         }
         return series;

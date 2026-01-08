@@ -25,7 +25,7 @@ import org.team100.lib.subsystems.prr.JointForce;
 import org.team100.lib.subsystems.prr.JointVelocities;
 import org.team100.lib.subsystems.swerve.module.state.SwerveModulePosition100;
 import org.team100.lib.subsystems.swerve.module.state.SwerveModulePositions;
-import org.team100.lib.trajectory.path.PathPointSE2;
+import org.team100.lib.trajectory.path.PathSE2Point;
 import org.team100.lib.trajectory.timing.TimedStateSE2;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -450,14 +450,14 @@ public class LoggerFactory {
 
     public class TimedStateSE2Logger {
         private final Level m_level;
-        private final PathPointSE2Logger m_pose2dWithMotionLogger;
+        private final PathSE2PointLogger m_pose2dWithMotionLogger;
         private final DoubleLogger m_timeLogger;
         private final DoubleLogger m_velocityLogger;
         private final DoubleLogger m_accelLogger;
 
         TimedStateSE2Logger(Level level, String leaf) {
             m_level = level;
-            m_pose2dWithMotionLogger = pose2dWithMotionLogger(level, join(leaf, "posestate"));
+            m_pose2dWithMotionLogger = pathSE2PointLogger(level, join(leaf, "posestate"));
             m_timeLogger = doubleLogger(level, join(leaf, "time"));
             m_velocityLogger = doubleLogger(level, join(leaf, "velocity"));
             m_accelLogger = doubleLogger(level, join(leaf, "accel"));
@@ -479,18 +479,18 @@ public class LoggerFactory {
         return new TimedStateSE2Logger(level, leaf);
     }
 
-    public class PathPointSE2Logger {
+    public class PathSE2PointLogger {
         private final Level m_level;
         private final Pose2dLogger m_pose2dLogger;
         private final Rotation2dLogger m_rotation2dLogger;
 
-        PathPointSE2Logger(Level level, String leaf) {
+        PathSE2PointLogger(Level level, String leaf) {
             m_level = level;
             m_pose2dLogger = pose2dLogger(level, join(leaf, "pose"));
             m_rotation2dLogger = rotation2dLogger(level, join(leaf, "course"));
         }
 
-        public void log(Supplier<PathPointSE2> vals) {
+        public void log(Supplier<PathSE2Point> vals) {
             if (!allow(m_level))
                 return;
             WaypointSE2 val = vals.get().waypoint();
@@ -499,8 +499,8 @@ public class LoggerFactory {
         }
     }
 
-    public PathPointSE2Logger pose2dWithMotionLogger(Level level, String leaf) {
-        return new PathPointSE2Logger(level, leaf);
+    public PathSE2PointLogger pathSE2PointLogger(Level level, String leaf) {
+        return new PathSE2PointLogger(level, leaf);
     }
 
     public class Twist2dLogger {

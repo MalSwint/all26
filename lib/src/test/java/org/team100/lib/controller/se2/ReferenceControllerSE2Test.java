@@ -25,7 +25,7 @@ import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.TrajectorySE2;
 import org.team100.lib.trajectory.TrajectorySE2Planner;
 import org.team100.lib.trajectory.examples.TrajectoryExamples;
-import org.team100.lib.trajectory.path.PathFactorySE2;
+import org.team100.lib.trajectory.path.PathSE2Factory;
 import org.team100.lib.trajectory.path.PathSE2;
 import org.team100.lib.trajectory.path.spline.SplineFactorySE2;
 import org.team100.lib.trajectory.path.spline.SplineSE2;
@@ -48,7 +48,7 @@ public class ReferenceControllerSE2Test implements Timeless {
         SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood(logger);
         TrajectorySE2Factory trajectoryFactory = new TrajectorySE2Factory(constraints);
-        PathFactorySE2 pathFactory = new PathFactorySE2();
+        PathSE2Factory pathFactory = new PathSE2Factory();
         TrajectorySE2Planner planner = new TrajectorySE2Planner(pathFactory, trajectoryFactory);
         // stepTime();
         TrajectoryExamples ex = new TrajectoryExamples(planner);
@@ -104,7 +104,7 @@ public class ReferenceControllerSE2Test implements Timeless {
         SwerveKinodynamics swerveKinodynamics = SwerveKinodynamicsFactory.forRealisticTest(logger);
         List<TimingConstraint> constraints = new TimingConstraintFactory(swerveKinodynamics).allGood(logger);
         TrajectorySE2Factory trajectoryFactory = new TrajectorySE2Factory(constraints);
-        PathFactorySE2 pathFactory = new PathFactorySE2();
+        PathSE2Factory pathFactory = new PathSE2Factory();
         TrajectorySE2Planner planner = new TrajectorySE2Planner(pathFactory, trajectoryFactory);
         stepTime();
         TrajectoryExamples ex = new TrajectoryExamples(planner);
@@ -161,7 +161,7 @@ public class ReferenceControllerSE2Test implements Timeless {
         double stepSize = 2;
 
         List<SplineSE2> splines = SplineFactorySE2.splinesFromWaypoints(waypoints);
-        PathFactorySE2 pathFactory = new PathFactorySE2(stepSize, 2, 0.25, 0.1);
+        PathSE2Factory pathFactory = new PathSE2Factory(stepSize, 2, 0.25, 0.1);
         PathSE2 path = pathFactory.get(splines);
         assertFalse(path.isEmpty());
 

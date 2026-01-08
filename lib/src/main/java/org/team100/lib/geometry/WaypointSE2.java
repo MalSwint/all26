@@ -6,7 +6,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
- * Pose and direction in SE(2). Direction is a unit vector describing how pose
+ * Pose and course in SE(2).
+ * 
+ * Course is a DirectionSE2, which is a unit vector describing how pose
  * changes with the spline parameter.
  * 
  * For constructing splines.

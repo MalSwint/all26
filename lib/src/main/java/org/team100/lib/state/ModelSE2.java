@@ -4,8 +4,7 @@ import org.team100.lib.geometry.GlobalVelocityR2;
 import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.trajectory.path.PathPointSE2;
-import org.team100.lib.trajectory.timing.TimedStateSE2;
+import org.team100.lib.trajectory.path.PathSE2Point;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -132,21 +131,17 @@ public class ModelSE2 {
         return m_theta;
     }
 
-    /**
-     * Transform timed pose into swerve state.
-     */
-    public static ModelSE2 fromTimedState(TimedStateSE2 timedPose) {
-        PathPointSE2 state = timedPose.point();
-        WaypointSE2 pose = state.waypoint();
+    /** Point and pathwise velocity => ModelSE2 */
+    public static ModelSE2 fromMovingPathPointSE2(PathSE2Point point, double velocityM_s) {
+        WaypointSE2 pose = point.waypoint();
         Translation2d translation = pose.pose().getTranslation();
         double xx = translation.getX();
         double yx = translation.getY();
         double thetax = pose.pose().getRotation().getRadians();
-        Rotation2d course = state.waypoint().course().toRotation();
-        double velocityM_s = timedPose.velocityM_S();
+        Rotation2d course = point.waypoint().course().toRotation();
         double xv = course.getCos() * velocityM_s;
         double yv = course.getSin() * velocityM_s;
-        double thetav = state.getHeadingRateRad_M() * velocityM_s;
+        double thetav = point.getHeadingRateRad_M() * velocityM_s;
         return new ModelSE2(
                 new ModelR1(xx, xv),
                 new ModelR1(yx, yv),

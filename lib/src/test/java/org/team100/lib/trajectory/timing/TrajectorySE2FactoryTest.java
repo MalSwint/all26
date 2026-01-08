@@ -17,7 +17,7 @@ import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.trajectory.PathToVectorSeries;
 import org.team100.lib.trajectory.TrajectorySE2;
 import org.team100.lib.trajectory.TrajectorySE2ToVectorSeries;
-import org.team100.lib.trajectory.path.PathFactorySE2;
+import org.team100.lib.trajectory.path.PathSE2Factory;
 import org.team100.lib.trajectory.path.PathSE2;
 import org.team100.lib.trajectory.path.spline.SplineFactorySE2;
 import org.team100.lib.trajectory.path.spline.SplineSE2;
@@ -195,7 +195,7 @@ public class TrajectorySE2FactoryTest {
                         new DirectionSE2(0, 1, 0), 1.2));
         List<SplineSE2> splines = SplineFactorySE2.splinesFromWaypoints(waypoints);
 
-        PathFactorySE2 pathFactory = new PathFactorySE2(0.1, 0.05, 0.05, 0.2);
+        PathSE2Factory pathFactory = new PathSE2Factory(0.1, 0.05, 0.05, 0.2);
 
         TrajectorySE2 trajectory = new TrajectorySE2();
         TrajectorySE2Factory m_trajectoryFactory = new TrajectorySE2Factory(new ArrayList<>());
@@ -227,7 +227,7 @@ public class TrajectorySE2FactoryTest {
      */
     private PathSE2 getPath() {
         List<SplineSE2> splines = SplineFactorySE2.splinesFromWaypoints(waypoints);
-        PathFactorySE2 pathFactory = new PathFactorySE2(0.2, 0.2, 0.2, 0.2);
+        PathSE2Factory pathFactory = new PathSE2Factory(0.2, 0.2, 0.2, 0.2);
         PathSE2 path = pathFactory.get(splines);
         List<VectorSeries> series = new PathToVectorSeries(0.1).convert(path);
         ChartUtil.plotOverlay(series, 200);

@@ -1,6 +1,7 @@
 package org.team100.lib.trajectory.timing;
 
-import org.team100.lib.trajectory.path.PathPointSE2;
+import org.team100.lib.trajectory.path.PathSE2Point;
+import org.team100.lib.trajectory.path.PathSE2Parameter;
 import org.team100.lib.util.Math100;
 
 /**
@@ -8,29 +9,34 @@ import org.team100.lib.util.Math100;
  */
 public class TimedStateSE2 {
     private static final boolean DEBUG = false;
-    private final PathPointSE2 m_point;
+
+    final PathSE2Parameter m_parameter;
+
+    final PathSE2Point m_point;
     /** Time we achieve this state. */
-    private final double m_timeS;
+    final double m_timeS;
     /** Instantaneous pathwise velocity, m/s. */
-    private final double m_velocityM_S;
+    final double m_velocityM_S;
     /**
      * Pathwise acceleration for the timespan after this state, m/s^2. It's computed
      * by looking at the velocity of the next state, and the distance to get there.
      */
-    private final double m_accelM_S_S;
+    final double m_accelM_S_S;
 
     public TimedStateSE2(
-            PathPointSE2 point,
+            PathSE2Parameter parameter,
+            PathSE2Point point,
             double t,
             double velocity,
             double acceleration) {
+        m_parameter = parameter;
         m_point = point;
         m_timeS = t;
         m_velocityM_S = velocity;
         m_accelM_S_S = acceleration;
     }
 
-    public PathPointSE2 point() {
+    public PathSE2Point point() {
         return m_point;
     }
 
@@ -55,43 +61,6 @@ public class TimedStateSE2 {
                 m_point,
                 m_timeS,
                 m_velocityM_S,
-                m_accelM_S_S);
-    }
-
-    /**
-     * Linear interpolation by time.
-     * 
-     * Velocity of this state is the initial velocity.
-     * Acceleration of this state is constant through the whole arc.
-     */
-    public TimedStateSE2 interpolate(TimedStateSE2 other, double delta_t) {
-        if (delta_t < 0)
-            throw new IllegalArgumentException("delta_t must be non-negative");
-        if (DEBUG)
-            System.out.println("lerp");
-        double tLerp = m_timeS + delta_t;
-        double vLerp = m_velocityM_S + m_accelM_S_S * delta_t;
-        double pathwiseDistance = m_velocityM_S * delta_t + 0.5 * m_accelM_S_S * delta_t * delta_t;
-
-        double distanceBetween = m_point.distanceCartesian(other.m_point);
-        double interpolant = pathwiseDistance / distanceBetween;
-        if (Double.isNaN(interpolant)) {
-            interpolant = 1.0;
-        }
-
-        // TODO: pass t interpolant, not just spatial one
-        double s = delta_t / (other.m_timeS - m_timeS);
-        if (DEBUG)
-            System.out.printf("t0 %f t1 %f delta t %f s %f\n",
-                    m_timeS, other.m_timeS, delta_t, s);
-
-        if (DEBUG)
-            System.out.printf("tlerp %f\n", tLerp);
-        return new TimedStateSE2(
-                // m_point.interpolate(other.m_point, interpolant),
-                m_point.interpolate(other.m_point, s),
-                tLerp,
-                vLerp,
                 m_accelM_S_S);
     }
 

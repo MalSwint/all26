@@ -9,7 +9,7 @@ import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.testing.Timeless;
-import org.team100.lib.trajectory.path.PathPointSE2;
+import org.team100.lib.trajectory.path.PathSE2Point;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -28,7 +28,7 @@ class CentripetalAccelerationConstraintTest implements Timeless {
                 logger,
                 SwerveKinodynamicsFactory.forTest(logger),
                 CENTRIPETAL_SCALE);
-        PathPointSE2 p = new PathPointSE2(
+        PathSE2Point p = new PathSE2Point(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 0, 1);
@@ -47,7 +47,7 @@ class CentripetalAccelerationConstraintTest implements Timeless {
                 logger,
                 SwerveKinodynamicsFactory.forTest(logger),
                 CENTRIPETAL_SCALE);
-        PathPointSE2 p = new PathPointSE2(
+        PathSE2Point p = new PathSE2Point(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 0, 1);
@@ -66,7 +66,7 @@ class CentripetalAccelerationConstraintTest implements Timeless {
                 logger,
                 SwerveKinodynamicsFactory.forTest(logger),
                 CENTRIPETAL_SCALE);
-        PathPointSE2 p = new PathPointSE2(
+        PathSE2Point p = new PathSE2Point(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 0, 1);
@@ -84,7 +84,7 @@ class CentripetalAccelerationConstraintTest implements Timeless {
                 logger,
                 SwerveKinodynamicsFactory.forTest2(logger),
                 CENTRIPETAL_SCALE);
-        PathPointSE2 p = new PathPointSE2(
+        PathSE2Point p = new PathSE2Point(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 0, 1);
@@ -101,7 +101,7 @@ class CentripetalAccelerationConstraintTest implements Timeless {
                 logger,
                 SwerveKinodynamicsFactory.forTest2(logger),
                 CENTRIPETAL_SCALE);
-        PathPointSE2 p = new PathPointSE2(
+        PathSE2Point p = new PathSE2Point(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 0, 0);

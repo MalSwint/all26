@@ -9,7 +9,7 @@ import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.testing.Timeless;
-import org.team100.lib.trajectory.path.PathPointSE2;
+import org.team100.lib.trajectory.path.PathSE2Point;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -27,7 +27,7 @@ class YawRateConstraintTest implements Timeless {
         // the linear constraint but it's ok)
         YawRateConstraint c = new YawRateConstraint(logger, SwerveKinodynamicsFactory.forTest(logger),
                 YAW_RATE_SCALE);
-        PathPointSE2 p = new PathPointSE2(
+        PathSE2Point p = new PathSE2Point(
                 WaypointSE2.irrotational(new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 1, // spatial, so rad/m
                 0);
@@ -41,7 +41,7 @@ class YawRateConstraintTest implements Timeless {
         // towards +x, 1 rad/m, 2 rad/s limit => 2 m/s
         YawRateConstraint c = new YawRateConstraint(logger, SwerveKinodynamicsFactory.forTest2(logger),
                 YAW_RATE_SCALE);
-        PathPointSE2 p = new PathPointSE2(
+        PathSE2Point p = new PathSE2Point(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 1, // spatial, so rad/m
@@ -56,7 +56,7 @@ class YawRateConstraintTest implements Timeless {
         YawRateConstraint c = new YawRateConstraint(logger, SwerveKinodynamicsFactory.forTest(logger),
                 YAW_RATE_SCALE);
         // driving and spinning
-        PathPointSE2 p = new PathPointSE2(
+        PathSE2Point p = new PathSE2Point(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 1,
@@ -73,7 +73,7 @@ class YawRateConstraintTest implements Timeless {
         double scale = 0.1;
         YawRateConstraint c = new YawRateConstraint(logger, SwerveKinodynamicsFactory.forRealisticTest(logger),
                 scale);
-        PathPointSE2 p = new PathPointSE2(
+        PathSE2Point p = new PathSE2Point(
                 WaypointSE2.irrotational(
                         new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
                 1, // spatial, so rad/m

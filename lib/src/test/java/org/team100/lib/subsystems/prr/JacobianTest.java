@@ -16,7 +16,7 @@ import org.team100.lib.state.ModelSE2;
 import org.team100.lib.trajectory.TrajectorySE2;
 import org.team100.lib.trajectory.TrajectorySE2Planner;
 import org.team100.lib.trajectory.examples.TrajectoryExamples;
-import org.team100.lib.trajectory.path.PathFactorySE2;
+import org.team100.lib.trajectory.path.PathSE2Factory;
 import org.team100.lib.trajectory.timing.ConstantConstraint;
 import org.team100.lib.trajectory.timing.TimedStateSE2;
 import org.team100.lib.trajectory.timing.TimingConstraint;
@@ -234,7 +234,7 @@ public class JacobianTest {
 
         List<TimingConstraint> constraints = List.of(new ConstantConstraint(logger, 1, 1));
         TrajectorySE2Factory trajectoryFactory = new TrajectorySE2Factory(constraints);
-        PathFactorySE2 pathFactory = new PathFactorySE2();
+        PathSE2Factory pathFactory = new PathSE2Factory();
         TrajectorySE2Planner planner = new TrajectorySE2Planner(pathFactory, trajectoryFactory);
         Pose2d start = new Pose2d(1, -1, Rotation2d.kZero);
         Pose2d end = new Pose2d(2, 1, Rotation2d.k180deg);
@@ -244,7 +244,7 @@ public class JacobianTest {
         double dt = d / 20;
         for (double time = 0; time < d; time += dt) {
             TimedStateSE2 tp = t.sample(time);
-            ModelSE2 sm = ModelSE2.fromTimedState(tp);
+            ModelSE2 sm = ModelSE2.fromMovingPathPointSE2(tp.point(), tp.velocityM_S());
             Pose2d p = sm.pose();
             VelocitySE2 v = sm.velocity();
             EAWConfig c = k.inverse(p);

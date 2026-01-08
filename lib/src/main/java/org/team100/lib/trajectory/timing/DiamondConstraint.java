@@ -1,7 +1,7 @@
 package org.team100.lib.trajectory.timing;
 
 import org.team100.lib.logging.LoggerFactory;
-import org.team100.lib.trajectory.path.PathPointSE2;
+import org.team100.lib.trajectory.path.PathSE2Point;
 import org.team100.lib.tuning.Mutable;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -33,7 +33,7 @@ public class DiamondConstraint implements TimingConstraint {
     }
 
     @Override
-    public double maxV(PathPointSE2 state) {
+    public double maxV(PathSE2Point state) {
         Rotation2d course = state.waypoint().course().toRotation();
         Rotation2d heading = state.waypoint().pose().getRotation();
         Rotation2d strafe = course.minus(heading);
@@ -45,13 +45,13 @@ public class DiamondConstraint implements TimingConstraint {
     }
 
     @Override
-    public double maxAccel(PathPointSE2 state, double velocityM_S) {
+    public double maxAccel(PathSE2Point state, double velocityM_S) {
         // TODO: this should also have a diamond shape
         return m_maxAccel.getAsDouble();
     }
 
     @Override
-    public double maxDecel(PathPointSE2 state, double velocity) {
+    public double maxDecel(PathSE2Point state, double velocity) {
         return -m_maxAccel.getAsDouble();
     }
 

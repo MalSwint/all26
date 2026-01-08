@@ -6,7 +6,7 @@ import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.trajectory.path.PathSE2;
 import org.team100.lib.trajectory.path.spline.SplineFactorySE2;
 import org.team100.lib.trajectory.path.spline.SplineSE2;
-import org.team100.lib.trajectory.path.PathFactorySE2;
+import org.team100.lib.trajectory.path.PathSE2Factory;
 import org.team100.lib.trajectory.timing.TrajectorySE2Factory;
 
 /**
@@ -23,10 +23,10 @@ import org.team100.lib.trajectory.timing.TrajectorySE2Factory;
 public class TrajectorySE2Planner {
     private static final boolean DEBUG = false;
 
-    private final PathFactorySE2 m_pathFactory;
+    private final PathSE2Factory m_pathFactory;
     private final TrajectorySE2Factory m_trajectoryFactory;
 
-    public TrajectorySE2Planner(PathFactorySE2 pathFactory, TrajectorySE2Factory trajectoryFactory) {
+    public TrajectorySE2Planner(PathSE2Factory pathFactory, TrajectorySE2Factory trajectoryFactory) {
         m_pathFactory = pathFactory;
         m_trajectoryFactory = trajectoryFactory;
     }

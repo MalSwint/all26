@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.team100.lib.geometry.WaypointSE2;
-import org.team100.lib.trajectory.path.PathPointSE2;
+import org.team100.lib.trajectory.path.PathSE2Point;
 import org.team100.lib.trajectory.timing.TimedStateSE2;
 import org.team100.lib.trajectory.timing.TimingConstraint;
+import org.team100.lib.trajectory.timing.TimingUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;
 
@@ -63,7 +64,7 @@ public class TrajectorySE2 {
                     return ceil;
                 }
                 double delta_t = timeS - floor.getTimeS();
-                return floor.interpolate(ceil, delta_t);
+                return TimingUtil.interpolate(floor, ceil, delta_t);
             }
         }
         throw new IllegalStateException("impossible trajectory: " + toString());
@@ -115,11 +116,11 @@ public class TrajectorySE2 {
         System.out.println("i, s, t, v, a, k, x, y");
         for (int i = 0; i < length(); ++i) {
             TimedStateSE2 ts = getPoint(i);
-            PathPointSE2 pwm = ts.point();
+            PathSE2Point pwm = ts.point();
             WaypointSE2 w = pwm.waypoint();
             Pose2d p = w.pose();
-            System.out.printf("%d, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f\n",
-                    i, pwm.getS(), ts.getTimeS(), ts.velocityM_S(), ts.acceleration(), pwm.getCurvatureRad_M(),
+            System.out.printf("%d, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f\n",
+                    i, ts.getTimeS(), ts.velocityM_S(), ts.acceleration(), pwm.getCurvatureRad_M(),
                     p.getX(), p.getY());
         }
     }
@@ -129,7 +130,7 @@ public class TrajectorySE2 {
         System.out.println("t, v, a, k, x, y");
         for (double t = 0; t < duration(); t += 0.02) {
             TimedStateSE2 ts = sample(t);
-            PathPointSE2 pwm = ts.point();
+            PathSE2Point pwm = ts.point();
             WaypointSE2 w = pwm.waypoint();
             Pose2d p = w.pose();
             System.out.printf("%5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f\n",

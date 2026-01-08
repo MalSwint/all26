@@ -6,8 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.VelocitySE2;
 import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.state.ControlSE2;
-import org.team100.lib.trajectory.path.PathPointSE2;
-import org.team100.lib.trajectory.timing.TimedStateSE2;
+import org.team100.lib.trajectory.path.PathSE2Point;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -27,13 +26,11 @@ class SwerveControlTest {
 
     @Test
     void testTimedState() {
-        ControlSE2 s = ControlSE2.fromTimedState(
-                new TimedStateSE2(
-                        new PathPointSE2(
-                                WaypointSE2.irrotational(
-                                        new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
-                                0, 0),
-                        0, 0, 0));
+        PathSE2Point p = new PathSE2Point(
+                WaypointSE2.irrotational(
+                        new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
+                0, 0);
+        ControlSE2 s = ControlSE2.fromMovingPathSE2Point(p, 0, 0);
         assertEquals(0, s.x().x(), DELTA);
         assertEquals(0, s.x().v(), DELTA);
         assertEquals(0, s.x().a(), DELTA);
@@ -44,13 +41,11 @@ class SwerveControlTest {
 
     @Test
     void testTimedState2() {
-        ControlSE2 s = ControlSE2.fromTimedState(
-                new TimedStateSE2(
-                        new PathPointSE2(
-                                WaypointSE2.irrotational(
-                                        new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
-                                0, 0),
-                        0, 0, 1));
+        PathSE2Point p = new PathSE2Point(
+                WaypointSE2.irrotational(
+                        new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
+                0, 0);
+        ControlSE2 s = ControlSE2.fromMovingPathSE2Point(p, 0, 1);
         assertEquals(0, s.x().x(), DELTA);
         assertEquals(0, s.x().v(), DELTA);
         assertEquals(1, s.x().a(), DELTA);
@@ -61,13 +56,11 @@ class SwerveControlTest {
 
     @Test
     void testTimedState3() {
-        ControlSE2 s = ControlSE2.fromTimedState(
-                new TimedStateSE2(
-                        new PathPointSE2(
-                                WaypointSE2.irrotational(
-                                        new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
-                                0, 0),
-                        0, 1, 0));
+        PathSE2Point p = new PathSE2Point(
+                WaypointSE2.irrotational(
+                        new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
+                0, 0);
+        ControlSE2 s = ControlSE2.fromMovingPathSE2Point(p, 1, 0);
         assertEquals(0, s.x().x(), DELTA);
         assertEquals(1, s.x().v(), DELTA);
         assertEquals(0, s.x().a(), DELTA);
@@ -79,13 +72,10 @@ class SwerveControlTest {
     /** +x motion, positive curvature => +y accel. */
     @Test
     void testTimedState4() {
-        ControlSE2 s = ControlSE2.fromTimedState(
-                new TimedStateSE2(
-                        new PathPointSE2(
-                                WaypointSE2.irrotational(
-                                        new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
-                                0, 1),
-                        0, 1, 0));
+        PathSE2Point p = new PathSE2Point(
+                WaypointSE2.irrotational(new Pose2d(0, 0, new Rotation2d(0)), 0, 1.2),
+                0, 1);
+        ControlSE2 s = ControlSE2.fromMovingPathSE2Point(p, 1, 0);
         assertEquals(0, s.x().x(), DELTA);
         assertEquals(1, s.x().v(), DELTA);
         assertEquals(0, s.x().a(), DELTA);

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.team100.lib.trajectory.TrajectorySE2;
-import org.team100.lib.trajectory.path.PathEntrySE2;
-import org.team100.lib.trajectory.path.PathPointSE2;
 import org.team100.lib.trajectory.path.PathSE2;
+import org.team100.lib.trajectory.path.PathSE2Entry;
+import org.team100.lib.trajectory.path.PathSE2Point;
 import org.team100.lib.util.Math100;
 
 /**
@@ -117,8 +117,14 @@ public class TrajectorySE2Factory {
         int n = path.length();
         List<TimedStateSE2> timedStates = new ArrayList<>(n);
         for (int i = 0; i < n; ++i) {
-            timedStates.add(new TimedStateSE2(
-                    path.getEntry(i).point(), runningTime[i], velocities[i], accels[i]));
+            PathSE2Entry entry = path.getEntry(i);
+            TimedStateSE2 ts = new TimedStateSE2(
+                    entry.parameter(),
+                    entry.point(),
+                    runningTime[i],
+                    velocities[i],
+                    accels[i]);
+            timedStates.add(ts);
         }
         return timedStates;
     }
@@ -224,7 +230,7 @@ public class TrajectorySE2Factory {
      * Returns the lowest (i.e. closest to zero) velocity constraint from the list
      * of constraints. Always positive or zero.
      */
-    private double maxVelocity(PathPointSE2 sample) {
+    private double maxVelocity(PathSE2Point sample) {
         double minVelocity = HIGH_V;
         for (TimingConstraint constraint : m_constraints) {
             minVelocity = Math.min(minVelocity, constraint.maxV(sample));
@@ -236,7 +242,7 @@ public class TrajectorySE2Factory {
      * Returns the lowest (i.e. closest to zero) acceleration constraint from the
      * list of constraints. Always positive or zero.
      */
-    private double maxAccel(PathEntrySE2 sample, double velocity) {
+    private double maxAccel(PathSE2Entry sample, double velocity) {
         double minAccel = HIGH_ACCEL;
         for (TimingConstraint constraint : m_constraints) {
             minAccel = Math.min(minAccel, constraint.maxAccel(sample.point(), velocity));
@@ -248,7 +254,7 @@ public class TrajectorySE2Factory {
      * Returns the highest (i.e. closest to zero) deceleration constraint from the
      * list of constraints. Always negative or zero.
      */
-    private double maxDecel(PathPointSE2 sample, double velocity) {
+    private double maxDecel(PathSE2Point sample, double velocity) {
         double maxDecel = -HIGH_ACCEL;
         for (TimingConstraint constraint : m_constraints) {
             maxDecel = Math.max(maxDecel, constraint.maxDecel(sample, velocity));

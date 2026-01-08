@@ -2,7 +2,7 @@ package org.team100.lib.trajectory.timing;
 
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
-import org.team100.lib.trajectory.path.PathPointSE2;
+import org.team100.lib.trajectory.path.PathSE2Point;
 import org.team100.lib.tuning.Mutable;
 
 /**
@@ -48,7 +48,7 @@ public class CapsizeAccelerationConstraint implements TimingConstraint {
      * If the curvature is zero, this will return infinity.
      */
     @Override
-    public double maxV(final PathPointSE2 state) {
+    public double maxV(PathSE2Point state) {
         double radius = 1 / Math.abs(state.getCurvatureRad_M());
         // abs is used here to make sure sqrt is happy.
         double maxV = Math.sqrt(Math.abs(m_maxCentripetalAccel * m_scale.getAsDouble() * radius));
@@ -58,7 +58,7 @@ public class CapsizeAccelerationConstraint implements TimingConstraint {
     }
 
     @Override
-    public double maxAccel(PathPointSE2 state, double velocity) {
+    public double maxAccel(PathSE2Point state, double velocity) {
         double alongsq = alongSq(state, velocity);
         if (alongsq < 0) {
             if (DEBUG)
@@ -72,7 +72,7 @@ public class CapsizeAccelerationConstraint implements TimingConstraint {
     }
 
     @Override
-    public double maxDecel(PathPointSE2 state, double velocity) {
+    public double maxDecel(PathSE2Point state, double velocity) {
         double alongsq = alongSq(state, velocity);
         if (alongsq < 0) {
             if (DEBUG)
@@ -96,7 +96,7 @@ public class CapsizeAccelerationConstraint implements TimingConstraint {
      * so
      * along = sqrt(total^2 - v^4/r^2)
      */
-    private double alongSq(PathPointSE2 state, double velocity) {
+    private double alongSq(PathSE2Point state, double velocity) {
         double radius = 1 / Math.abs(state.getCurvatureRad_M());
         double actualCentripetalAccel = velocity * velocity / radius;
         if (DEBUG)

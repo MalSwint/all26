@@ -37,27 +37,27 @@ public class YawRateConstraint implements TimingConstraint {
     }
 
     @Override
-    public double maxV(PathSE2Point state) {
+    public double maxV(PathSE2Point point) {
         // Heading rate in rad/m
-        double heading_rate = state.getHeadingRateRad_M();
+        double heading_rate = point.getHeadingRateRad_M();
         // rad/s / rad/m => m/s.
         return m_maxOmegaRad_S.getAsDouble() / Math.abs(heading_rate);
     }
 
     @Override
-    public double maxAccel(PathSE2Point state, double velocity) {
+    public double maxAccel(PathSE2Point point, double velocity) {
         // TODO: this is wrong
         // Heading rate in rad/m
-        double heading_rate = state.getHeadingRateRad_M();
+        double heading_rate = point.getHeadingRateRad_M();
         // rad/s^2 / rad/m => m/s^2
         return m_maxAlphaRad_S2.getAsDouble() / Math.abs(heading_rate);
     }
 
     @Override
-    public double maxDecel(PathSE2Point state, double velocity) {
+    public double maxDecel(PathSE2Point point, double velocity) {
         // TODO: this is wrong
         // Heading rate in rad/m
-        double heading_rate = state.getHeadingRateRad_M();
+        double heading_rate = point.getHeadingRateRad_M();
         // rad/s^2 / rad/m => m/s^2
         return -(m_maxAlphaRad_S2.getAsDouble() / Math.abs(heading_rate));
     }

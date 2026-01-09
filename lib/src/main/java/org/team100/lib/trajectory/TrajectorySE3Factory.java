@@ -117,7 +117,7 @@ public class TrajectorySE3Factory {
             velocities[i1] = maxVelocity;
             // reduce velocity to fit under the acceleration constraint
             double impliedAccel = Math100.accel(velocities[i0], velocities[i1], arclength);
-            double maxAccel = maxAccel(path.getEntry(i0), velocities[i0]);
+            double maxAccel = maxAccel(path.getEntry(i0).point(), velocities[i0]);
             if (impliedAccel > maxAccel) {
                 velocities[i1] = Math100.v1(velocities[i0], maxAccel, arclength);
                 if (DEBUG)
@@ -177,26 +177,26 @@ public class TrajectorySE3Factory {
         }
     }
 
-    private double maxVelocity(PathSE3Point sample) {
+    private double maxVelocity(PathSE3Point point) {
         double minVelocity = HIGH_V;
         for (TimingConstraintSE3 constraint : m_constraints) {
-            minVelocity = Math.min(minVelocity, constraint.maxV(sample));
+            minVelocity = Math.min(minVelocity, constraint.maxV(point));
         }
         return minVelocity;
     }
 
-    private double maxAccel(PathSE3Entry sample, double velocity) {
+    private double maxAccel(PathSE3Point point, double velocity) {
         double minAccel = HIGH_ACCEL;
         for (TimingConstraintSE3 constraint : m_constraints) {
-            minAccel = Math.min(minAccel, constraint.maxAccel(sample.point(), velocity));
+            minAccel = Math.min(minAccel, constraint.maxAccel(point, velocity));
         }
         return minAccel;
     }
 
-    private double maxDecel(PathSE3Point sample, double velocity) {
+    private double maxDecel(PathSE3Point point, double velocity) {
         double maxDecel = -HIGH_ACCEL;
         for (TimingConstraintSE3 constraint : m_constraints) {
-            maxDecel = Math.max(maxDecel, constraint.maxDecel(sample, velocity));
+            maxDecel = Math.max(maxDecel, constraint.maxDecel(point, velocity));
         }
         return maxDecel;
     }

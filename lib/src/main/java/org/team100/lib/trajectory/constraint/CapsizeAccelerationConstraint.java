@@ -48,8 +48,8 @@ public class CapsizeAccelerationConstraint implements TimingConstraint {
      * If the curvature is zero, this will return infinity.
      */
     @Override
-    public double maxV(PathSE2Point state) {
-        double radius = 1 / Math.abs(state.getCurvatureRad_M());
+    public double maxV(PathSE2Point point) {
+        double radius = 1 / Math.abs(point.getCurvatureRad_M());
         // abs is used here to make sure sqrt is happy.
         double maxV = Math.sqrt(Math.abs(m_maxCentripetalAccel * m_scale.getAsDouble() * radius));
         if (DEBUG)
@@ -58,8 +58,8 @@ public class CapsizeAccelerationConstraint implements TimingConstraint {
     }
 
     @Override
-    public double maxAccel(PathSE2Point state, double velocity) {
-        double alongsq = alongSq(state, velocity);
+    public double maxAccel(PathSE2Point point, double velocity) {
+        double alongsq = alongSq(point, velocity);
         if (alongsq < 0) {
             if (DEBUG)
                 System.out.println("too fast for the curvature, can't speed up");
@@ -72,8 +72,8 @@ public class CapsizeAccelerationConstraint implements TimingConstraint {
     }
 
     @Override
-    public double maxDecel(PathSE2Point state, double velocity) {
-        double alongsq = alongSq(state, velocity);
+    public double maxDecel(PathSE2Point point, double velocity) {
+        double alongsq = alongSq(point, velocity);
         if (alongsq < 0) {
             if (DEBUG)
                 System.out.println("too fast for the curvature, slowing down is ok");

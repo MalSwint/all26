@@ -21,17 +21,17 @@ public class ConstantConstraint implements TimingConstraint {
     }
 
     @Override
-    public double maxV(PathSE2Point state) {
+    public double maxV(PathSE2Point point) {
         return m_maxVelocity.getAsDouble();
     }
 
     @Override
-    public double maxAccel(PathSE2Point state, double velocityM_S) {
+    public double maxAccel(PathSE2Point point, double velocityM_S) {
         return m_maxAccel.getAsDouble();
     }
     
     @Override
-    public double maxDecel(PathSE2Point state, double velocity) {
+    public double maxDecel(PathSE2Point point, double velocity) {
         return -m_maxAccel.getAsDouble();
     }
 }

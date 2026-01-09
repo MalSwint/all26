@@ -289,8 +289,8 @@ class TrajectorySE2PlannerTest implements Timeless {
 
         class ConditionalTimingConstraint implements TimingConstraint {
             @Override
-            public double maxV(PathSE2Point state) {
-                double x = state.waypoint().pose().getTranslation().getX();
+            public double maxV(PathSE2Point point) {
+                double x = point.waypoint().pose().getTranslation().getX();
                 if (x < 1.5) {
                     return 2.0;
                 }
@@ -302,12 +302,12 @@ class TrajectorySE2PlannerTest implements Timeless {
             }
 
             @Override
-            public double maxAccel(PathSE2Point state, double velocity) {
+            public double maxAccel(PathSE2Point point, double velocity) {
                 return 2;
             }
 
             @Override
-            public double maxDecel(PathSE2Point state, double velocity) {
+            public double maxDecel(PathSE2Point point, double velocity) {
                 return -1;
             }
         }

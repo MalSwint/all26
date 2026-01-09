@@ -46,20 +46,19 @@ public class TorqueConstraint implements TimingConstraint {
     }
 
     @Override
-    public double maxV(PathSE2Point state) {
+    public double maxV(PathSE2Point point) {
         // Do not constrain velocity.
         return Double.POSITIVE_INFINITY;
     }
 
     @Override
-    public double maxAccel(
-            PathSE2Point state, double velocityM_S) {
-        return getA(state);
+    public double maxAccel(PathSE2Point point, double velocityM_S) {
+        return getA(point);
     }
 
     @Override
-    public double maxDecel(PathSE2Point state, double velocity) {
-        return -getA(state);
+    public double maxDecel(PathSE2Point point, double velocity) {
+        return -getA(point);
     }
 
     private double getA(PathSE2Point state) {

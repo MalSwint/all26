@@ -20,19 +20,19 @@ public interface TimingConstraint {
      * 
      * Always positive.
      */
-    double maxV(PathSE2Point state);
+    double maxV(PathSE2Point point);
 
     /**
      * Maximum allowed pathwise acceleration, m/s^2.
      * 
      * Always positive.
      */
-    double maxAccel(PathSE2Point state, double velocityM_S);
+    double maxAccel(PathSE2Point point, double velocityM_S);
 
     /**
      * Maximum allowed pathwise deceleration, m/s^2.
      * 
      * Always negative.
      */
-    double maxDecel(PathSE2Point state, double velocityM_S);
+    double maxDecel(PathSE2Point point, double velocityM_S);
 }

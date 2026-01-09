@@ -42,16 +42,16 @@ public class SwerveDriveDynamicsConstraint implements TimingConstraint {
      * speed allowed (m/s) that maintains the target spatial heading rate.
      */
     @Override
-    public double maxV(PathSE2Point state) {
+    public double maxV(PathSE2Point point) {
         // First check instantaneous velocity and compute a limit based on drive
         // velocity.
-        Rotation2d course = state.waypoint().course().toRotation();
-        Rotation2d heading = state.waypoint().pose().getRotation();
+        Rotation2d course = point.waypoint().course().toRotation();
+        Rotation2d heading = point.waypoint().pose().getRotation();
         Rotation2d course_local = course.minus(heading);
         double vx = course_local.getCos();
         double vy = course_local.getSin();
         // rad/m
-        double vtheta = state.getHeadingRateRad_M();
+        double vtheta = point.getHeadingRateRad_M();
 
         // first compute the effect of heading rate
 
@@ -79,7 +79,7 @@ public class SwerveDriveDynamicsConstraint implements TimingConstraint {
      * @see SwerveUtil.getAccelLimit()
      */
     @Override
-    public double maxAccel(PathSE2Point state, double velocity) {
+    public double maxAccel(PathSE2Point point, double velocity) {
         if (Double.isNaN(velocity))
             throw new IllegalArgumentException();
         double maxAccel = SwerveUtil.minAccel(m_limits, 1, 1, velocity);
@@ -92,7 +92,7 @@ public class SwerveDriveDynamicsConstraint implements TimingConstraint {
     }
 
     @Override
-    public double maxDecel(PathSE2Point state, double velocity) {
+    public double maxDecel(PathSE2Point point, double velocity) {
         // min accel is stronger than max accel
         return -1.0 * maxA();
     }

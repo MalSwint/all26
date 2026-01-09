@@ -33,9 +33,9 @@ public class DiamondConstraint implements TimingConstraint {
     }
 
     @Override
-    public double maxV(PathSE2Point state) {
-        Rotation2d course = state.waypoint().course().toRotation();
-        Rotation2d heading = state.waypoint().pose().getRotation();
+    public double maxV(PathSE2Point point) {
+        Rotation2d course = point.waypoint().course().toRotation();
+        Rotation2d heading = point.waypoint().pose().getRotation();
         Rotation2d strafe = course.minus(heading);
         // a rhombus is a superellipse with exponent 1
         // https://en.wikipedia.org/wiki/Superellipse
@@ -45,13 +45,13 @@ public class DiamondConstraint implements TimingConstraint {
     }
 
     @Override
-    public double maxAccel(PathSE2Point state, double velocityM_S) {
+    public double maxAccel(PathSE2Point point, double velocityM_S) {
         // TODO: this should also have a diamond shape
         return m_maxAccel.getAsDouble();
     }
 
     @Override
-    public double maxDecel(PathSE2Point state, double velocity) {
+    public double maxDecel(PathSE2Point point, double velocity) {
         return -m_maxAccel.getAsDouble();
     }
 

@@ -5,7 +5,6 @@ import java.util.List;
 import org.team100.lib.geometry.WaypointSE3;
 import org.team100.lib.trajectory.path.PathFactorySE3;
 import org.team100.lib.trajectory.path.PathSE3;
-import org.team100.lib.trajectory.timing.TrajectorySE3Factory;
 
 public class TrajectorySE3Planner {
     private static final boolean DEBUG = false;

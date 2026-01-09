@@ -15,8 +15,8 @@ import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.PathToVectorSeries;
-import org.team100.lib.trajectory.path.spline.SplineFactorySE2;
-import org.team100.lib.trajectory.path.spline.SplineSE2;
+import org.team100.lib.trajectory.spline.SplineFactorySE2;
+import org.team100.lib.trajectory.spline.SplineSE2;
 import org.team100.lib.util.ChartUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;

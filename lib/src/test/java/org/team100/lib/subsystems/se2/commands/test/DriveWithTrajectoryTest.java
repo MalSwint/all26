@@ -33,12 +33,12 @@ import org.team100.lib.subsystems.swerve.module.SwerveModuleCollection;
 import org.team100.lib.subsystems.swerve.module.state.SwerveModulePositions;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.TrajectorySE2;
+import org.team100.lib.trajectory.TrajectorySE2Factory;
 import org.team100.lib.trajectory.TrajectorySE2Planner;
+import org.team100.lib.trajectory.constraint.TimingConstraint;
+import org.team100.lib.trajectory.constraint.TimingConstraintFactory;
 import org.team100.lib.trajectory.examples.TrajectoryExamples;
 import org.team100.lib.trajectory.path.PathSE2Factory;
-import org.team100.lib.trajectory.timing.TimingConstraint;
-import org.team100.lib.trajectory.timing.TimingConstraintFactory;
-import org.team100.lib.trajectory.timing.TrajectorySE2Factory;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -63,7 +63,7 @@ public class DriveWithTrajectoryTest implements Timeless {
                 new Pose2d(0, 0, Rotation2d.kZero),
                 new Pose2d(1, 0, Rotation2d.kZero));
         // first state is motionless
-        assertEquals(0, t.sample(0).velocityM_S(), DELTA);
+        assertEquals(0, t.sample(0).point().velocity(), DELTA);
         ControllerSE2 controller = ControllerFactorySE2.test(logger);
 
         // initially at rest
@@ -120,7 +120,7 @@ public class DriveWithTrajectoryTest implements Timeless {
                 new Pose2d(0, 0, Rotation2d.kZero),
                 new Pose2d(1, 0, Rotation2d.kZero));
         // first state is motionless
-        assertEquals(0, t.sample(0).velocityM_S(), DELTA);
+        assertEquals(0, t.sample(0).point().velocity(), DELTA);
         ControllerSE2 controller = ControllerFactorySE2.test(logger);
 
         // initially at rest
@@ -163,7 +163,7 @@ public class DriveWithTrajectoryTest implements Timeless {
                 new Pose2d(0, 0, Rotation2d.kZero),
                 new Pose2d(1, 0, Rotation2d.kZero));
         // first state is motionless
-        assertEquals(0, trajectory.sample(0).velocityM_S(), DELTA);
+        assertEquals(0, trajectory.sample(0).point().velocity(), DELTA);
         ControllerSE2 controller = ControllerFactorySE2.test(logger);
 
         Gyro gyro = new SimulatedGyro(logger, swerveKinodynamics, collection);

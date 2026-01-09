@@ -19,17 +19,15 @@ import org.team100.lib.state.ModelSE2;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.testing.Timeless;
+import org.team100.lib.trajectory.constraint.CapsizeAccelerationConstraint;
+import org.team100.lib.trajectory.constraint.ConstantConstraint;
+import org.team100.lib.trajectory.constraint.SwerveDriveDynamicsConstraint;
+import org.team100.lib.trajectory.constraint.TimingConstraint;
+import org.team100.lib.trajectory.constraint.TimingConstraintFactory;
+import org.team100.lib.trajectory.constraint.YawRateConstraint;
 import org.team100.lib.trajectory.examples.TrajectoryExamples;
 import org.team100.lib.trajectory.path.PathSE2Factory;
 import org.team100.lib.trajectory.path.PathSE2Point;
-import org.team100.lib.trajectory.timing.CapsizeAccelerationConstraint;
-import org.team100.lib.trajectory.timing.ConstantConstraint;
-import org.team100.lib.trajectory.timing.SwerveDriveDynamicsConstraint;
-import org.team100.lib.trajectory.timing.TimedStateSE2;
-import org.team100.lib.trajectory.timing.TimingConstraint;
-import org.team100.lib.trajectory.timing.TimingConstraintFactory;
-import org.team100.lib.trajectory.timing.TrajectorySE2Factory;
-import org.team100.lib.trajectory.timing.YawRateConstraint;
 import org.team100.lib.util.ChartUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -60,12 +58,12 @@ class TrajectorySE2PlannerTest implements Timeless {
         TrajectorySE2Planner planner = new TrajectorySE2Planner(pathFactory, trajectoryFactory);
         TrajectorySE2 t = planner.restToRest(waypoints);
         assertEquals(17, t.length());
-        TimedStateSE2 tp = t.getPoint(0);
+        TrajectorySE2Entry tp = t.getPoint(0);
         // start at zero velocity
-        assertEquals(0, tp.velocityM_S(), DELTA);
-        TimedStateSE2 p = t.getPoint(8);
-        assertEquals(0.5, p.point().waypoint().pose().getTranslation().getX(), DELTA);
-        assertEquals(0, p.point().getHeadingRateRad_M(), DELTA);
+        assertEquals(0, tp.point().velocity(), DELTA);
+        TrajectorySE2Entry p = t.getPoint(8);
+        assertEquals(0.5, p.point().point().waypoint().pose().getTranslation().getX(), DELTA);
+        assertEquals(0, p.point().point().getHeadingRateRad_M(), DELTA);
     }
 
     @Test
@@ -93,11 +91,11 @@ class TrajectorySE2PlannerTest implements Timeless {
         TrajectorySE2Planner planner = new TrajectorySE2Planner(pathFactory, trajectoryFactory);
         TrajectorySE2 t = planner.restToRest(waypoints);
         assertEquals(17, t.length());
-        TimedStateSE2 tp = t.getPoint(0);
-        assertEquals(0, tp.velocityM_S(), DELTA);
-        TimedStateSE2 p = t.getPoint(8);
-        assertEquals(0.5, p.point().waypoint().pose().getTranslation().getX(), DELTA);
-        assertEquals(0, p.point().getHeadingRateRad_M(), DELTA);
+        TrajectorySE2Entry tp = t.getPoint(0);
+        assertEquals(0, tp.point().velocity(), DELTA);
+        TrajectorySE2Entry p = t.getPoint(8);
+        assertEquals(0.5, p.point().point().waypoint().pose().getTranslation().getX(), DELTA);
+        assertEquals(0, p.point().point().getHeadingRateRad_M(), DELTA);
     }
 
     /**
@@ -137,9 +135,9 @@ class TrajectorySE2PlannerTest implements Timeless {
             System.out.printf("duration per iteration ms: %5.3f\n", totalDurationMs / iterations);
         }
         assertEquals(33, t.length());
-        TimedStateSE2 p = t.getPoint(12);
-        assertEquals(0.605, p.point().waypoint().pose().getTranslation().getX(), DELTA);
-        assertEquals(0, p.point().getHeadingRateRad_M(), DELTA);
+        TrajectorySE2Entry p = t.getPoint(12);
+        assertEquals(0.605, p.point().point().waypoint().pose().getTranslation().getX(), DELTA);
+        assertEquals(0, p.point().point().getHeadingRateRad_M(), DELTA);
     }
 
     @Test
@@ -159,17 +157,17 @@ class TrajectorySE2PlannerTest implements Timeless {
         double m_timeS = 0;
 
         // initial velocity is zero.
-        assertEquals(0, trajectory.sample(m_timeS).velocityM_S(), DELTA);
+        assertEquals(0, trajectory.sample(m_timeS).point().velocity(), DELTA);
 
         double maxDriveVelocityM_S = swerveKinodynamics.getMaxDriveVelocityM_S();
         double maxDriveAccelerationM_S2 = swerveKinodynamics.getMaxDriveAccelerationM_S2();
         assertEquals(5, maxDriveVelocityM_S);
         assertEquals(10, maxDriveAccelerationM_S2);
-        for (TimedStateSE2 p : trajectory.getPoints()) {
-            assertTrue(p.velocityM_S() - 0.001 <= maxDriveVelocityM_S,
-                    String.format("%f %f", p.velocityM_S(), maxDriveVelocityM_S));
-            assertTrue(p.acceleration() - 0.001 <= maxDriveAccelerationM_S2,
-                    String.format("%f %f", p.acceleration(), maxDriveAccelerationM_S2));
+        for (TrajectorySE2Entry p : trajectory.getPoints()) {
+            assertTrue(p.point().velocity() - 0.001 <= maxDriveVelocityM_S,
+                    String.format("%f %f", p.point().velocity(), maxDriveVelocityM_S));
+            assertTrue(p.point().accel() - 0.001 <= maxDriveAccelerationM_S2,
+                    String.format("%f %f", p.point().accel(), maxDriveAccelerationM_S2));
         }
     }
 
@@ -417,34 +415,34 @@ class TrajectorySE2PlannerTest implements Timeless {
         TrajectorySE2Planner planner = new TrajectorySE2Planner(pathFactory, trajectoryFactory);
         TrajectorySE2 trajectory = planner.generateTrajectory(waypoints, 0, 0);
         double duration = trajectory.duration();
-        TimedStateSE2 p0 = trajectory.sample(0);
+        TrajectorySE2Entry p0 = trajectory.sample(0);
         if (DEBUG)
             System.out.println(
                     "t, intrinsic_heading_dt, heading_dt, intrinsic_ca, extrinsic_ca, extrinsic v, intrinsic v, dcourse, dcourse1");
         for (double t = 0.04; t < duration; t += 0.04) {
-            TimedStateSE2 p1 = trajectory.sample(t);
-            Rotation2d heading0 = p0.point().waypoint().pose().getRotation();
-            Rotation2d heading1 = p1.point().waypoint().pose().getRotation();
+            TrajectorySE2Entry p1 = trajectory.sample(t);
+            Rotation2d heading0 = p0.point().point().waypoint().pose().getRotation();
+            Rotation2d heading1 = p1.point().point().waypoint().pose().getRotation();
             double dheading = heading1.minus(heading0).getRadians();
             // compute time derivative of heading two ways:
             // this just compares the poses and uses the known time step
             double dheadingDt = dheading / 0.04;
             // this uses the intrinsic heading rate and the velocity
             // rad/m * m/s = rad/s
-            double intrinsicDheadingDt = p0.point().getHeadingRateRad_M() * p0.velocityM_S();
+            double intrinsicDheadingDt = p0.point().point().getHeadingRateRad_M() * p0.point().velocity();
             // curvature is used to compute centripetal acceleration
             // ca = v^2*curvature
-            DirectionSE2 course0 = p0.point().waypoint().course();
-            DirectionSE2 course1 = p1.point().waypoint().course();
-            p1.point().waypoint().pose().log(p0.point().waypoint().pose());
+            DirectionSE2 course0 = p0.point().point().waypoint().course();
+            DirectionSE2 course1 = p1.point().point().waypoint().course();
+            p1.point().point().waypoint().pose().log(p0.point().point().waypoint().pose());
             double dcourse1 = Metrics.translationalNorm(course1.minus(course0));
             double dcourse = course1.toRotation().minus(course0.toRotation()).getRadians();
-            double intrinsicCa = p0.velocityM_S() * p0.velocityM_S() * p0.point().getCurvatureRad_M();
+            double intrinsicCa = p0.point().velocity() * p0.point().velocity() * p0.point().point().getCurvatureRad_M();
 
             if (DEBUG)
                 System.out.printf("%5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f\n",
                         t, intrinsicDheadingDt, dheadingDt,
-                        intrinsicCa, p0.velocityM_S(),
+                        intrinsicCa, p0.point().velocity(),
                         dcourse, dcourse1);
             p0 = p1;
         }

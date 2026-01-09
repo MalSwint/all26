@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.team100.lib.geometry.WaypointSE2;
+import org.team100.lib.trajectory.constraint.TimingConstraint;
 import org.team100.lib.trajectory.path.PathSE2Point;
-import org.team100.lib.trajectory.timing.TimedStateSE2;
-import org.team100.lib.trajectory.timing.TimingConstraint;
-import org.team100.lib.trajectory.timing.TimingUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;
 
@@ -18,7 +16,7 @@ import edu.wpi.first.math.geometry.Pose2d;
  * TimedState.
  */
 public class TrajectorySE2 {
-    private final List<TimedStateSE2> m_points;
+    private final List<TrajectorySE2Entry> m_points;
     /** Constraints used for this trajectory, for resampling */
     private final List<TimingConstraint> m_constraints;
     private final double m_duration;
@@ -31,10 +29,10 @@ public class TrajectorySE2 {
 
     /** First timestamp must be zero. */
     public TrajectorySE2(
-            List<TimedStateSE2> points, List<TimingConstraint> constraints) {
+            List<TrajectorySE2Entry> points, List<TimingConstraint> constraints) {
         m_points = points;
         m_constraints = constraints;
-        m_duration = m_points.get(m_points.size() - 1).getTimeS();
+        m_duration = m_points.get(m_points.size() - 1).point().time();
     }
 
     /**
@@ -42,7 +40,7 @@ public class TrajectorySE2 {
      * 
      * @param timeS start is zero.
      */
-    public TimedStateSE2 sample(double timeS) {
+    public TrajectorySE2Entry sample(double timeS) {
         // This scans the whole trajectory for every sample, but most of the time
         // is the interpolation; I tried a TreeMap index and it only saved a few
         // nanoseconds per call.
@@ -56,14 +54,14 @@ public class TrajectorySE2 {
         }
 
         for (int i = 1; i < length(); ++i) {
-            final TimedStateSE2 ceil = getPoint(i);
-            if (ceil.getTimeS() >= timeS) {
-                final TimedStateSE2 floor = getPoint(i - 1);
-                double span = ceil.getTimeS() - floor.getTimeS();
+            final TrajectorySE2Entry ceil = getPoint(i);
+            if (ceil.point().time() >= timeS) {
+                final TrajectorySE2Entry floor = getPoint(i - 1);
+                double span = ceil.point().time() - floor.point().time();
                 if (Math.abs(span) <= 1e-12) {
                     return ceil;
                 }
-                double delta_t = timeS - floor.getTimeS();
+                double delta_t = timeS - floor.point().time();
                 return TimingUtil.interpolate(floor, ceil, delta_t);
             }
         }
@@ -83,15 +81,15 @@ public class TrajectorySE2 {
         return m_points.size();
     }
 
-    public TimedStateSE2 getLastPoint() {
+    public TrajectorySE2Entry getLastPoint() {
         return m_points.get(length() - 1);
     }
 
-    public List<TimedStateSE2> getPoints() {
+    public List<TrajectorySE2Entry> getPoints() {
         return m_points;
     }
 
-    public TimedStateSE2 getPoint(int index) {
+    public TrajectorySE2Entry getPoint(int index) {
         return m_points.get(index);
     }
 
@@ -115,12 +113,12 @@ public class TrajectorySE2 {
     public void dump() {
         System.out.println("i, s, t, v, a, k, x, y");
         for (int i = 0; i < length(); ++i) {
-            TimedStateSE2 ts = getPoint(i);
-            PathSE2Point pwm = ts.point();
+            TrajectorySE2Entry ts = getPoint(i);
+            PathSE2Point pwm = ts.point().point();
             WaypointSE2 w = pwm.waypoint();
             Pose2d p = w.pose();
             System.out.printf("%d, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f\n",
-                    i, ts.getTimeS(), ts.velocityM_S(), ts.acceleration(), pwm.getCurvatureRad_M(),
+                    i, ts.point().time(), ts.point().velocity(), ts.point().accel(), pwm.getCurvatureRad_M(),
                     p.getX(), p.getY());
         }
     }
@@ -129,12 +127,12 @@ public class TrajectorySE2 {
     public void tdump() {
         System.out.println("t, v, a, k, x, y");
         for (double t = 0; t < duration(); t += 0.02) {
-            TimedStateSE2 ts = sample(t);
-            PathSE2Point pwm = ts.point();
+            TrajectorySE2Entry ts = sample(t);
+            PathSE2Point pwm = ts.point().point();
             WaypointSE2 w = pwm.waypoint();
             Pose2d p = w.pose();
             System.out.printf("%5.3f, %5.3f, %5.3f, %5.3f, %5.3f, %5.3f\n",
-                    ts.getTimeS(), ts.velocityM_S(), ts.acceleration(), pwm.getCurvatureRad_M(), p.getX(), p.getY());
+                    ts.point().time(), ts.point().velocity(), ts.point().accel(), pwm.getCurvatureRad_M(), p.getX(), p.getY());
         }
     }
 }

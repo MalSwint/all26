@@ -15,13 +15,11 @@ import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.path.PathSE2Factory;
+import org.team100.lib.trajectory.spline.SplineFactorySE2;
+import org.team100.lib.trajectory.spline.SplineSE2;
+import org.team100.lib.trajectory.constraint.TimingConstraint;
+import org.team100.lib.trajectory.constraint.TimingConstraintFactory;
 import org.team100.lib.trajectory.path.PathSE2;
-import org.team100.lib.trajectory.path.spline.SplineFactorySE2;
-import org.team100.lib.trajectory.path.spline.SplineSE2;
-import org.team100.lib.trajectory.timing.TimedStateSE2;
-import org.team100.lib.trajectory.timing.TimingConstraint;
-import org.team100.lib.trajectory.timing.TimingConstraintFactory;
-import org.team100.lib.trajectory.timing.TrajectorySE2Factory;
 import org.team100.lib.util.ChartUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -55,17 +53,17 @@ class TrajectorySE2Test implements Timeless {
 
         TrajectorySE2 trajectory = planner.restToRest(waypoints);
 
-        TimedStateSE2 sample = trajectory.sample(0);
-        assertEquals(0, sample.point().waypoint().pose().getTranslation().getX(), DELTA);
+        TrajectorySE2Entry sample = trajectory.sample(0);
+        assertEquals(0, sample.point().point().waypoint().pose().getTranslation().getX(), DELTA);
 
         sample = trajectory.sample(1);
-        assertEquals(1, sample.point().waypoint().pose().getTranslation().getX(), DELTA);
+        assertEquals(1, sample.point().point().waypoint().pose().getTranslation().getX(), DELTA);
 
         sample = trajectory.sample(2);
-        assertEquals(1, sample.point().waypoint().pose().getTranslation().getX(), DELTA);
+        assertEquals(1, sample.point().point().waypoint().pose().getTranslation().getX(), DELTA);
 
         sample = trajectory.sample(3);
-        assertEquals(1, sample.point().waypoint().pose().getTranslation().getX(), DELTA);
+        assertEquals(1, sample.point().point().waypoint().pose().getTranslation().getX(), DELTA);
     }
 
     @Test
@@ -92,12 +90,12 @@ class TrajectorySE2Test implements Timeless {
             trajectory.dump();
 
         assertEquals(1.415, trajectory.duration(), DELTA);
-        TimedStateSE2 sample = trajectory.sample(0);
-        assertEquals(0, sample.point().waypoint().pose().getTranslation().getX(), DELTA);
+        TrajectorySE2Entry sample = trajectory.sample(0);
+        assertEquals(0, sample.point().point().waypoint().pose().getTranslation().getX(), DELTA);
         sample = trajectory.sample(1);
-        assertEquals(0.827, sample.point().waypoint().pose().getTranslation().getX(), DELTA);
+        assertEquals(0.827, sample.point().point().waypoint().pose().getTranslation().getX(), DELTA);
         sample = trajectory.sample(2);
-        assertEquals(1, sample.point().waypoint().pose().getTranslation().getX(), DELTA);
+        assertEquals(1, sample.point().point().waypoint().pose().getTranslation().getX(), DELTA);
     }
 
     /**
@@ -153,7 +151,7 @@ class TrajectorySE2Test implements Timeless {
     }
 
     private void check(TrajectorySE2 trajectory, double t, double x) {
-        assertEquals(x, trajectory.sample(t).point().waypoint().pose().getTranslation().getX(), DELTA);
+        assertEquals(x, trajectory.sample(t).point().point().waypoint().pose().getTranslation().getX(), DELTA);
     }
 
     /**

@@ -4,10 +4,9 @@ import java.util.List;
 
 import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.trajectory.path.PathSE2;
-import org.team100.lib.trajectory.path.spline.SplineFactorySE2;
-import org.team100.lib.trajectory.path.spline.SplineSE2;
 import org.team100.lib.trajectory.path.PathSE2Factory;
-import org.team100.lib.trajectory.timing.TrajectorySE2Factory;
+import org.team100.lib.trajectory.spline.SplineFactorySE2;
+import org.team100.lib.trajectory.spline.SplineSE2;
 
 /**
  * Creates a trajectory in three steps:

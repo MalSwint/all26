@@ -13,14 +13,14 @@ import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
 import org.team100.lib.optimization.NumericalJacobian100;
 import org.team100.lib.state.ModelSE2;
+import org.team100.lib.trajectory.TrajectorySE2Entry;
 import org.team100.lib.trajectory.TrajectorySE2;
+import org.team100.lib.trajectory.TrajectorySE2Factory;
 import org.team100.lib.trajectory.TrajectorySE2Planner;
+import org.team100.lib.trajectory.constraint.ConstantConstraint;
+import org.team100.lib.trajectory.constraint.TimingConstraint;
 import org.team100.lib.trajectory.examples.TrajectoryExamples;
 import org.team100.lib.trajectory.path.PathSE2Factory;
-import org.team100.lib.trajectory.timing.ConstantConstraint;
-import org.team100.lib.trajectory.timing.TimedStateSE2;
-import org.team100.lib.trajectory.timing.TimingConstraint;
-import org.team100.lib.trajectory.timing.TrajectorySE2Factory;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -243,8 +243,8 @@ public class JacobianTest {
         double d = t.duration();
         double dt = d / 20;
         for (double time = 0; time < d; time += dt) {
-            TimedStateSE2 tp = t.sample(time);
-            ModelSE2 sm = ModelSE2.fromMovingPathPointSE2(tp.point(), tp.velocityM_S());
+            TrajectorySE2Entry tp = t.sample(time);
+            ModelSE2 sm = ModelSE2.fromMovingPathPointSE2(tp.point().point(), tp.point().velocity());
             Pose2d p = sm.pose();
             VelocitySE2 v = sm.velocity();
             EAWConfig c = k.inverse(p);

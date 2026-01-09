@@ -1,6 +1,6 @@
 package org.team100.lib.trajectory.path;
 
-import org.team100.lib.trajectory.path.spline.SplineSE2;
+import org.team100.lib.trajectory.spline.SplineSE2;
 import org.team100.lib.util.Math100;
 
 public class PathUtil {

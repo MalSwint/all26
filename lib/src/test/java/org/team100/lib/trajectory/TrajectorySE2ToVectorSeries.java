@@ -5,7 +5,6 @@ import java.util.List;
 import org.jfree.data.xy.VectorSeries;
 import org.jfree.data.xy.XYSeries;
 import org.team100.lib.geometry.WaypointSE2;
-import org.team100.lib.trajectory.timing.TimedStateSE2;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
@@ -28,8 +27,8 @@ public class TrajectorySE2ToVectorSeries {
             System.out.printf("duration %f\n", duration);
         double dt = duration / POINTS;
         for (double time = 0; time < duration; time += dt) {
-            TimedStateSE2 p = t.sample(time);
-            WaypointSE2 pp = p.point().waypoint();
+            TrajectorySE2Entry p = t.sample(time);
+            WaypointSE2 pp = p.point().point().waypoint();
             double x = pp.pose().getTranslation().getX();
             double y = pp.pose().getTranslation().getY();
             Rotation2d heading = pp.pose().getRotation();
@@ -52,8 +51,8 @@ public class TrajectorySE2ToVectorSeries {
         double duration = trajectory.duration();
         double dt = duration / POINTS;
         for (double t = 0; t <= duration + 0.0001; t += dt) {
-            TimedStateSE2 p = trajectory.sample(t);
-            WaypointSE2 pp = p.point().waypoint();
+            TrajectorySE2Entry p = trajectory.sample(t);
+            WaypointSE2 pp = p.point().point().waypoint();
             double x = pp.pose().getTranslation().getX();
             series.add(t, x);
         }
@@ -70,9 +69,9 @@ public class TrajectorySE2ToVectorSeries {
         double duration = trajectory.duration();
         double dt = duration / POINTS;
         for (double t = 0; t <= duration + 0.0001; t += dt) {
-            TimedStateSE2 p = trajectory.sample(t);
-            Rotation2d course = p.point().waypoint().course().toRotation();
-            double velocityM_s = p.velocityM_S();
+            TrajectorySE2Entry p = trajectory.sample(t);
+            Rotation2d course = p.point().point().waypoint().course().toRotation();
+            double velocityM_s = p.point().velocity();
             System.out.println(velocityM_s);
             System.out.println(course);
             double xv = course.getCos() * velocityM_s;

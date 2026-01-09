@@ -12,13 +12,12 @@ import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
+import org.team100.lib.trajectory.constraint.ConstantConstraint;
+import org.team100.lib.trajectory.constraint.TimingConstraint;
+import org.team100.lib.trajectory.constraint.YawRateConstraint;
 import org.team100.lib.trajectory.path.PathSE2Factory;
-import org.team100.lib.trajectory.path.spline.SplineSE2;
-import org.team100.lib.trajectory.path.spline.SplineSE2ToVectorSeries;
-import org.team100.lib.trajectory.timing.ConstantConstraint;
-import org.team100.lib.trajectory.timing.TimingConstraint;
-import org.team100.lib.trajectory.timing.TrajectorySE2Factory;
-import org.team100.lib.trajectory.timing.YawRateConstraint;
+import org.team100.lib.trajectory.spline.SplineSE2;
+import org.team100.lib.trajectory.spline.SplineSE2ToVectorSeries;
 import org.team100.lib.util.ChartUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;

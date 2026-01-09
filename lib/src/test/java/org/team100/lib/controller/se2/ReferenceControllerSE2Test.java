@@ -23,15 +23,15 @@ import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.testing.Timeless;
 import org.team100.lib.trajectory.TrajectorySE2;
+import org.team100.lib.trajectory.TrajectorySE2Factory;
 import org.team100.lib.trajectory.TrajectorySE2Planner;
+import org.team100.lib.trajectory.constraint.TimingConstraint;
+import org.team100.lib.trajectory.constraint.TimingConstraintFactory;
 import org.team100.lib.trajectory.examples.TrajectoryExamples;
 import org.team100.lib.trajectory.path.PathSE2Factory;
+import org.team100.lib.trajectory.spline.SplineFactorySE2;
+import org.team100.lib.trajectory.spline.SplineSE2;
 import org.team100.lib.trajectory.path.PathSE2;
-import org.team100.lib.trajectory.path.spline.SplineFactorySE2;
-import org.team100.lib.trajectory.path.spline.SplineSE2;
-import org.team100.lib.trajectory.timing.TimingConstraint;
-import org.team100.lib.trajectory.timing.TimingConstraintFactory;
-import org.team100.lib.trajectory.timing.TrajectorySE2Factory;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -56,7 +56,7 @@ public class ReferenceControllerSE2Test implements Timeless {
                 new Pose2d(0, 0, Rotation2d.kZero),
                 new Pose2d(1, 0, Rotation2d.kZero));
         // first state is motionless
-        assertEquals(0, t.sample(0).velocityM_S(), DELTA);
+        assertEquals(0, t.sample(0).point().velocity(), DELTA);
         ControllerSE2 controller = ControllerFactorySE2.test(logger);
 
         // initially at rest
@@ -112,7 +112,7 @@ public class ReferenceControllerSE2Test implements Timeless {
                 new Pose2d(0, 0, Rotation2d.kZero),
                 new Pose2d(1, 0, Rotation2d.kZero));
         // first state is motionless
-        assertEquals(0, t.sample(0).velocityM_S(), DELTA);
+        assertEquals(0, t.sample(0).point().velocity(), DELTA);
         ControllerSE2 controller = ControllerFactorySE2.test(logger);
 
         // initially at rest
@@ -182,7 +182,7 @@ public class ReferenceControllerSE2Test implements Timeless {
         VelocityReferenceControllerSE2 referenceController = new VelocityReferenceControllerSE2(
                 logger, drive, swerveController, reference);
 
-        Pose2d pose = trajectory.sample(0).point().waypoint().pose();
+        Pose2d pose = trajectory.sample(0).point().point().waypoint().pose();
         VelocitySE2 velocity = VelocitySE2.ZERO;
 
         double mDt = 0.02;

@@ -7,13 +7,13 @@ import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.subsystems.tank.TankDrive;
+import org.team100.lib.trajectory.TrajectorySE2Entry;
 import org.team100.lib.trajectory.TrajectorySE2;
+import org.team100.lib.trajectory.TrajectorySE2Factory;
 import org.team100.lib.trajectory.TrajectorySE2Planner;
+import org.team100.lib.trajectory.constraint.ConstantConstraint;
+import org.team100.lib.trajectory.constraint.TimingConstraint;
 import org.team100.lib.trajectory.path.PathSE2Factory;
-import org.team100.lib.trajectory.timing.ConstantConstraint;
-import org.team100.lib.trajectory.timing.TrajectorySE2Factory;
-import org.team100.lib.trajectory.timing.TimedStateSE2;
-import org.team100.lib.trajectory.timing.TimingConstraint;
 import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.controller.LTVUnicycleController;
@@ -66,13 +66,13 @@ public class ToPoseWithTrajectory extends Command {
                 return;
             // current for position error
             double t = progress();
-            TimedStateSE2 current = m_trajectory.sample(t);
+            TrajectorySE2Entry current = m_trajectory.sample(t);
             // next for feedforward (and selecting K)
-            TimedStateSE2 next = m_trajectory.sample(t + TimedRobot100.LOOP_PERIOD_S);
+            TrajectorySE2Entry next = m_trajectory.sample(t + TimedRobot100.LOOP_PERIOD_S);
             Pose2d currentPose = m_drive.getPose();
-            Pose2d poseReference = current.point().waypoint().pose();
-            double velocityReference = next.velocityM_S();
-            double omegaReference = next.velocityM_S() * next.point().getHeadingRateRad_M();
+            Pose2d poseReference = current.point().point().waypoint().pose();
+            double velocityReference = next.point().velocity();
+            double omegaReference = next.point().velocity() * next.point().point().getHeadingRateRad_M();
             ChassisSpeeds speeds = m_controller.calculate(
                     currentPose, poseReference, velocityReference, omegaReference);
             m_drive.setVelocity(speeds.vxMetersPerSecond, speeds.omegaRadiansPerSecond);

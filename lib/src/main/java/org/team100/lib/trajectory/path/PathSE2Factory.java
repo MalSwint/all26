@@ -6,7 +6,7 @@ import java.util.List;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.GeometryUtil;
 import org.team100.lib.geometry.Metrics;
-import org.team100.lib.trajectory.path.spline.SplineSE2;
+import org.team100.lib.trajectory.spline.SplineSE2;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;

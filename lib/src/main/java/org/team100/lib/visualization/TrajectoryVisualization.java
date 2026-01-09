@@ -6,8 +6,8 @@ import org.team100.lib.geometry.WaypointSE2;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.LoggerFactory.DoubleArrayLogger;
+import org.team100.lib.trajectory.TrajectorySE2Entry;
 import org.team100.lib.trajectory.TrajectorySE2;
-import org.team100.lib.trajectory.timing.TimedStateSE2;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -31,8 +31,8 @@ public class TrajectoryVisualization {
     private static double[] fromTrajectorySE2(TrajectorySE2 m_trajectory) {
         double[] arr = new double[m_trajectory.length() * 3];
         int ndx = 0;
-        for (TimedStateSE2 p : m_trajectory.getPoints()) {
-            WaypointSE2 pose = p.point().waypoint();
+        for (TrajectorySE2Entry p : m_trajectory.getPoints()) {
+            WaypointSE2 pose = p.point().point().waypoint();
             arr[ndx + 0] = pose.pose().getTranslation().getX();
             arr[ndx + 1] = pose.pose().getTranslation().getY();
             arr[ndx + 2] = pose.pose().getRotation().getDegrees();

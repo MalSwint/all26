@@ -7,11 +7,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.team100.lib.geometry.DirectionSE3;
 import org.team100.lib.geometry.WaypointSE3;
+import org.team100.lib.trajectory.constraint.ConstantConstraintSE3;
+import org.team100.lib.trajectory.constraint.TimingConstraintSE3;
 import org.team100.lib.trajectory.path.PathFactorySE3;
-import org.team100.lib.trajectory.timing.ConstantConstraintSE3;
-import org.team100.lib.trajectory.timing.TimedStateSE3;
-import org.team100.lib.trajectory.timing.TimingConstraintSE3;
-import org.team100.lib.trajectory.timing.TrajectorySE3Factory;
 import org.team100.lib.util.ChartUtil3d;
 
 import edu.wpi.first.math.geometry.Pose3d;
@@ -43,7 +41,7 @@ public class TrajectorySE3Test {
             trajectory.dump();
 
         assertEquals(1.610, trajectory.duration(), DELTA);
-        TimedStateSE3 sample = trajectory.sample(0);
+        TrajectorySE3Entry sample = trajectory.sample(0);
         assertEquals(0, sample.point().waypoint().pose().getTranslation().getX(), DELTA);
         sample = trajectory.sample(1);
         assertEquals(0.461, sample.point().waypoint().pose().getTranslation().getX(), DELTA);

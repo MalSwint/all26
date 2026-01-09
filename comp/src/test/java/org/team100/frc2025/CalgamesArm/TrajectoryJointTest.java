@@ -15,14 +15,14 @@ import org.team100.lib.subsystems.prr.EAWConfig;
 import org.team100.lib.subsystems.prr.ElevatorArmWristKinematics;
 import org.team100.lib.subsystems.prr.JointAccelerations;
 import org.team100.lib.subsystems.prr.JointVelocities;
+import org.team100.lib.trajectory.TrajectorySE2Entry;
 import org.team100.lib.trajectory.TrajectorySE2;
+import org.team100.lib.trajectory.TrajectorySE2Factory;
 import org.team100.lib.trajectory.TrajectorySE2Planner;
+import org.team100.lib.trajectory.constraint.ConstantConstraint;
+import org.team100.lib.trajectory.constraint.TimingConstraint;
+import org.team100.lib.trajectory.constraint.YawRateConstraint;
 import org.team100.lib.trajectory.path.PathSE2Factory;
-import org.team100.lib.trajectory.timing.ConstantConstraint;
-import org.team100.lib.trajectory.timing.TimedStateSE2;
-import org.team100.lib.trajectory.timing.TimingConstraint;
-import org.team100.lib.trajectory.timing.TrajectorySE2Factory;
-import org.team100.lib.trajectory.timing.YawRateConstraint;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -68,9 +68,9 @@ public class TrajectoryJointTest {
                     .println(
                             "t, x, y, r, vx, vy, vr, ax, ay, ar, q1, q2, q3, q1dot, q2dot, q3dot, q1ddot, q2ddot, q3ddot");
         for (double tt = 0; tt < t.duration(); tt += 0.02) {
-            TimedStateSE2 sample = t.sample(tt);
+            TrajectorySE2Entry sample = t.sample(tt);
             ControlSE2 m = ControlSE2.fromMovingPathSE2Point(
-                    sample.point(), sample.velocityM_S(), sample.acceleration());
+                    sample.point().point(), sample.point().velocity(), sample.point().accel());
             Pose2d p = m.pose();
             VelocitySE2 v = m.velocity();
             AccelerationSE2 a = m.acceleration();

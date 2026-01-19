@@ -20,7 +20,6 @@ import org.team100.sim2026.actions.Move;
 import org.team100.sim2026.actions.ScoreOnly;
 
 public abstract class Robot implements Actor, BallContainer {
-    private static final int BIN_CAPACITY = 50;
     /** between adjacent zones */
     public static final int TRAVEL_TIME = 3;
     /** don't hunt for balls when there aren't very many */
@@ -46,6 +45,8 @@ public abstract class Robot implements Actor, BallContainer {
     public Action action = new Idle();
     // 2 chars
     public final String name;
+    private final int capacity;
+
     final SimRun sim;
     final AllianceColor alliance;
     /** another robot is blocking us, which slows everything down. */
@@ -54,11 +55,13 @@ public abstract class Robot implements Actor, BallContainer {
     public Robot(
             AllianceColor alliance,
             String name,
+            int capacity,
             int initialCount,
             SimRun sim) {
         this.alliance = alliance;
         this.sim = sim;
         this.name = name;
+        this.capacity = capacity;
         this.myZone = alliance == AllianceColor.RED ? sim.redZone : sim.blueZone;
         this.neutralZone = sim.neutralZone;
         this.otherZone = alliance == AllianceColor.RED ? sim.blueZone : sim.redZone;
@@ -164,7 +167,7 @@ public abstract class Robot implements Actor, BallContainer {
 
     void intakeAndScore() {
         // there are balls nearby so shoot them
-        int intakeCount = Math.min(Math.max(0, BIN_CAPACITY - count), intakeRate());
+        int intakeCount = Math.min(Math.max(0, capacity - count), intakeRate());
         int taken = location.take(intakeCount);
         count += taken;
         int actual = shoot(myHub);
@@ -224,7 +227,7 @@ public abstract class Robot implements Actor, BallContainer {
 
     private void intakeAndLob() {
         // both intake and lob
-        int intakeCount = Math.min(Math.max(0, BIN_CAPACITY - count), intakeRate());
+        int intakeCount = Math.min(Math.max(0, capacity - count), intakeRate());
         int taken = location.take(intakeCount);
         count += taken;
         int lobbed = shoot(myZone);
@@ -245,7 +248,7 @@ public abstract class Robot implements Actor, BallContainer {
         } else {
             // we're in the neutral zone
             // for now let's ferry
-            if (count >= BIN_CAPACITY) {
+            if (count >= capacity) {
                 // time to go back
                 moveTo(myZone);
             } else {
@@ -260,7 +263,7 @@ public abstract class Robot implements Actor, BallContainer {
     }
 
     void intakeOnly() {
-        int intakeCount = Math.min(Math.max(0, BIN_CAPACITY - count), intakeRate());
+        int intakeCount = Math.min(Math.max(0, capacity - count), intakeRate());
         int taken = location.take(intakeCount);
         count += taken;
         action = new IntakeOnly(taken);

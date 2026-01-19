@@ -15,11 +15,13 @@ public class Defender extends Robot {
     public Defender(
             AllianceColor alliance,
             String name,
+            int capacity,
             int initialCount,
             SimRun sim) {
         super(
                 alliance,
                 name,
+                capacity,
                 initialCount,
                 sim);
     }

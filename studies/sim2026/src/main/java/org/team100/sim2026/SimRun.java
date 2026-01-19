@@ -7,6 +7,7 @@ import java.util.Random;
 
 import org.team100.sim2026.actions.Block;
 import org.team100.sim2026.robots.Robot;
+import org.team100.sim2026.scenarios.Scenario;
 
 /** The main simulation loop, runs one simulation scenario. */
 public class SimRun {
@@ -46,11 +47,16 @@ public class SimRun {
 
     // set after auto
     AllianceColor firstActive;
+    final boolean printDetail;
 
-    public SimRun(Scenario scenario) {
+    final Alliance red;
+    final Alliance blue;
+
+    public SimRun(Scenario scenario, boolean printDetail) {
+        this.printDetail = printDetail;
         // TODO: avoid "this" leakage here.
-        Alliance red = scenario.red(this);
-        Alliance blue = scenario.blue(this);
+        this.red = scenario.red(this);
+        this.blue = scenario.blue(this);
         red1 = red.robot1;
         red2 = red.robot2;
         red3 = red.robot3;
@@ -175,6 +181,8 @@ public class SimRun {
 
     /** print the ball location header */
     void header() {
+        if (!printDetail)
+            return;
         System.out.print(
                 "            |---SCORE----|--------ZONE--------|----HUB----|--OUTPOST--");
         System.out.print("|----ACTIVE----");
@@ -194,6 +202,8 @@ public class SimRun {
 
     /** print the states and events */
     void row() {
+        if (!printDetail)
+            return;
         System.out.printf("%4d, %5d | %4d, %4d | %3d, %7d, %4d | %3d, %4d | %3d, %4d ",
                 matchTimer, total(), redScore.total(), blueScore.total(),
                 redZone.count(), neutralZone.count(), blueZone.count(),
@@ -208,7 +218,7 @@ public class SimRun {
     }
 
     void score() {
-        System.out.printf("RED\n  %s\nBLUE\n  %s\n", redScore, blueScore);
+        System.out.printf("RED:   %s %s\nBLUE:  %s %s\n", red.name, redScore, blue.name, blueScore);
     }
 
 }

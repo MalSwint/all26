@@ -14,11 +14,13 @@ public class Scorer extends Robot {
     public Scorer(
             AllianceColor alliance,
             String name,
+            int capacity,
             int initialCount,
             SimRun sim) {
         super(
                 alliance,
                 name,
+                capacity,
                 initialCount,
                 sim);
     }

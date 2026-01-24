@@ -1,0 +1,63 @@
+package org.team100.lib.targeting;
+
+import java.util.Optional;
+
+import org.team100.lib.geometry.GlobalVelocityR2;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+
+/**
+ * Time-of-flight recursion, as described by @oblarg is an iterative approach
+ * that works as follows:
+ * 
+ * 1. shoot at the target location
+ * 2. evolve the target location based on the TOF of that shot
+ * 3. repeat until the shooting solution doesn't change
+ * 
+ * see
+ * https://www.chiefdelphi.com/t/shoot-on-the-move-from-the-code-perspective/511815/21?u=truher
+ */
+public class TimeOfFlightRecursion {
+    private static final boolean DEBUG = false;
+
+    public record Solution(Rotation2d azimuth, Rotation2d elevation) {
+    }
+
+    /** Look up solution parameters for range. */
+    private final InverseRange m_inverseRange;
+    /** Solution TOF tolerance, seconds. */
+    private final double m_tolerance;
+
+    public TimeOfFlightRecursion(InverseRange inverseRange, double tolerance) {
+        m_inverseRange = inverseRange;
+        m_tolerance = tolerance;
+    }
+
+    public Optional<Solution> solve(
+            Translation2d robotPosition,
+            GlobalVelocityR2 robotVelocity,
+            Translation2d targetPosition,
+            GlobalVelocityR2 targetVelocity) {
+        // Target relative to robot
+        Translation2d T0 = targetPosition.minus(robotPosition);
+        // Target velocity relative to robot
+        GlobalVelocityR2 vT = targetVelocity.minus(robotVelocity);
+
+        double range = T0.getNorm();
+        double tof = m_inverseRange.get(range).tof();
+        double iter = 100;
+        while (iter-- > 0) {
+            Translation2d T = vT.integrate(T0, tof);
+            range = T.getNorm();
+            FiringParameters p2 = m_inverseRange.get(range);
+            if (DEBUG)
+                System.out.printf("range %f elevation %f tof %f\n", range, p2.elevation(), p2.tof());
+            if (Math.abs(tof - p2.tof()) < m_tolerance)
+                return Optional.of(new Solution(T.getAngle(), new Rotation2d(p2.elevation())));
+            tof = p2.tof();
+        }
+        return Optional.empty();
+    }
+
+}

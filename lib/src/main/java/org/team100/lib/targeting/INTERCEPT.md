@@ -185,6 +185,11 @@ There are a few options in `lib.optimization` for the optimizer, e.g.
 A good choice for the initial guesses would be pointing at the target's
 current location using the looked-up elevation for that location.
 
+# Iteration on TOF
+
+Another iterative approach evolves the target location with a given TOF (starting with zero),
+and aims directly at that, until the TOF of the solution matches.  See `TimeOfFlightRecursion`.
+
 ## Computing range and time of flight
 
 There is some code in `Drag` that describes the forces on a projectile,

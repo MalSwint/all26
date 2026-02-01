@@ -47,6 +47,9 @@ public class Uncertainty {
     /**
      * Figure 6 in the Wang paper indicates a U-shaped relationship between the "off
      * axis" angle and the error. Note the very large error at zero.
+     * 
+     * Remember that our tag normal direction is "into the page", but the "off axis"
+     * normal is "out of the page".
      */
     static double figure6(double offAxisAngleRad) {
         if (offAxisAngleRad < 0)

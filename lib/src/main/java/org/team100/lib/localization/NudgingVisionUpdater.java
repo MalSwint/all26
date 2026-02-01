@@ -71,7 +71,7 @@ public class NudgingVisionUpdater implements VisionUpdater {
         // Replay everything after the sample.
         m_odometryUpdater.replay(timestamp);
 
-        // Remember the 
+        // Remember the
         m_latestTimeS = Takt.get();
     }
 

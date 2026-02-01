@@ -16,31 +16,31 @@ public class MetricsTest {
     void testOffAxis() {
         // one meter away in x, facing us
         Transform3d tagInCamera = new Transform3d(1, 0, 0,
-                new Rotation3d(0, 0, Math.PI));
+                new Rotation3d(0, 0, 0));
         // we are on the axis.
         assertEquals(0, Metrics.offAxisAngleRad(tagInCamera), DELTA);
 
         // one meter away in x, rotated 45 degrees
         tagInCamera = new Transform3d(1, 0, 0,
-                new Rotation3d(0, 0, 3 * Math.PI / 4));
+                new Rotation3d(0, 0, Math.PI / 4));
         // we are 45 degrees from the axis
         assertEquals(Math.PI / 4, Metrics.offAxisAngleRad(tagInCamera), DELTA);
 
         // one meter away in x, rotated 45 degrees the other way
         tagInCamera = new Transform3d(1, 0, 0,
-                new Rotation3d(0, 0, -3 * Math.PI / 4));
+                new Rotation3d(0, 0, -Math.PI / 4));
         // we are 45 degrees from the axis
         assertEquals(Math.PI / 4, Metrics.offAxisAngleRad(tagInCamera), DELTA);
 
         // not rotated, but offset
         tagInCamera = new Transform3d(1, 1, 0,
-                new Rotation3d(0, 0, Math.PI));
+                new Rotation3d(0, 0, 0));
         // we are 45 degrees from the axis
         assertEquals(Math.PI / 4, Metrics.offAxisAngleRad(tagInCamera), DELTA);
 
         // rotated, and offset
-        tagInCamera = new Transform3d(1, -1, 0,
-                new Rotation3d(0, 0, 3 * Math.PI / 4));
+        tagInCamera = new Transform3d(1, 1, 0,
+                new Rotation3d(0, 0, Math.PI / 4));
         // we are on the axis
         assertEquals(0, Metrics.offAxisAngleRad(tagInCamera), DELTA);
     }

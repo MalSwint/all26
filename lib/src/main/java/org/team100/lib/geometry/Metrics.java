@@ -24,7 +24,9 @@ public class Metrics {
         Transform3d cameraInTagFrame = tagInCameraFrame.inverse();
         Translation3d cameraTranslation = cameraInTagFrame.getTranslation();
         Translation3d cameraDirection = cameraTranslation.div(cameraTranslation.getNorm());
-        Translation3d tagUnitNormal = new Translation3d(1, 0, 0);
+        // Tag orientation is "into the page" but unit normal direction is "out of the
+        // page," so the unit normal is negative in x.
+        Translation3d tagUnitNormal = new Translation3d(-1, 0, 0);
         double dot = GeometryUtil.dot(cameraDirection, tagUnitNormal);
         double angle = Math.acos(dot);
         return angle;

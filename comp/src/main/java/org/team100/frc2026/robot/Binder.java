@@ -129,7 +129,7 @@ public class Binder {
         onTrue(driver::a,
                 new DriveToPoseWithProfile(
                 fieldLogger, m_machinery.m_drive,holonomicController, HolonomicProfileFactory.get(
-                    coralSequence, m_machinery.m_swerveKinodynamics, 1, 0.5, 1, 0.2), () -> new Pose2d(15.167,3.846, new Rotation2d(0)) 
+                    coralSequence, m_machinery.m_swerveKinodynamics, 1, 0.5, 1, 0.2), () -> new Pose2d(15.366,5.227, new Rotation2d(0)) 
                     ));
 
         // Reset pose estimator so the current gyro rotation corresponds to 180.

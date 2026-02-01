@@ -116,21 +116,25 @@ public class SwerveModulePosition100
     public SwerveModulePosition100 interpolate(SwerveModulePosition100 endValue, double t) {
         double distLerp = MathUtil.interpolate(m_distanceMeters, endValue.m_distanceMeters, t);
         if (m_unwrappedAngle.isEmpty() && endValue.m_unwrappedAngle.isEmpty()) {
-            // no angle information at all == no idea where we are, just return zero.
+            // No angle information at all == no idea where we are, just return zero.
             return new SwerveModulePosition100(0.0, Optional.empty());
         }
         if (m_unwrappedAngle.isEmpty()) {
-            // start is unknown but end is known, so use end.
+            // Start is unknown but end is known, so use end.
             Rotation2d angleLerp = endValue.m_unwrappedAngle.get();
             return new SwerveModulePosition100(distLerp, Optional.of(angleLerp));
         }
         if (endValue.m_unwrappedAngle.isEmpty()) {
-            // start is known but end is not, so use start.
+            // Start is known but end is not, so use start.
             Rotation2d angleLerp = m_unwrappedAngle.get();
             return new SwerveModulePosition100(distLerp, Optional.of(angleLerp));
         }
-        // both start and end are known, so interpolate.
-        Rotation2d angleLerp = m_unwrappedAngle.get().interpolate(endValue.m_unwrappedAngle.get(), t);
+        // Both start and end are known.
+        // This is the old method, interpolating the angle.
+        // Rotation2d angleLerp = m_unwrappedAngle.get().interpolate(endValue.m_unwrappedAngle.get(), t);
+        // Kinematics assumes that the path from start to end consists of straight
+        // lines, using the end angles, so that's what we do here too.
+        Rotation2d angleLerp = endValue.m_unwrappedAngle.get();
         return new SwerveModulePosition100(distLerp, Optional.of(angleLerp));
     }
 

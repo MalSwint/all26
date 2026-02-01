@@ -9,26 +9,29 @@ import org.team100.lib.subsystems.swerve.module.state.SwerveModuleDeltas;
 import org.team100.lib.subsystems.swerve.module.state.SwerveModulePositions;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.Interpolatable;
 
 class SwerveState implements Interpolatable<SwerveState> {
+    /** For interpolation. */
     private final SwerveDriveKinematics100 m_kinematics;
+    /** Position and velocity. */
     private final ModelSE2 m_state;
+    /** Wheel position and angle. */
     private final SwerveModulePositions m_positions;
+    /** Yaw observation from the gyro. */
+    private final Rotation2d m_gyroYaw;
 
-    /**
-     * @param kinematics Passed here for convenience.
-     * @param state      Position and velocity.
-     * @param positions  Current wheel position and angle.
-     */
     SwerveState(
             SwerveDriveKinematics100 kinematics,
             ModelSE2 state,
-            SwerveModulePositions positions) {
+            SwerveModulePositions positions,
+            Rotation2d gyroYaw) {
         m_kinematics = kinematics;
         m_state = state;
         m_positions = positions;
+        m_gyroYaw = gyroYaw;
     }
 
     /**
@@ -46,7 +49,7 @@ class SwerveState implements Interpolatable<SwerveState> {
      */
     @Override
     public SwerveState interpolate(SwerveState endValue, double t) {
-        if (t < 0) {
+        if (t <= 0) {
             return this;
         }
         if (t >= 1) {
@@ -61,17 +64,20 @@ class SwerveState implements Interpolatable<SwerveState> {
 
         // Create a twist to represent the change based on the interpolated sensor
         // inputs.
-        Twist2d twist = m_kinematics.toTwist2d(
-                SwerveModuleDeltas.modulePositionDelta(m_positions, wheelLerp));
+        SwerveModuleDeltas delta = SwerveModuleDeltas.modulePositionDelta(m_positions, wheelLerp);
+        Twist2d twist = m_kinematics.toTwist2d(delta);
         Pose2d pose = m_state.pose().exp(twist);
 
-        // these lerps are wrong but maybe close enough
+        // These lerps are wrong but maybe close enough
         VelocitySE2 startVelocity = m_state.velocity();
         VelocitySE2 endVelocity = endValue.m_state.velocity();
         VelocitySE2 velocity = startVelocity.plus(endVelocity.minus(startVelocity).times(t));
 
         ModelSE2 newState = new ModelSE2(pose, velocity);
-        return new SwerveState(m_kinematics, newState, wheelLerp);
+
+        Rotation2d gyroLerp = m_gyroYaw.interpolate(endValue.m_gyroYaw, t);
+
+        return new SwerveState(m_kinematics, newState, wheelLerp, gyroLerp);
     }
 
     @Override
@@ -93,6 +99,10 @@ class SwerveState implements Interpolatable<SwerveState> {
 
     public SwerveModulePositions positions() {
         return m_positions;
+    }
+
+    public Rotation2d gyroYaw() {
+        return m_gyroYaw;
     }
 
     @Override

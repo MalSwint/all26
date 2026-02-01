@@ -76,7 +76,11 @@ public class OdometryUpdater {
 
     /** For testing. */
     void update(double timestamp) {
-        put(timestamp, m_gyro.getYawNWU(), m_gyro.getYawRateNWU(), m_positions.get());
+        put(
+                timestamp,
+                m_gyro.getYawNWU(),
+                m_gyro.getYawRateNWU(),
+                m_positions.get());
     }
 
     /**
@@ -90,7 +94,11 @@ public class OdometryUpdater {
     /** For testing. */
     public void reset(Pose2d pose, double timestampSeconds) {
         m_gyroOffset = pose.getRotation().minus(m_gyro.getYawNWU());
-        m_history.reset(m_positions.get(), pose, timestampSeconds);
+        m_history.reset(
+                m_positions.get(),
+                pose,
+                timestampSeconds,
+                m_gyro.getYawNWU());
     }
 
     /**
@@ -101,7 +109,11 @@ public class OdometryUpdater {
             Pose2d pose,
             double timestampSeconds) {
         m_gyroOffset = pose.getRotation().minus(gyroAngle);
-        m_history.reset(m_positions.get(), pose, timestampSeconds);
+        m_history.reset(
+                m_positions.get(),
+                pose,
+                timestampSeconds,
+                gyroAngle);
     }
 
     ////////////////////////////////////////////////////
@@ -170,7 +182,7 @@ public class OdometryUpdater {
 
         ModelSE2 swerveState = new ModelSE2(newPose, velocity);
 
-        m_history.put(currentTimeS, swerveState, wheelPositions);
+        m_history.put(currentTimeS, swerveState, wheelPositions, gyroAngleRadNWU);
     }
 
     /** Replay odometry after the sample time. */

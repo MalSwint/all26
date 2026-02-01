@@ -63,9 +63,9 @@ public class Math100 {
 
     /** Linear interpolation between a and b */
     public static double interpolate(double a, double b, double x) {
-        if (x == 0)
+        if (x <= 0)
             return a;
-        if (x == 1)
+        if (x >= 1)
             return b;
         x = limit(x, 0.0, 1.0);
         if (x < 1e-12)

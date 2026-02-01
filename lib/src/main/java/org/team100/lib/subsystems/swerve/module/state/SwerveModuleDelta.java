@@ -38,7 +38,7 @@ public class SwerveModuleDelta {
      * indeterminate (e.g. calculating the angle required for zero speed). This is
      * not the *difference* in angle from start to end; it is the angle at the end.
      * 
-     * Note this is the field-relative wrapped angle, i.e. it's just dy/dx for the
+     * Note this is the robot-relative wrapped angle, i.e. it's just arctan for the
      * delta.
      */
     private final Optional<Rotation2d> m_wrappedAngle;

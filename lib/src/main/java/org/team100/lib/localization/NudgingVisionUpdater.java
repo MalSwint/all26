@@ -4,6 +4,7 @@ import org.team100.lib.coherence.Takt;
 import org.team100.lib.state.ModelSE2;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 
 /**
@@ -52,10 +53,13 @@ public class NudgingVisionUpdater implements VisionUpdater {
         // If there is a sample, nudge it towards the measurement.
         Pose2d nudged = nudge(
                 sample.state().pose(), measurement, stateSigma, visionSigma);
+        // For now, just use the sample yaw. Is this right?
+        Rotation2d gyroYaw = sample.gyroYaw();
         m_history.put(
                 timestampS,
                 new ModelSE2(nudged, sample.state().velocity()),
-                sample.positions());
+                sample.positions(),
+                gyroYaw);
         m_odometryUpdater.replay(timestampS);
         m_latestTimeS = Takt.get();
     }

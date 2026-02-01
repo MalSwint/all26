@@ -9,7 +9,7 @@ import edu.wpi.first.math.geometry.Translation2d;
  * This is just a container for the difference between two poses.
  * 
  * This treats the dimensions as independent, i.e. in the R3 tangent space,
- * not the SE(2) manifold.  Actually it's more like R2xS1, independently.
+ * not the SE(2) manifold. Actually it's more like R2xS1, independently.
  * 
  * The SE(2) difference represents a *geodesic* in SE(2), and for differences
  * that include rotation, this will appear as a curved path -- usually not what
@@ -35,6 +35,12 @@ public class DeltaSE2 {
         Translation2d t = end.getTranslation().minus(start.getTranslation());
         Rotation2d r = end.getRotation().minus(start.getRotation());
         return new DeltaSE2(t, r);
+    }
+
+    public double l2Norm() {
+        return Math.sqrt(m_translation.getX() * m_translation.getX()
+                + m_translation.getY() * m_translation.getY()
+                + m_rotation.getRadians() * m_rotation.getRadians());
     }
 
     public DeltaSE2 limit(double cartesian, double rotation) {

@@ -93,6 +93,10 @@ public class GeometryUtil {
         return a.getX() * b.x() + a.getY() * b.y();
     }
 
+    public static double dot(Translation3d a, Translation3d b) {
+        return a.getX() * b.getX() + a.getY() * b.getY() + a.getZ() * b.getZ();
+    }
+
     public static Twist2d discretize(ChassisSpeeds continuous, double dt) {
         ChassisSpeeds speeds = ChassisSpeeds.discretize(continuous, dt);
         return new Twist2d(
@@ -191,7 +195,8 @@ public class GeometryUtil {
     public static Pose2d interpolate(Pose2d a, Pose2d b, double x) {
         if (x <= 0.0) {
             return a;
-        } else if (x >= 1.0) {
+        }
+        if (x >= 1.0) {
             return b;
         }
         Translation2d aT = a.getTranslation();
@@ -231,7 +236,8 @@ public class GeometryUtil {
     public static Pose3d interpolate(Pose3d a, Pose3d b, double x) {
         if (x <= 0.0) {
             return a;
-        } else if (x >= 1.0) {
+        }
+        if (x >= 1.0) {
             return b;
         }
         Translation3d aT = a.getTranslation();
@@ -253,7 +259,8 @@ public class GeometryUtil {
     public static Rotation3d interpolate(Rotation3d a, Rotation3d b, double x) {
         if (x <= 0.0) {
             return a;
-        } else if (x >= 1.0) {
+        }
+        if (x >= 1.0) {
             return b;
         }
         return new Rotation3d(

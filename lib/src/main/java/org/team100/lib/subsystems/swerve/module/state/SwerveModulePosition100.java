@@ -24,8 +24,11 @@ public class SwerveModulePosition100
         Interpolatable<SwerveModulePosition100>,
         StructSerializable {
     private static final boolean DEBUG = false;
+    /** SwerveModulePosition struct for serialization. */
+    public static final SwerveModulePosition100Struct struct = new SwerveModulePosition100Struct();
+
     /** Distance measured by the wheel of the module. */
-    public double distanceMeters;
+    private final double m_distanceMeters;
 
     /**
      * Angle of the module. It can be empty, in cases where the angle is
@@ -33,18 +36,25 @@ public class SwerveModulePosition100
      * 
      * This is "unwrapped": its domain is infinite, not periodic within +/- pi.
      */
-    public Optional<Rotation2d> unwrappedAngle = Optional.empty();
-
-    /** SwerveModulePosition struct for serialization. */
-    public static final SwerveModulePosition100Struct struct = new SwerveModulePosition100Struct();
+    private final Optional<Rotation2d> m_unwrappedAngle;
 
     /** Zero distance and empty angle. */
     public SwerveModulePosition100() {
+        m_distanceMeters = 0;
+        m_unwrappedAngle = Optional.empty();
     }
 
     public SwerveModulePosition100(double distanceMeters, Optional<Rotation2d> unwrappedAngle) {
-        this.distanceMeters = distanceMeters;
-        this.unwrappedAngle = unwrappedAngle;
+        m_distanceMeters = distanceMeters;
+        m_unwrappedAngle = unwrappedAngle;
+    }
+
+    public double distanceMeters() {
+        return m_distanceMeters;
+    }
+
+    public Optional<Rotation2d> unwrappedAngle() {
+        return m_unwrappedAngle;
     }
 
     /**
@@ -56,22 +66,22 @@ public class SwerveModulePosition100
         if (!(obj instanceof SwerveModulePosition100 other))
             return false;
 
-        if (Math.abs(other.distanceMeters - distanceMeters) > 1E-9)
+        if (Math.abs(other.m_distanceMeters - m_distanceMeters) > 1E-9)
             return false;
-        if (unwrappedAngle.isEmpty() && other.unwrappedAngle.isPresent())
+        if (m_unwrappedAngle.isEmpty() && other.m_unwrappedAngle.isPresent())
             return false;
-        if (unwrappedAngle.isPresent() && other.unwrappedAngle.isEmpty())
+        if (m_unwrappedAngle.isPresent() && other.m_unwrappedAngle.isEmpty())
             return false;
-        if (unwrappedAngle.isEmpty() && other.unwrappedAngle.isEmpty())
+        if (m_unwrappedAngle.isEmpty() && other.m_unwrappedAngle.isEmpty())
             return true;
-        if (Math.abs(unwrappedAngle.get().getRadians() - other.unwrappedAngle.get().getRadians()) > 1e-9)
+        if (Math.abs(m_unwrappedAngle.get().getRadians() - other.m_unwrappedAngle.get().getRadians()) > 1e-9)
             return false;
         return true;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(distanceMeters, unwrappedAngle);
+        return Objects.hash(m_distanceMeters, m_unwrappedAngle);
     }
 
     /**
@@ -84,13 +94,13 @@ public class SwerveModulePosition100
      */
     @Override
     public int compareTo(SwerveModulePosition100 other) {
-        return Double.compare(this.distanceMeters, other.distanceMeters);
+        return Double.compare(m_distanceMeters, other.m_distanceMeters);
     }
 
     @Override
     public String toString() {
         return String.format(
-                "SwerveModulePosition(Distance: %.2f m, Angle: %s)", distanceMeters, unwrappedAngle);
+                "SwerveModulePosition(Distance: %.2f m, Angle: %s)", m_distanceMeters, m_unwrappedAngle);
     }
 
     /**
@@ -99,28 +109,32 @@ public class SwerveModulePosition100
      * @return A copy.
      */
     public SwerveModulePosition100 copy() {
-        return new SwerveModulePosition100(distanceMeters, unwrappedAngle);
+        return new SwerveModulePosition100(m_distanceMeters, m_unwrappedAngle);
     }
 
     @Override
     public SwerveModulePosition100 interpolate(SwerveModulePosition100 endValue, double t) {
-        double distLerp = MathUtil.interpolate(distanceMeters, endValue.distanceMeters, t);
-        if (this.unwrappedAngle.isEmpty() && endValue.unwrappedAngle.isEmpty()) {
-            // no angle information at all == no idea where we are, just return zero.
+        double distLerp = MathUtil.interpolate(m_distanceMeters, endValue.m_distanceMeters, t);
+        if (m_unwrappedAngle.isEmpty() && endValue.m_unwrappedAngle.isEmpty()) {
+            // No angle information at all == no idea where we are, just return zero.
             return new SwerveModulePosition100(0.0, Optional.empty());
         }
-        if (this.unwrappedAngle.isEmpty()) {
-            // start is unknown but end is known, so use end.
-            Rotation2d angleLerp = endValue.unwrappedAngle.get();
+        if (m_unwrappedAngle.isEmpty()) {
+            // Start is unknown but end is known, so use end.
+            Rotation2d angleLerp = endValue.m_unwrappedAngle.get();
             return new SwerveModulePosition100(distLerp, Optional.of(angleLerp));
         }
-        if (endValue.unwrappedAngle.isEmpty()) {
-            // start is known but end is not, so use start.
-            Rotation2d angleLerp = unwrappedAngle.get();
+        if (endValue.m_unwrappedAngle.isEmpty()) {
+            // Start is known but end is not, so use start.
+            Rotation2d angleLerp = m_unwrappedAngle.get();
             return new SwerveModulePosition100(distLerp, Optional.of(angleLerp));
         }
-        // both start and end are known, so interpolate.
-        Rotation2d angleLerp = unwrappedAngle.get().interpolate(endValue.unwrappedAngle.get(), t);
+        // Both start and end are known.
+        // This is the old method, interpolating the angle.
+        // Rotation2d angleLerp = m_unwrappedAngle.get().interpolate(endValue.m_unwrappedAngle.get(), t);
+        // Kinematics assumes that the path from start to end consists of straight
+        // lines, using the end angles, so that's what we do here too.
+        Rotation2d angleLerp = endValue.m_unwrappedAngle.get();
         return new SwerveModulePosition100(distLerp, Optional.of(angleLerp));
     }
 
@@ -130,19 +144,20 @@ public class SwerveModulePosition100
      * the difference between start and end angles is large.
      */
     public SwerveModulePosition100 plus(SwerveModuleDelta delta) {
-        double posM = distanceMeters + delta.distanceMeters;
-        if (delta.wrappedAngle.isPresent()) {
+        double posM = m_distanceMeters + delta.distanceMeters();
+        if (delta.wrappedAngle().isPresent()) {
             if (DEBUG) {
-                if (unwrappedAngle.isPresent()) {
+                if (m_unwrappedAngle.isPresent()) {
                     // note wrapping here
-                    Rotation2d angleDiff = delta.wrappedAngle.get().minus(unwrappedAngle.get());
+                    Rotation2d angleDiff = delta.wrappedAngle().get().minus(m_unwrappedAngle.get());
                     if (Math.abs(angleDiff.getRadians()) > 0.2) {
                         System.out.printf("very fast steering start: %f end: %f\n",
-                                unwrappedAngle.get().getRadians(), delta.wrappedAngle.get().getRadians());
+                                m_unwrappedAngle.get().getRadians(),
+                                delta.wrappedAngle().get().getRadians());
                     }
                 }
             }
-            return new SwerveModulePosition100(posM, delta.wrappedAngle);
+            return new SwerveModulePosition100(posM, delta.wrappedAngle());
         }
         // if there's no delta angle, we're not going anywhere.
         if (DEBUG)

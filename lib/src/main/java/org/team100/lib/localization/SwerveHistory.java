@@ -41,7 +41,7 @@ public class SwerveHistory implements DoubleFunction<ModelSE2> {
 
     private final DoubleLogger m_log_timestamp;
     private final SwerveKinodynamics m_kinodynamics;
-    private final TimeInterpolatableBuffer100<InterpolationRecord> m_poseBuffer;
+    private final TimeInterpolatableBuffer100<SwerveState> m_poseBuffer;
 
     public SwerveHistory(
             LoggerFactory parent,
@@ -55,12 +55,13 @@ public class SwerveHistory implements DoubleFunction<ModelSE2> {
         m_poseBuffer = new TimeInterpolatableBuffer100<>(
                 BUFFER_DURATION,
                 timestampSeconds,
-                new InterpolationRecord(
+                new SwerveState(
                         m_kinodynamics.getKinematics(),
                         new ModelSE2(
                                 initialPoseMeters,
                                 new VelocitySE2(0, 0, 0)),
-                        modulePositions));
+                        modulePositions,
+                        gyroAngle));
     }
 
     /**
@@ -69,21 +70,23 @@ public class SwerveHistory implements DoubleFunction<ModelSE2> {
     @Override
     public ModelSE2 apply(double timestampSeconds) {
         m_log_timestamp.log(() -> timestampSeconds);
-        return m_poseBuffer.get(timestampSeconds).m_state;
+        return m_poseBuffer.get(timestampSeconds).state();
     }
 
     /** Empty the buffer and add the given measurements. */
     void reset(
             SwerveModulePositions modulePositions,
             Pose2d pose,
-            double timestampSeconds) {
+            double timestampSeconds,
+            Rotation2d gyroYaw) {
         // empty the buffer and add the current pose
         m_poseBuffer.reset(
                 timestampSeconds,
-                new InterpolationRecord(
+                new SwerveState(
                         m_kinodynamics.getKinematics(),
                         new ModelSE2(pose, new VelocitySE2(0, 0, 0)),
-                        modulePositions));
+                        modulePositions,
+                        gyroYaw));
     }
 
     //////////////////////////////////////////////////
@@ -95,20 +98,22 @@ public class SwerveHistory implements DoubleFunction<ModelSE2> {
     void put(
             double timestamp,
             ModelSE2 model,
-            SwerveModulePositions positions) {
+            SwerveModulePositions positions,
+            Rotation2d gyroYaw) {
         m_poseBuffer.put(
                 timestamp,
-                new InterpolationRecord(
+                new SwerveState(
                         m_kinodynamics.getKinematics(),
                         model,
-                        positions));
+                        positions,
+                        gyroYaw));
     }
 
-    Entry<Double, InterpolationRecord> lowerEntry(double timestamp) {
+    Entry<Double, SwerveState> lowerEntry(double timestamp) {
         return m_poseBuffer.lowerEntry(timestamp);
     }
 
-    InterpolationRecord getRecord(double timestamp) {
+    SwerveState getRecord(double timestamp) {
         return m_poseBuffer.get(timestamp);
     }
 
@@ -116,7 +121,7 @@ public class SwerveHistory implements DoubleFunction<ModelSE2> {
         return m_poseBuffer.tooOld(timestamp);
     }
 
-    SortedMap<Double, InterpolationRecord> exclusiveTailMap(double timestamp) {
+    SortedMap<Double, SwerveState> exclusiveTailMap(double timestamp) {
         return m_poseBuffer.tailMap(timestamp, false);
     }
 

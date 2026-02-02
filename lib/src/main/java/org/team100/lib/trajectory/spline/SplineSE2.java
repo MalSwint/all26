@@ -3,10 +3,10 @@ package org.team100.lib.trajectory.spline;
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.Metrics;
 import org.team100.lib.geometry.WaypointSE2;
-import org.team100.lib.trajectory.CurveUtil;
 import org.team100.lib.trajectory.path.PathSE2Entry;
 import org.team100.lib.trajectory.path.PathSE2Parameter;
 import org.team100.lib.trajectory.path.PathSE2Point;
+import org.team100.lib.trajectory.path.PathUtil;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
@@ -203,7 +203,7 @@ public class SplineSE2 implements ISplineSE2 {
      * see MATH.md.
      */
     double curvature(double s) {
-        return CurveUtil.kappaSigned(T(s), K(s));
+        return PathUtil.kappaSigned(T(s), K(s));
     }
 
     /**
@@ -214,7 +214,7 @@ public class SplineSE2 implements ISplineSE2 {
      */
     @Override
     public Vector<N2> K(double s) {
-        return CurveUtil.K(rprime(s), rprimeprime(s));
+        return PathUtil.K(rprime(s), rprimeprime(s));
     }
 
     /**
@@ -223,7 +223,7 @@ public class SplineSE2 implements ISplineSE2 {
      * see MATH.md
      */
     Vector<N2> T(double s) {
-        return CurveUtil.T(rprime(s));
+        return PathUtil.T(rprime(s));
     }
 
     /**

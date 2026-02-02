@@ -2,10 +2,10 @@ package org.team100.lib.trajectory.spline;
 
 import org.team100.lib.geometry.DirectionSE3;
 import org.team100.lib.geometry.WaypointSE3;
-import org.team100.lib.trajectory.CurveUtil;
 import org.team100.lib.trajectory.path.PathSE3Entry;
 import org.team100.lib.trajectory.path.PathSE3Parameter;
 import org.team100.lib.trajectory.path.PathSE3Point;
+import org.team100.lib.trajectory.path.PathUtil;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -269,7 +269,7 @@ public class SplineSE3 {
      * see MATH.md
      */
     public Vector<N3> K(double s) {
-        return CurveUtil.K(rprime(s), rprimeprime(s));
+        return PathUtil.K(rprime(s), rprimeprime(s));
     }
 
     /**

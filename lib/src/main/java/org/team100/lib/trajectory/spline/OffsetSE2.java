@@ -2,10 +2,10 @@ package org.team100.lib.trajectory.spline;
 
 import org.team100.lib.geometry.DirectionSE2;
 import org.team100.lib.geometry.WaypointSE2;
-import org.team100.lib.trajectory.CurveUtil;
 import org.team100.lib.trajectory.path.PathSE2Entry;
 import org.team100.lib.trajectory.path.PathSE2Parameter;
 import org.team100.lib.trajectory.path.PathSE2Point;
+import org.team100.lib.trajectory.path.PathUtil;
 
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -59,7 +59,7 @@ public class OffsetSE2 implements ISplineSE2 {
 
     @Override
     public Vector<N2> K(double s) {
-        return CurveUtil.K(rprime(s), rprimeprime(s));
+        return PathUtil.K(rprime(s), rprimeprime(s));
     }
 
     @Override

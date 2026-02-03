@@ -41,9 +41,10 @@ public class Climber extends SubsystemBase {
 
         switch (Identity.instance) {
             case COMP_BOT -> {
-                Falcon6Motor motor = new Falcon6Motor(log, canID, NeutralMode.BRAKE, MotorPhase.REVERSE,
+                Falcon6Motor motor = new Falcon6Motor(
+                        log, canID, NeutralMode.BRAKE, MotorPhase.REVERSE,
                         20, 20,
-                        PIDConstants.makePositionPID(log, 1),
+                        PIDConstants.makePositionPID(log, 0.2),
                         Falcon6Motor.ff2(log));
 
                 double inputOffset = 0.440602;

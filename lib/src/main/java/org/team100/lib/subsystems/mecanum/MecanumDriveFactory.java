@@ -35,22 +35,20 @@ public class MecanumDriveFactory {
         LoggerFactory logRL = log.name("rearLeft");
         LoggerFactory logRR = log.name("rearRight");
 
-        // all wheels need the same ff/pid values
         Feedforward100 ff = NeoCANSparkMotor.ff(log);
-        // 10/22/25: Anay found this value worked well
-        // PIDConstants pid = PIDConstants.makeVelocityPID(log, 0.00005);
-// Doubled the value for auton 
-        PIDConstants pid = PIDConstants.makeVelocityPID(log, 0.0001);
-        // 10/22/25: Lincoln used this value
-        // PIDConstants.makeVelocityPID(0.0003));
+        PIDConstants pid = PIDConstants.makeVelocityPID(log, 0.01);
 
         Gyro gyro = gyro(log, gyroId);
         slip = slip(slip);
 
-        BareMotor motorFL = NeoCANSparkMotor.get(log, canFL, MotorPhase.REVERSE, statorLimit, ff, pid);
-        BareMotor motorFR = NeoCANSparkMotor.get(log, canFR, MotorPhase.FORWARD, statorLimit, ff, pid);
-        BareMotor motorRL = NeoCANSparkMotor.get(log, canRL, MotorPhase.REVERSE, statorLimit, ff, pid);
-        BareMotor motorRR = NeoCANSparkMotor.get(log, canRR, MotorPhase.FORWARD, statorLimit, ff, pid);
+        BareMotor motorFL = NeoCANSparkMotor.get(
+                log, canFL, MotorPhase.REVERSE, statorLimit, ff, pid);
+        BareMotor motorFR = NeoCANSparkMotor.get(
+                log, canFR, MotorPhase.FORWARD, statorLimit, ff, pid);
+        BareMotor motorRL = NeoCANSparkMotor.get(
+                log, canRL, MotorPhase.REVERSE, statorLimit, ff, pid);
+        BareMotor motorRR = NeoCANSparkMotor.get(
+                log, canRR, MotorPhase.FORWARD, statorLimit, ff, pid);
 
         return new MecanumDrive100(
                 log, fieldLogger, gyro, trackWidthM, wheelbaseM, slip,

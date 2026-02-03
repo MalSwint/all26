@@ -24,11 +24,12 @@ public class DrumShooterFactory {
         CanId canR = new CanId(19);
 
         Feedforward100 ff = Neo550CANSparkMotor.ff(log);
-        // This P value is a guess
-        PIDConstants pid = PIDConstants.makeVelocityPID(log, 0.0002);
+        PIDConstants pid = PIDConstants.makeVelocityPID(log, 0.02);
 
-        BareMotor motorL = Neo550CANSparkMotor.get(log, canL, MotorPhase.FORWARD, currentLimit, ff, pid);
-        BareMotor motorR = Neo550CANSparkMotor.get(log, canR, MotorPhase.REVERSE, currentLimit, ff, pid);
+        BareMotor motorL = Neo550CANSparkMotor.get(
+                log, canL, MotorPhase.FORWARD, currentLimit, ff, pid);
+        BareMotor motorR = Neo550CANSparkMotor.get(
+                log, canR, MotorPhase.REVERSE, currentLimit, ff, pid);
 
         return new DualDrumShooter(parent,
                 OutboardLinearVelocityServo.make(logL, motorL, GEAR_RATIO, WHEEL_DIA_M),

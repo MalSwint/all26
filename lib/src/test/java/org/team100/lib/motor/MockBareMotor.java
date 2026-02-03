@@ -5,14 +5,16 @@ import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
 
 public class MockBareMotor implements BareMotor, IncrementalBareEncoder {
     public double output = 0;
-    public double velocity = 0;
+    /** rad */
     public double position = 0;
+    /** rad/s */
+    public double velocity = 0;
+    /** rad/s^2 */
     public double accel = 0;
+    /** Nm */
     public double torque = 0;
 
-    /**
-     * this is for testing feedforwards.
-     */
+    /** These is for testing feedforwards. */
     public double ffVolts;
     public double frictionFFVolts;
     public double velocityFFVolts;
@@ -30,27 +32,24 @@ public class MockBareMotor implements BareMotor, IncrementalBareEncoder {
     }
 
     @Override
-    public void setVelocity(double velocityRad_S, double accel, double torque) {
-        this.velocity = velocityRad_S;
-        this.accel = accel;
-        this.torque = torque;
+    public void setVelocity(double motorRad_S, double motorRad_S2, double torqueNm) {
+        velocity = motorRad_S;
+        accel = motorRad_S2;
+        torque = torqueNm;
     }
 
     @Override
     public void setUnwrappedPosition(
-            double position, double velocity, double accelRad_S2, double torque) {
-        this.position = position;
-        this.velocity = velocity;
-        this.accel = accelRad_S2;
-        this.torque = torque;
+            double motorRad, double motorRad_S, double motorRad_S2, double torqueNm) {
+        position = motorRad;
+        velocity = motorRad_S;
+        accel = motorRad_S2;
+        torque = torqueNm;
 
-        final double motorRev_S = velocity / (2 * Math.PI);
-        final double motorRev_S2 = accelRad_S2 / (2 * Math.PI);
-
-        frictionFFVolts = m_ff.frictionFFVolts(motorRev_S);
-        velocityFFVolts = m_ff.velocityFFVolts(motorRev_S);
-        torqueFFVolts = getTorqueFFVolts(torque);
-        accelFFVolts = m_ff.accelFFVolts(motorRev_S, motorRev_S2);
+        frictionFFVolts = m_ff.frictionFFVolts(motorRad_S);
+        velocityFFVolts = m_ff.velocityFFVolts(motorRad_S);
+        torqueFFVolts = getTorqueFFVolts(torqueNm);
+        accelFFVolts = m_ff.accelFFVolts(motorRad_S, motorRad_S2);
         ffVolts = frictionFFVolts + velocityFFVolts + torqueFFVolts + accelFFVolts;
     }
 

@@ -186,9 +186,10 @@ public class FiveBarMech extends SubsystemBase {
 
     private Falcon6Motor makeMotor(LoggerFactory logger, CanId canId) {
         /** Units of positional PID are volts per revolution. */
-        PIDConstants PID = PIDConstants.makePositionPID(logger, 10.0);
+        PIDConstants pid = PIDConstants.makePositionPID(
+                logger, 2.0);
         /** We never use feedforward since all our goals are motionless. */
-        Feedforward100 FF = Feedforward100.zero(logger);
+        Feedforward100 ff = Feedforward100.zero(logger);
         return new Falcon6Motor(
                 logger,
                 canId,
@@ -196,8 +197,8 @@ public class FiveBarMech extends SubsystemBase {
                 MotorPhase.FORWARD,
                 SUPPLY_LIMIT,
                 STATOR_LIMIT,
-                PID,
-                FF);
+                pid,
+                ff);
     }
 
     /** For homing; ignores feasibility and limits. */

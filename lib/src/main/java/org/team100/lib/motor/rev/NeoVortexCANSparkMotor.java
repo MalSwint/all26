@@ -1,6 +1,6 @@
 package org.team100.lib.motor.rev;
 
-import org.team100.lib.config.Feedforward100;
+import org.team100.lib.config.SimpleDynamics;
 import org.team100.lib.config.Friction;
 import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
@@ -26,10 +26,11 @@ public class NeoVortexCANSparkMotor extends CANSparkMotor {
             NeutralMode neutral,
             MotorPhase motorPhase,
             int statorCurrentLimit,
-            Feedforward100 ff,
+            SimpleDynamics ff,
+            Friction friction,
             PIDConstants pid) {
         super(parent, new SparkFlex(canId.id, MotorType.kBrushless),
-                neutral, motorPhase, statorCurrentLimit, ff, pid);
+                neutral, motorPhase, statorCurrentLimit, ff, friction, pid);
     }
 
     /**
@@ -40,12 +41,12 @@ public class NeoVortexCANSparkMotor extends CANSparkMotor {
      */
     public static BareMotor get(
             LoggerFactory log, CanId can, MotorPhase phase, int statorLimit,
-            Feedforward100 ff, PIDConstants pid) {
+            SimpleDynamics ff, Friction friction, PIDConstants pid) {
         return switch (Identity.instance) {
             case BLANK ->
                 new SimulatedBareMotor(log, 600);
             default -> new NeoVortexCANSparkMotor(
-                    log, can, NeutralMode.BRAKE, phase, statorLimit, ff, pid);
+                    log, can, NeutralMode.BRAKE, phase, statorLimit, ff, friction, pid);
         };
 
     }
@@ -65,9 +66,11 @@ public class NeoVortexCANSparkMotor extends CANSparkMotor {
         return 6784;
     }
 
-    public static Feedforward100 ff(LoggerFactory log) {
-        // TODO: friction
-        return new Feedforward100(log, 0.000, 0.000,
-                new Friction(log, 0.100, 0.065, 0.0, 0.5));
+    public static SimpleDynamics ff(LoggerFactory log) {
+        return new SimpleDynamics(log, 0.000, 0.000);
+    }
+
+    public static Friction friction(LoggerFactory log) {
+        return new Friction(log, 0.100, 0.065, 0.0, 0.5);
     }
 }

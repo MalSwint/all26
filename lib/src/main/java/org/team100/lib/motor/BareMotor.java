@@ -31,8 +31,8 @@ public interface BareMotor extends Player {
      * Could be open-loop (e.g. "kV") or closed-loop.
      * 
      * @param velocityRad_S motor shaft speed, rad/s.
-     * @param accelRad_S2   rad/s^2.
-     * @param torqueNm      Nm, for gravity compensation or holding.
+     * @param accelRad_S2   rad/s^2. TODO: remove this field
+     * @param torqueNm      Nm, for gravity compensation or acceleration.
      */
     void setVelocity(
             double velocityRad_S,
@@ -81,8 +81,8 @@ public interface BareMotor extends Player {
      * 
      * @param positionRad   radians.
      * @param velocityRad_S rad/s.
-     * @param accelRad_S2   rad/s^2.
-     * @param torqueNm      Nm, for gravity compensation or holding.
+     * @param accelRad_S2   rad/s^2. TODO: remove this field
+     * @param torqueNm      Nm, for gravity compensation or acceleration.
      */
     void setUnwrappedPosition(
             double positionRad,

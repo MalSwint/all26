@@ -1,6 +1,7 @@
 package org.team100.lib.motor;
 
-import org.team100.lib.config.Feedforward100;
+import org.team100.lib.config.Friction;
+import org.team100.lib.config.SimpleDynamics;
 import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
 
 public class MockBareMotor implements BareMotor, IncrementalBareEncoder {
@@ -20,10 +21,12 @@ public class MockBareMotor implements BareMotor, IncrementalBareEncoder {
     public double backEMFVolts;
     public double torqueFFVolts;
     public double accelFFVolts;
-    private final Feedforward100 m_ff;
+    private final SimpleDynamics m_ff;
+    private final Friction m_friction;
 
-    public MockBareMotor(Feedforward100 ff) {
+    public MockBareMotor(SimpleDynamics ff, Friction friction) {
         m_ff = ff;
+        m_friction = friction;
     }
 
     @Override
@@ -46,7 +49,7 @@ public class MockBareMotor implements BareMotor, IncrementalBareEncoder {
         accel = motorRad_S2;
         torque = torqueNm;
 
-        frictionFFVolts = m_ff.frictionFFVolts(motorRad_S);
+        frictionFFVolts = m_friction.frictionFFVolts(motorRad_S);
         backEMFVolts = backEMFVoltage(motorRad_S);
         torqueFFVolts = getTorqueFFVolts(torqueNm);
         accelFFVolts = m_ff.accelFFVolts(motorRad_S, motorRad_S2);

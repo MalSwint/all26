@@ -5,7 +5,8 @@ import java.util.function.Supplier;
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.DoubleCache;
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.config.Feedforward100;
+import org.team100.lib.config.SimpleDynamics;
+import org.team100.lib.config.Friction;
 import org.team100.lib.config.PIDConstants;
 import org.team100.lib.logging.Level;
 import org.team100.lib.logging.LoggerFactory;
@@ -42,7 +43,8 @@ public abstract class Talon6Motor implements BareMotor {
 
     private final TalonFX m_motor;
     private final PhoenixConfigurator m_configurator;
-    private final Feedforward100 m_ff;
+    private final SimpleDynamics m_ff;
+    private final Friction m_friction;
 
     // CACHES
     // Two levels of caching here: the cotemporal cache caches the value
@@ -101,8 +103,9 @@ public abstract class Talon6Motor implements BareMotor {
             MotorPhase motorPhase,
             double supplyLimit,
             double statorLimit,
-            PIDConstants lowLevelPIDConstants,
-            Feedforward100 ff) {
+            SimpleDynamics ff,
+            Friction friction,
+            PIDConstants pid) {
         //////////////////////////////////////
         //
         // CONTROL REQUESTS
@@ -123,6 +126,7 @@ public abstract class Talon6Motor implements BareMotor {
         m_log = parent.type(this);
         m_motor = new TalonFX(canId.id);
         m_ff = ff;
+        m_friction = friction;
 
         m_configurator = new PhoenixConfigurator(
                 m_motor,
@@ -130,7 +134,7 @@ public abstract class Talon6Motor implements BareMotor {
                 motorPhase,
                 supplyLimit,
                 statorLimit,
-                lowLevelPIDConstants);
+                pid);
         m_configurator.logCrashStatus();
         m_configurator.baseConfig();
         m_configurator.motorConfig();
@@ -228,7 +232,7 @@ public abstract class Talon6Motor implements BareMotor {
     @Override
     public void setVelocity(double motorRad_S, double motorRad_S2, double torqueNm) {
         double backEMFVolts = backEMFVoltage(motorRad_S);
-        double frictionFFVolts = m_ff.frictionFFVolts(motorRad_S);
+        double frictionFFVolts = m_friction.frictionFFVolts(motorRad_S);
         double accelFFVolts = m_ff.accelFFVolts(motorRad_S, motorRad_S2);
         double torqueFFVolts = getTorqueFFVolts(torqueNm);
         double FFVolts = backEMFVolts + frictionFFVolts + accelFFVolts + torqueFFVolts;
@@ -269,7 +273,7 @@ public abstract class Talon6Motor implements BareMotor {
             double motorRad_S2,
             double torqueNm) {
         double backEMFVolts = backEMFVoltage(motorRad_S);
-        double frictionFFVolts = m_ff.frictionFFVolts(motorRad_S);
+        double frictionFFVolts = m_friction.frictionFFVolts(motorRad_S);
         double accelFFVolts = m_ff.accelFFVolts(motorRad_S, motorRad_S2);
         double torqueFFVolts = getTorqueFFVolts(torqueNm);
         double FFVolts = backEMFVolts + frictionFFVolts + accelFFVolts + torqueFFVolts;

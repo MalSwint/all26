@@ -17,14 +17,14 @@ public class Uncertainty {
      * this is the default value which, in hindsight, seems ridiculously high.
      * TODO: do some calibration of this
      */
-    private static final IsotropicNoiseSE2 DEFAULT_STATE_STDDEV = new IsotropicNoiseSE2(0.1, 0.1);
+    private static final IsotropicNoiseSE2 DEFAULT_STATE_STDDEV = IsotropicNoiseSE2.fromStdDev(0.1, 0.1);
 
     /**
      * This value is tuned so that errors scale at 0.2x per second. See
      * SwerveDrivePoseEstimator100Test::testFirmerNudge.
      * TODO: get rid of this
      */
-    static final IsotropicNoiseSE2 TIGHT_STATE_STDDEV = new IsotropicNoiseSE2(0.001, 0.1);
+    static final IsotropicNoiseSE2 TIGHT_STATE_STDDEV = IsotropicNoiseSE2.fromStdDev(0.001, 0.1);
 
     /**
      * Standard deviation of vision updates in SE(2).
@@ -51,7 +51,7 @@ public class Uncertainty {
         double rotationErrorRad = figure6(offAxisAngleRad) + 0.01;
         double rotationEffectM = distanceM * rotationErrorRad;
         double maxCartesian = Math.max(cartesianErrorM, rotationEffectM);
-        return new IsotropicNoiseSE2(maxCartesian, rotationErrorRad);
+        return IsotropicNoiseSE2.fromStdDev(maxCartesian, rotationErrorRad);
     }
 
     /**
@@ -112,22 +112,23 @@ public class Uncertainty {
         double cartesian = lowSpeedError * distanceM + superError * distanceM * distanceM;
         // We haven't measured this, so just guess it's the same???
         double rotation = lowSpeedError * rotationRad + superError * rotationRad * rotationRad;
-        return new IsotropicNoiseSE2(cartesian, rotation);
+        return IsotropicNoiseSE2.fromStdDev(cartesian, rotation);
 
     }
 
     /**
-     * @param stateSigma  standard deviation of state in SE(2)
-     * @param visionSigma standard deviation of vision update in SE(2)
+     * TODO: remove this
+     * @param stateNoise  state noise in SE(2)
+     * @param visionNoise vision update noise in SE(2)
      * @param twist       from sample to measurement, i.e. in the intrinsic frame of
      *                    the sample.
      */
     static Twist2d getScaledTwist(
-            IsotropicNoiseSE2 stateSigma,
-            IsotropicNoiseSE2 visionSigma,
+            IsotropicNoiseSE2 stateNoise,
+            IsotropicNoiseSE2 visionNoise,
             Twist2d twist) {
-        double cartesianWeight = cartesianWeight(stateSigma, visionSigma);
-        double rotationWeight = rotationWeight(stateSigma, visionSigma);
+        double cartesianWeight = cartesianWeight(stateNoise, visionNoise);
+        double rotationWeight = rotationWeight(stateNoise, visionNoise);
         return new Twist2d(
                 cartesianWeight * twist.dx,
                 cartesianWeight * twist.dy,
@@ -135,16 +136,18 @@ public class Uncertainty {
     }
 
     /**
-     * @param stateSigma  standard deviation of state in SE(2)
-     * @param visionSigma standard deviation of vision update in SE(2)
+     * Use inverse-variance weighting to scale the delta.
+     * 
+     * @param stateNoise  state noise in SE(2)
+     * @param visionNoise vision update noise in SE(2)
      * @param delta       from sample to measurement, in (extrinsic) field frame.
      */
     static DeltaSE2 getScaledDelta(
-            IsotropicNoiseSE2 stateSigma,
-            IsotropicNoiseSE2 visionSigma,
+            IsotropicNoiseSE2 stateNoise,
+            IsotropicNoiseSE2 visionNoise,
             DeltaSE2 delta) {
-        double cartesianWeight = cartesianWeight(stateSigma, visionSigma);
-        double rotationWeight = rotationWeight(stateSigma, visionSigma);
+        double cartesianWeight = cartesianWeight(stateNoise, visionNoise);
+        double rotationWeight = rotationWeight(stateNoise, visionNoise);
         return new DeltaSE2(
                 delta.getTranslation().times(cartesianWeight),
                 delta.getRotation().times(rotationWeight));
@@ -153,35 +156,31 @@ public class Uncertainty {
     /**
      * Weights for the vision update, using inverse-variance weighting.
      * 
-     * This used to use inverse-standard-deviation weighting, which is just wrong.
-     * 
-     * @param stateSigma  standard deviation of state in SE(2)
-     * @param visionSigma standard deviation of vision update in SE(2)
+     * @param stateNoise  state noise in SE(2)
+     * @param visionNoise vision update noise in SE(2)
      * @return update weight for cartesian dimensions
      */
     static double cartesianWeight(
-            IsotropicNoiseSE2 stateSigma,
-            IsotropicNoiseSE2 visionSigma) {
+            IsotropicNoiseSE2 stateNoise,
+            IsotropicNoiseSE2 visionNoise) {
         return weight(
-                stateSigma.cartesianVariance(),
-                visionSigma.cartesianVariance());
+                stateNoise.cartesianVariance(),
+                visionNoise.cartesianVariance());
     }
 
     /**
      * Weights for the vision update, using inverse-variance weighting.
      * 
-     * This used to use inverse-standard-deviation weighting, which is just wrong.
-     * 
-     * @param stateSigma  standard deviation of state in SE(2)
-     * @param visionSigma standard deviation of vision update in SE(2)
+     * @param stateNoise  state noise in SE(2)
+     * @param visionNoise vision update noise in SE(2)
      * @return update weight for rotation
      */
     static double rotationWeight(
-            IsotropicNoiseSE2 stateSigma,
-            IsotropicNoiseSE2 visionSigma) {
+            IsotropicNoiseSE2 stateNoise,
+            IsotropicNoiseSE2 visionNoise) {
         return weight(
-                stateSigma.rotationVariance(),
-                visionSigma.rotationVariance());
+                stateNoise.rotationVariance(),
+                visionNoise.rotationVariance());
     }
 
     /**

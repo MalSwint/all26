@@ -96,7 +96,7 @@ public class UncertaintyTest {
 
     @Test
     void testScaledTwist() {
-        IsotropicNoiseSE2 stateStdDev = new IsotropicNoiseSE2(0.02, 0.02);
+        IsotropicNoiseSE2 stateStdDev = IsotropicNoiseSE2.fromStdDev(0.02, 0.02);
         double targetRangeM = 1.0;
         double offAxisRad = 1.0;
         IsotropicNoiseSE2 visionStdDev = Uncertainty.visionMeasurementStdDevs(targetRangeM, offAxisRad);
@@ -113,7 +113,7 @@ public class UncertaintyTest {
 
     @Test
     void testScaledDelta() {
-        IsotropicNoiseSE2 stateStdDev = new IsotropicNoiseSE2(0.02, 0.02);
+        IsotropicNoiseSE2 stateStdDev = IsotropicNoiseSE2.fromStdDev(0.02, 0.02);
         double targetRangeM = 1.0;
         double offAxisRad = 1.0;
         IsotropicNoiseSE2 visionStdDev = Uncertainty.visionMeasurementStdDevs(targetRangeM, offAxisRad);
@@ -130,7 +130,7 @@ public class UncertaintyTest {
 
     @Test
     void testCartesianWeight() {
-        IsotropicNoiseSE2 stateStdDev = new IsotropicNoiseSE2(0.01, 0.01);
+        IsotropicNoiseSE2 stateStdDev = IsotropicNoiseSE2.fromStdDev(0.01, 0.01);
         double targetRangeM = 1.0;
         double offAxisRad = 1.0;
         IsotropicNoiseSE2 visionStdDev = Uncertainty.visionMeasurementStdDevs(targetRangeM, offAxisRad);
@@ -142,7 +142,7 @@ public class UncertaintyTest {
 
     @Test
     void testRotationWeight() {
-        IsotropicNoiseSE2 stateStdDev = new IsotropicNoiseSE2(0.01, 0.01);
+        IsotropicNoiseSE2 stateStdDev =  IsotropicNoiseSE2.fromStdDev(0.01, 0.01);
         double targetRangeM = 1.0;
         double offAxisRad = 1.0;
         IsotropicNoiseSE2 visionStdDev = Uncertainty.visionMeasurementStdDevs(targetRangeM, offAxisRad);

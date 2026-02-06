@@ -18,32 +18,100 @@ public class VariableR1 {
     }
 
     /**
-     * Uses inverse-variance weighting.
+     * Gaussian mixture model.
+     * 
+     * Uses inverse-variance weights but also includes a
+     * covariance term for the dispersion of the means.
+     * 
+     * The variance is never less than the smaller component variance.
      */
-    public static VariableR1 fuse(VariableR1 a, VariableR1 b) {
-        double wA = weight(a.variance, b.variance);
-        double wB = weight(b.variance, a.variance);
-        double mean = wA * a.mean + wB * b.mean;
+    public static VariableR1 fuse1(VariableR1 a, VariableR1 b) {
+        // double wA = weight(a.variance, b.variance);
+        // double wB = weight(b.variance, a.variance);
+        double wA = 1 / a.variance;
+        double wB = 1 / b.variance;
+        double totalWeight = wA + wB;
+        double mean = (wA * a.mean + wB * b.mean) / totalWeight;
         // gaussian mixture
         // law of total variance
         // takes mean dispersion into account
         // https://stats.stackexchange.com/questions/16608/what-is-the-variance-of-the-weighted-mixture-of-two-gaussians
         // https://stats.stackexchange.com/questions/309622/calculate-moments-of-a-weighted-mixture-of-normal-distributions
-        double variance = wA * a.variance + wB * b.variance + wA * wB * Math.pow(a.mean - b.mean, 2);
+        double variance = 2 / totalWeight
 
-        return new VariableR1(mean, variance);
+         + wA * Math.pow(a.mean - mean, 2) / totalWeight
+                + wB * Math.pow(b.mean - mean, 2) / totalWeight;
+                // + wA * wB * Math.pow(a.mean - b.mean, 2) / Math.pow(totalWeight, 2);
+
+                return new VariableR1(mean, variance);
     }
 
+    /**
+     * Uses inverse-variance weighting.
+     */
     public static VariableR1 fuse2(VariableR1 a, VariableR1 b) {
         // TODO: handle zero
         double wA = 1 / a.variance;
         double wB = 1 / b.variance;
-        double mean = (wA * a.mean + wB * b.mean) / (wA + wB);
+        double totalWeight = wA + wB;
+        double mean = (wA * a.mean + wB * b.mean) / totalWeight;
         // inverse-variance weighting
         // does *not* take mean dispersion into account.
         // but does increase confidence with multiple measurements.
-        double variance = 1 / (wA + wB);
+        // This is wrong, when the means are different: repeated updates
+        // yield a slowly moving mean but rapidly increasing confidence
+        // (which slows the movement of the mean)
+        double variance = 1 / totalWeight;
+        return new VariableR1(mean, variance);
+    }
 
+    /**
+     * Joel's hack
+     * 
+     * Combines the mean dispersion term of the first method with the variance
+     * minimization of the second method.
+     */
+    public static VariableR1 fuse3(VariableR1 a, VariableR1 b) {
+        // TODO: handle zero
+        double wA = 1 / a.variance;
+        double wB = 1 / b.variance;
+        double totalWeight = wA + wB;
+        double mean = (wA * a.mean + wB * b.mean) / totalWeight;
+        // inverse-variance weighting
+        // does *not* take mean dispersion into account.
+        // but does increase confidence with multiple measurements.
+        // This is wrong, when the means are different: repeated updates
+        // yield a slowly moving mean but rapidly increasing confidence
+        // (which slows the movement of the mean)
+        // double variance = 1 / totalWeight
+        // + wA * wB * Math.pow(a.mean - b.mean, 2) / Math.pow(totalWeight, 2);
+        // this makes the contribution of the component means more obvious.
+        double variance = 2 / totalWeight
+                + wA * Math.pow(a.mean - mean, 2) / totalWeight
+                + wB * Math.pow(b.mean - mean, 2) / totalWeight;
+        return new VariableR1(mean, variance);
+    }
+
+    /**
+     * Bayesian
+     * 
+     * https://stats.stackexchange.com/questions/237037/bayesian-updating-with-new-data
+     * 
+     * I think this post has an error in the mean computation, like they meant to
+     * write precision (1/var).
+     * 
+     * https://seor.vse.gmu.edu/~klaskey/SYST664/Bayes_Unit5.pdf
+     * 
+     * Bayesian updating is identical to inverse variance weighting:
+     * it weighs the more confident update more highly
+     * it ignores mean dispersion
+     */
+    public static VariableR1 fuse4(VariableR1 a, VariableR1 b) {
+        // double mean = (a.mean / a.variance + b.mean / b.variance) / (a.variance +
+        // b.variance);
+        double mean = (a.mean / a.variance + b.mean / b.variance) / (1 / a.variance + 1 / b.variance);
+        // double variance = a.variance * b.variance / (a.variance + b.variance);
+        double variance = 1 / (1 / a.variance + 1 / b.variance);
         return new VariableR1(mean, variance);
     }
 

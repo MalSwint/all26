@@ -9,7 +9,7 @@ import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.mechanism.RotaryMechanism;
 import org.team100.lib.motor.BareMotor;
 import org.team100.lib.motor.MotorPhase;
-import org.team100.lib.motor.NeutralMode;
+import org.team100.lib.motor.NeutralMode100;
 import org.team100.lib.motor.ctre.Falcon6Motor;
 import org.team100.lib.motor.sim.SimulatedBareMotor;
 import org.team100.lib.sensor.position.absolute.HomingRotaryPositionSensor;
@@ -193,7 +193,7 @@ public class FiveBarMech extends SubsystemBase {
         return new Falcon6Motor(
                 logger,
                 canId,
-                NeutralMode.COAST,
+                NeutralMode100.COAST,
                 MotorPhase.FORWARD,
                 SUPPLY_LIMIT,
                 STATOR_LIMIT,

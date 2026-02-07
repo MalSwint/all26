@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 import org.team100.lib.config.PIDConstants;
 import org.team100.lib.motor.MotorPhase;
-import org.team100.lib.motor.NeutralMode;
+import org.team100.lib.motor.NeutralMode100;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.AudioConfigs;
@@ -32,7 +32,7 @@ public class PhoenixConfigurator {
     private static final int SIGNAL_UPDATE_FREQ_HZ = 100;
 
     private final TalonFX m_motor;
-    private final NeutralMode m_neutral;
+    private final NeutralMode100 m_neutral;
     private final MotorPhase m_phase;
     private final double m_supply;
     private final double m_stator;
@@ -40,7 +40,7 @@ public class PhoenixConfigurator {
 
     public PhoenixConfigurator(
             TalonFX motor,
-            NeutralMode neutral,
+            NeutralMode100 neutral,
             MotorPhase phase,
             double supply,
             double stator,

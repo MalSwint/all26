@@ -25,6 +25,8 @@ import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.subsystems.swerve.module.SwerveModuleCollection;
 import org.team100.lib.visualization.RobotPoseVisualization;
+import org.team100.lib.util.CanId;
+
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -73,7 +75,7 @@ public class Machinery {
 
         // Subsystem initializers go here.
         m_shooter = new Shooter(driveLog);
-        m_intake = new Intake(driveLog);
+        m_intake = new Intake(driveLog, new CanId(20));
         m_extender = new IntakeExtend(driveLog);
 
         ////////////////////////////////////////////////////////////

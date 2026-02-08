@@ -1,5 +1,6 @@
 package org.team100.frc2026;
 
+import org.team100.lib.config.Identity;
 import org.team100.lib.controller.r1.PIDFeedback;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.mechanism.RotaryMechanism;
@@ -10,32 +11,75 @@ import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
 import org.team100.lib.reference.r1.ProfileReferenceR1;
 import org.team100.lib.sensor.position.absolute.sim.SimulatedRotaryPositionSensor;
 import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
+import org.team100.lib.sensor.position.incremental.ctre.Talon6Encoder;
 import org.team100.lib.servo.AngularPositionServo;
 import org.team100.lib.servo.OnboardAngularPositionServo;
+import org.team100.lib.motor.NeutralMode100;
+import org.team100.lib.motor.MotorPhase;
+import org.team100.lib.config.PIDConstants;
+import org.team100.lib.motor.ctre.Kraken6Motor;
+import org.team100.lib.util.CanId;
+import org.team100.lib.servo.OutboardAngularPositionServo;
+import org.team100.lib.sensor.position.absolute.ProxyRotaryPositionSensor;
+
+
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+
+
 public class IntakeExtend extends SubsystemBase {
     private final AngularPositionServo m_servo;
 
-    public IntakeExtend(LoggerFactory parent) {
+    public IntakeExtend(LoggerFactory parent, CanId canID) {
         LoggerFactory log = parent.type(this);
-        SimulatedBareMotor climberMotor = new SimulatedBareMotor(log, 600);
 
-        IncrementalProfile profile = new TrapezoidIncrementalProfile(log, 1, 2, 0.05);
-        ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(log, () -> profile, 0.05, 0.05);
-        PIDFeedback feedback = new PIDFeedback(log, 5, 0, 0, false, 0.05, 0.1);
+        switch (Identity.instance) {
 
-        IncrementalBareEncoder encoder = climberMotor.encoder();
-        SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(log, encoder, 1);
+        case COMP_BOT -> {
+            float gearRatio = 10;
+            Kraken6Motor m_motor = new Kraken6Motor(
+                log,    //LoggerFactory parent,
+                canID,  // CanId canId,
+                NeutralMode100.COAST, //NeutralMode neutral,
+                MotorPhase.REVERSE, //MotorPhase motorPhase,
+                20, // og 50 //double supplyLimit,
+                20, // og 2 //double statorLimit,
+                PIDConstants.zero(log),  //PIDConstants pid,
+                Kraken6Motor.highFrictionFF(log)//Feedforward100 ff
+            );
+            Talon6Encoder encoder = m_motor.encoder();
+            ProxyRotaryPositionSensor sensor = new ProxyRotaryPositionSensor(
+                encoder, gearRatio
+            );
+            TrapezoidIncrementalProfile profile = new TrapezoidIncrementalProfile(log, 1, 2, 0.05);
+            ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(log, () -> profile, 0.05, 0.05);
+            RotaryMechanism climberMech = new RotaryMechanism(
+                    log, m_motor, sensor, 1,
+                    Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+            m_servo = new OutboardAngularPositionServo(parent, climberMech, ref);
+            
+        }
 
-        RotaryMechanism climberMech = new RotaryMechanism(
-                log, climberMotor, sensor, 1,
-                Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+        default -> {
+            SimulatedBareMotor m_motor = new SimulatedBareMotor(log, 600);
 
-        m_servo = new OnboardAngularPositionServo(log, climberMech, ref, feedback);
+            IncrementalProfile profile = new TrapezoidIncrementalProfile(log, 1, 2, 0.05);
+            ProfileReferenceR1 ref = new IncrementalProfileReferenceR1(log, () -> profile, 0.05, 0.05);
+            PIDFeedback feedback = new PIDFeedback(log, 5, 0, 0, false, 0.05, 0.1);
+
+            IncrementalBareEncoder encoder = m_motor.encoder();
+            SimulatedRotaryPositionSensor sensor = new SimulatedRotaryPositionSensor(log, encoder, 1);
+
+            RotaryMechanism climberMech = new RotaryMechanism(
+                    log, m_motor, sensor, 1,
+                    Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+
+            m_servo = new OnboardAngularPositionServo(log, climberMech, ref, feedback);
+        }
+        }
     }
 
     @Override

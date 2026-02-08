@@ -104,13 +104,37 @@ large innovation.
 
 The gyro can be modeled with two random variables:
 
-* **Drift rate**, radians/sec.  This is a slow random walk, informed by odometry: the drift
+* **Bias**, radians/sec.  This is a slow random walk, informed by odometry: the drift
 rate is the difference between the gyro dtheta and the odometry dtheta for each
 update.  Sometimes the odometry isn't very accurate (e.g. when driving fast), and
 so has essentially no influence on the drift rate.  When the odometry is very
 accurate (e.g. when stopped), it has very firm control over the drift rate.
-* **Noise**, radians.  This is gaussian noise with a fixed width.
+* **Noise**, radians.  This is gaussian noise with a fixed width.  The effect
+of gyro noise is simply to inform the variance used in fusion.
 
+As an example, the Kalibr docs mention the ADIS16448 (a MEMS device similar to the
+gyro we use) with these noise parameters:
+
+```
+white_noise = 0.0004 // rad/sqrt(hz)s
+bias_noise = 0.000004 // rad*sqrt(hz)/s
+```
+
+(We should attempt to verify these parameters.)
+
+These parameters scale with the sensor bandwidth, i.e. sample rate:
+
+```
+sample_rate = 50 // hz
+
+noise_stddev = white_noise * sqrt(sample_rate)
+noise = noise_stddev * random.nextGaussian()
+
+bias_stddev = bias_noise / sqrt(sample_rate)
+bias += bias_stddev * random.nextGaussian()
+
+measurement = ground_truth + bias + noise
+```
 
 
 ### Mixture model
@@ -160,3 +184,5 @@ References:
 * Wikipedia on [covariance intersection](https://en.wikipedia.org/wiki/Covariance_intersection), which is the same, if the weights are chosen to be equal.
 * [Bayesian update](https://stats.stackexchange.com/questions/237037/bayesian-updating-with-new-data)
 * Some slides about [Covariance inflation](https://web.cels.anl.gov/~aattia/Files/Slides/SIAM_MPE_18/mpe18_adaptive.pdf)
+* [Gyro model discussion](https://github.com/ethz-asl/kalibr/issues/354#issuecomment-979934812) in the context of the [ETH Kalibr camera/IMU calibration toolkit](https://github.com/ethz-asl/kalibr/wiki).  See also [python example](https://github.com/Team100/all24/blob/main/studies/factor_graph/kalibr_gyro.py) of the gyro model, and a more [complete simulation](https://github.com/Team100/all24/blob/main/studies/factor_graph/gyro_sim.py) from the 2024 GTSAM effort. (Note these contain errors.)
+* [Kalibr IMU noise model](https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model)

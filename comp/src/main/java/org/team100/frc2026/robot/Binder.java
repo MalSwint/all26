@@ -139,7 +139,12 @@ public class Binder {
         whileTrue(driver::b, m_machinery.m_shooter.shoot());
         
         whileTrue(driver::x, m_machinery.m_intake.intake());
-        // whileTrue(driver::y, m_machinery.m_extender.goToExtendedPosition());
+
+        // Test bindings
+        whileTrue(driver::leftBumper, m_machinery.m_extender.goToExtendedPosition());
+        whileTrue(driver::rightBumper, m_machinery.m_extender.goToRetractedPosition());
+
+        // The real bindings
         whileTrue(driver::leftBumper, m_machinery.m_extender.goToRetractedPosition());
         whileTrue(driver::leftTrigger,
                 m_machinery.m_extender.goToExtendedPosition()

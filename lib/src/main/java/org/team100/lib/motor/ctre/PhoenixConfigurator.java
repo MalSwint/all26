@@ -19,6 +19,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 /** Utilities for CTRE Phoenix motors: Falcon, Kraken. */
 public class PhoenixConfigurator {
+    private static final boolean DEBUG = false;
     private static final boolean ACTUALLY_CRASH = false;
     /**
      * The default is 0.05. This is much longer, to eliminate unnecessary config
@@ -157,7 +158,11 @@ public class PhoenixConfigurator {
         slot1Configs.kP = 2 * Math.PI * m_pid.getVelocityPVS_Rad();
         slot1Configs.kI = 2 * Math.PI * m_pid.getVelocityIVolt_Rad();
         slot1Configs.kD = 2 * Math.PI * m_pid.getVelocityDVS2_Rad();
-        System.out.printf("==== P VALUE %f\n", slot0Configs.kP);
+
+        if (DEBUG) {
+            System.out.printf("POSITION P VALUE %f\n", slot0Configs.kP);
+            System.out.printf("VELOCITY P VALUE %f\n", slot1Configs.kP);
+        }
         crash(() -> m_motor.getConfigurator().apply(slot0Configs, TIMEOUT_SEC));
         crash(() -> m_motor.getConfigurator().apply(slot1Configs, TIMEOUT_SEC));
     }

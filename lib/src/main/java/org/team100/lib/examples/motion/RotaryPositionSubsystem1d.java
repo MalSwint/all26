@@ -8,7 +8,7 @@ import org.team100.lib.controller.r1.FullStateFeedback;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.mechanism.RotaryMechanism;
 import org.team100.lib.motor.MotorPhase;
-import org.team100.lib.motor.NeutralMode;
+import org.team100.lib.motor.NeutralMode100;
 import org.team100.lib.motor.ctre.Kraken6Motor;
 import org.team100.lib.motor.sim.SimulatedBareMotor;
 import org.team100.lib.profile.r1.IncrementalProfile;
@@ -94,7 +94,7 @@ public class RotaryPositionSubsystem1d extends SubsystemBase {
                 // you should make a case in the feedforward class for your constants
                 Feedforward100 FF = Feedforward100.test(log);
                 Kraken6Motor motor = new Kraken6Motor(
-                        log, new CanId(1), NeutralMode.COAST, MotorPhase.REVERSE, supplyLimit, statorLimit, PID, FF);
+                        log, new CanId(1), NeutralMode100.COAST, MotorPhase.REVERSE, supplyLimit, statorLimit, PID, FF);
                 RotaryPositionSensor sensor = new AS5048RotaryPositionSensor(
                         log, new RoboRioChannel(5), inputOffset, EncoderDrive.DIRECT);
                 RotaryMechanism mech = new RotaryMechanism(

@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 import org.team100.lib.config.PIDConstants;
 import org.team100.lib.motor.MotorPhase;
-import org.team100.lib.motor.NeutralMode;
+import org.team100.lib.motor.NeutralMode100;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.AudioConfigs;
@@ -32,7 +32,7 @@ public class PhoenixConfigurator {
     private static final int SIGNAL_UPDATE_FREQ_HZ = 100;
 
     private final TalonFX m_motor;
-    private final NeutralMode m_neutral;
+    private final NeutralMode100 m_neutral;
     private final MotorPhase m_phase;
     private final double m_supply;
     private final double m_stator;
@@ -40,7 +40,7 @@ public class PhoenixConfigurator {
 
     public PhoenixConfigurator(
             TalonFX motor,
-            NeutralMode neutral,
+            NeutralMode100 neutral,
             MotorPhase phase,
             double supply,
             double stator,
@@ -157,6 +157,7 @@ public class PhoenixConfigurator {
         slot1Configs.kP = 2 * Math.PI * m_pid.getVelocityPVS_Rad();
         slot1Configs.kI = 2 * Math.PI * m_pid.getVelocityIVolt_Rad();
         slot1Configs.kD = 2 * Math.PI * m_pid.getVelocityDVS2_Rad();
+        System.out.printf("==== P VALUE %f\n", slot0Configs.kP);
         crash(() -> m_motor.getConfigurator().apply(slot0Configs, TIMEOUT_SEC));
         crash(() -> m_motor.getConfigurator().apply(slot1Configs, TIMEOUT_SEC));
     }

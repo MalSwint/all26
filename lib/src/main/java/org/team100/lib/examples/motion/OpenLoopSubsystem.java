@@ -6,7 +6,7 @@ import org.team100.lib.config.PIDConstants;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.motor.BareMotor;
 import org.team100.lib.motor.MotorPhase;
-import org.team100.lib.motor.NeutralMode;
+import org.team100.lib.motor.NeutralMode100;
 import org.team100.lib.motor.ctre.Falcon6Motor;
 import org.team100.lib.motor.sim.SimulatedBareMotor;
 import org.team100.lib.util.CanId;
@@ -46,7 +46,7 @@ public class OpenLoopSubsystem extends SubsystemBase {
                 // you should make a case in the feedforward class for your constants
                 Feedforward100 FF = Feedforward100.test(log);
                 m_motor = new Falcon6Motor(
-                        log, canId, NeutralMode.COAST, MotorPhase.FORWARD, supplyLimit, statorLimit, PID, FF);
+                        log, canId, NeutralMode100.COAST, MotorPhase.FORWARD, supplyLimit, statorLimit, PID, FF);
             }
             default -> {
                 m_motor = new SimulatedBareMotor(log, 600);

@@ -1,13 +1,23 @@
 package org.team100.lib.localization;
 
+import edu.wpi.first.math.MathUtil;
+
 /** Random variable in one dimension */
 public class VariableR1 {
     private final double mean;
     private final double variance;
 
     public VariableR1(double mean, double variance) {
+        if (variance < 1e-9)
+            throw new IllegalArgumentException("zero variance not allowed");
         this.mean = mean;
         this.variance = variance;
+    }
+
+    public VariableR1 interpolate(VariableR1 other, double t) {
+        return new VariableR1(
+                MathUtil.interpolate(mean, other.mean, t),
+                MathUtil.interpolate(variance, other.variance, t));
     }
 
     /**

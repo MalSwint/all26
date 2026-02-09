@@ -18,6 +18,7 @@ import org.team100.lib.localization.NudgingVisionUpdater;
 import org.team100.lib.localization.OdometryUpdater;
 import org.team100.lib.localization.SimulatedTagDetector;
 import org.team100.lib.localization.SwerveHistory;
+import org.team100.lib.localization.VariableR1;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.Logging;
 import org.team100.lib.sensor.gyro.Gyro;
@@ -113,6 +114,7 @@ public class Machinery {
                 driveLog,
                 m_swerveKinodynamics,
                 gyro.getYawNWU(),
+                new VariableR1(0, 1),
                 m_modules.positions(),
                 Pose2d.kZero,
                 IsotropicNoiseSE2.high(),

@@ -75,8 +75,11 @@ public class NudgingVisionUpdater implements VisionUpdater {
         IsotropicNoiseSE2 noise = IsotropicNoiseSE2.inverseVarianceWeightedAverage(
                 sampleNoise, visionNoise);
 
+        // TODO: compute gyro bias
+        VariableR1 gyroBias = new VariableR1(0, 1);
+
         // Remember the result.
-        m_history.put(timestamp, model, noise, samplePositions, gyroYaw);
+        m_history.put(timestamp, model, noise, samplePositions, gyroYaw, gyroBias);
 
         // Replay everything after the sample.
         m_odometryUpdater.replay(timestamp);

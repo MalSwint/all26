@@ -11,6 +11,7 @@ import org.team100.lib.localization.IsotropicNoiseSE2;
 import org.team100.lib.localization.NudgingVisionUpdater;
 import org.team100.lib.localization.OdometryUpdater;
 import org.team100.lib.localization.SwerveHistory;
+import org.team100.lib.localization.VariableR1;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.logging.TestLoggerFactory;
 import org.team100.lib.logging.primitive.TestPrimitiveLogger;
@@ -56,6 +57,7 @@ public class RealisticFixture {
                 logger,
                 swerveKinodynamics,
                 Rotation2d.kZero,
+                new VariableR1(0, 1),
                 SwerveModulePositions.kZero(),
                 Pose2d.kZero,
                 IsotropicNoiseSE2.high(),

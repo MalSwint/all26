@@ -47,6 +47,7 @@ public class SwerveHistory implements DoubleFunction<ModelSE2> {
             LoggerFactory parent,
             SwerveKinodynamics kinodynamics,
             Rotation2d gyroAngle,
+            VariableR1 gyroBias,
             SwerveModulePositions modulePositions,
             Pose2d initialPoseMeters,
             IsotropicNoiseSE2 noise,
@@ -59,7 +60,8 @@ public class SwerveHistory implements DoubleFunction<ModelSE2> {
                 state,
                 noise,
                 modulePositions,
-                gyroAngle);
+                gyroAngle,
+                gyroBias);
         m_poseBuffer = new TimeInterpolatableBuffer100<>(
                 BUFFER_DURATION, timestampSeconds, initialState);
     }
@@ -79,7 +81,8 @@ public class SwerveHistory implements DoubleFunction<ModelSE2> {
             Pose2d pose,
             IsotropicNoiseSE2 noise,
             double timestampSeconds,
-            Rotation2d gyroYaw) {
+            Rotation2d gyroYaw,
+            VariableR1 gyroBias) {
         // empty the buffer and add the current pose
         ModelSE2 model = new ModelSE2(pose, new VelocitySE2(0, 0, 0));
         SwerveState state = new SwerveState(
@@ -87,7 +90,8 @@ public class SwerveHistory implements DoubleFunction<ModelSE2> {
                 model,
                 noise,
                 modulePositions,
-                gyroYaw);
+                gyroYaw,
+                gyroBias);
         m_poseBuffer.reset(timestampSeconds, state);
     }
 
@@ -102,7 +106,8 @@ public class SwerveHistory implements DoubleFunction<ModelSE2> {
             ModelSE2 model,
             IsotropicNoiseSE2 noise,
             SwerveModulePositions positions,
-            Rotation2d gyroYaw) {
+            Rotation2d gyroYaw,
+            VariableR1 gyroBias) {
         m_poseBuffer.put(
                 timestamp,
                 new SwerveState(
@@ -110,7 +115,8 @@ public class SwerveHistory implements DoubleFunction<ModelSE2> {
                         model,
                         noise,
                         positions,
-                        gyroYaw));
+                        gyroYaw,
+                        gyroBias));
     }
 
     Entry<Double, SwerveState> lowerEntry(double timestamp) {

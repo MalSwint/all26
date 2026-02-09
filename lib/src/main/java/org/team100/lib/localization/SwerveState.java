@@ -22,20 +22,24 @@ class SwerveState implements Interpolatable<SwerveState> {
     private final IsotropicNoiseSE2 m_noise;
     /** Wheel position and angle. */
     private final SwerveModulePositions m_positions;
-    /** Yaw observation from the gyro. */
+    /** Yaw observation from the gyro, uncorrected. */
     private final Rotation2d m_gyroYaw;
+    /** Estimate for the gyro bias (drift rate). */
+    private final VariableR1 m_gyroBias;
 
     SwerveState(
             SwerveDriveKinematics100 kinematics,
             ModelSE2 state,
             IsotropicNoiseSE2 noise,
             SwerveModulePositions positions,
-            Rotation2d gyroYaw) {
+            Rotation2d gyroYaw,
+            VariableR1 gyroBias) {
         m_kinematics = kinematics;
         m_state = state;
         m_noise = noise;
         m_positions = positions;
         m_gyroYaw = gyroYaw;
+        m_gyroBias = gyroBias;
     }
 
     /**
@@ -81,8 +85,10 @@ class SwerveState implements Interpolatable<SwerveState> {
         IsotropicNoiseSE2 newNoise = m_noise.interpolate(endValue.m_noise, t);
 
         Rotation2d gyroLerp = m_gyroYaw.interpolate(endValue.m_gyroYaw, t);
+        VariableR1 gyroBiasLerp = m_gyroBias.interpolate(endValue.m_gyroBias, t);
 
-        return new SwerveState(m_kinematics, newState, newNoise, wheelLerp, gyroLerp);
+        return new SwerveState(
+                m_kinematics, newState, newNoise, wheelLerp, gyroLerp, gyroBiasLerp);
     }
 
     @Override

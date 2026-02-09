@@ -108,12 +108,19 @@ dispersion of updates, is what is implemented in the `Covariance Inflation` meth
 
 The gyro can be modeled with two random variables:
 
-* **Bias**, radians/sec.  This is a slow random walk, informed by odometry: the drift
+* **Bias**, radians/sec.  This is the "drift rate," a slow random walk.
+It's the product of imbalance in the differential sensors.
+In reality, it is temperature-dependent, but we ignore that.
+* **Noise**, radians.  This is the integral of the (Gaussian) sensor noise,
+which turns out to also be Gaussian.  
+
+Be use odometry to learn the bias: the drift
 rate is the difference between the gyro dtheta and the odometry dtheta for each
 update.  Sometimes the odometry isn't very accurate (e.g. when driving fast), and
 so has essentially no influence on the drift rate.  When the odometry is very
 accurate (e.g. when stopped), it has very firm control over the drift rate.
-* **Noise**, radians.  This is gaussian noise with a fixed width.  The effect
+
+The noise term has fixed width.  The effect
 of gyro noise is simply to inform the variance used in fusion.
 
 As an example, the Kalibr docs mention the ADIS16448 (a MEMS device similar to the
@@ -142,16 +149,16 @@ measurement = ground_truth + bias + noise
 
 We use several steps to ingest the gyro measurement:
 
-* Find the gyro increment: the difference between the gyro measurement at the current instant
+1. Find the gyro increment: the difference between the gyro measurement at the current instant
 and the previous step.  The variance in this measurement is a constant.
-* Find the odometry rotation increment.  The variance in this measurement depends on drive speed.
-* Subtract the odometry increment from the gyro increment, noting that the variances add.
-This is an estimate for drift.
-* Fuse this drift estimate with the state drift estimate (and its variance).
+2. Find the odometry rotation increment.  The variance in this measurement depends on drive speed.
+3. Subtract the odometry increment from the gyro increment, noting that the variances add.
+This is the drift measurement.
+4. Fuse this drift estimate with the state drift estimate (and its variance).
 This fusion should use the same covariance inflation method mentioned above.
-* Subtract this new state drift estimate from the gyro increment to find the corrected gyro
+5. Subtract this new state drift estimate from the gyro increment to find the corrected gyro
 increment.  Note, the variances add.
-* Fuse the corrected gyro increment with the odometry rotation increment, again using the covariance
+6. Fuse the corrected gyro increment with the odometry rotation increment, again using the covariance
 inflation method.
 
 

@@ -91,6 +91,8 @@ public class OdometryUpdater {
      * translation and a rotation of zero (or 180 for the other button).
      * The gyro angle is whatever the gyro says, not zero.
      * 
+     * New! Adds a very uncertain gyro bias.
+     * 
      * Package private for testing.
      */
     void reset(
@@ -103,7 +105,8 @@ public class OdometryUpdater {
                 pose,
                 noise,
                 timestampSeconds,
-                gyroAngle);
+                gyroAngle,
+                new VariableR1(0, 1));
     }
 
     ////////////////////////////////////////////////////
@@ -171,7 +174,10 @@ public class OdometryUpdater {
         // without bound.
         IsotropicNoiseSE2 noise = previousNoise.plus(n0);
 
-        m_history.put(currentTimeS, model, noise, positions, gyroYaw);
+        // TODO: compute gyro bias
+        VariableR1 gyroBias = new VariableR1(0, 1);
+
+        m_history.put(currentTimeS, model, noise, positions, gyroYaw, gyroBias);
     }
 
     /**

@@ -36,8 +36,9 @@ class SwerveStateTest implements Timeless {
                 new SwerveModulePosition100(0, Optional.empty()),
                 new SwerveModulePosition100(0, Optional.empty()));
         Rotation2d gyroYaw0 = new Rotation2d();
+        VariableR1 gyroBias = new VariableR1(0, 0.001);
         SwerveState r0 = new SwerveState(
-                kinodynamics.getKinematics(), s0, n0, p0, gyroYaw0);
+                kinodynamics.getKinematics(), s0, n0, p0, gyroYaw0, gyroBias);
         assertEquals(0, r0.state().theta().x(), 0.001);
         assertEquals(0, r0.state().theta().v(), 0.001);
 
@@ -65,7 +66,7 @@ class SwerveStateTest implements Timeless {
 
         // current speed is 1 rad/s
         SwerveState r1 = new SwerveState(
-                kinodynamics.getKinematics(), s1, n1, p1, gyroYaw1);
+                kinodynamics.getKinematics(), s1, n1, p1, gyroYaw1, new VariableR1(0, 1));
 
         assertEquals(1, r1.state().theta().x(), 0.001);
         assertEquals(1, r1.state().theta().v(), 0.001);
@@ -106,7 +107,7 @@ class SwerveStateTest implements Timeless {
                 new SwerveModulePosition100(0, Optional.of(new Rotation2d())));
         Rotation2d gyroYaw0 = new Rotation2d();
         SwerveState r0 = new SwerveState(
-                kinodynamics.getKinematics(), s0, n0, p0, gyroYaw0);
+                kinodynamics.getKinematics(), s0, n0, p0, gyroYaw0, new VariableR1(0, 1));
         assertEquals(0, r0.state().theta().x(), 0.001);
         assertEquals(0, r0.state().theta().v(), 0.001);
 
@@ -133,7 +134,7 @@ class SwerveStateTest implements Timeless {
 
         // current speed is 1 rad/s
         SwerveState r1 = new SwerveState(
-                kinodynamics.getKinematics(), s1, n1, p1, gyroYaw1);
+                kinodynamics.getKinematics(), s1, n1, p1, gyroYaw1, new VariableR1(0, 1));
 
         assertEquals(1, r1.state().theta().x(), 0.001);
         assertEquals(1, r1.state().theta().v(), 0.001);

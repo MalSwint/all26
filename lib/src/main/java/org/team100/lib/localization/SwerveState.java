@@ -16,13 +16,13 @@ import edu.wpi.first.math.interpolation.Interpolatable;
 class SwerveState implements Interpolatable<SwerveState> {
     /** For interpolation. */
     private final SwerveDriveKinematics100 m_kinematics;
-    /** Position and velocity. */
+    /** Estimate for position and velocity. */
     private final ModelSE2 m_state;
-    /** Position uncertainty. */
+    /** Estimate for position uncertainty. */
     private final IsotropicNoiseSE2 m_noise;
-    /** Wheel position and angle. */
+    /** Verbatim measurement of wheel position and angle. */
     private final SwerveModulePositions m_positions;
-    /** Yaw observation from the gyro, uncorrected. */
+    /** Verbatim measurement of yaw from the gyro, uncorrected. */
     private final Rotation2d m_gyroYaw;
     /** Estimate for the gyro bias (drift rate). */
     private final VariableR1 m_gyroBias;
@@ -118,6 +118,10 @@ class SwerveState implements Interpolatable<SwerveState> {
 
     public Rotation2d gyroYaw() {
         return m_gyroYaw;
+    }
+
+    public VariableR1 gyroBias() {
+        return m_gyroBias;
     }
 
     @Override

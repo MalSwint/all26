@@ -66,6 +66,11 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         assertEquals(sigma, noise.cartesian(), DELTA);
     }
 
+    private static void verifyBias(double mean, double sigma, SwerveHistory history, double timestamp) {
+        assertEquals(mean, history.getRecord(timestamp).gyroBias().mean(), DELTA);
+        assertEquals(sigma, history.getRecord(timestamp).gyroBias().sigma(), DELTA);
+    }
+
     private static void verifyVelocity(double xV, ModelSE2 state) {
         VelocitySE2 v = state.velocity();
         assertEquals(xV, v.x(), DELTA);
@@ -158,6 +163,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         vu.put(0.00, visionRobotPoseMeters, visionMeasurementStdDevs);
         // position slides over there
         verify(0.038, 0.098, history, 0.00);
+        verifyBias(0, 1, history, 0);
         verifyVelocity(0.000, history.apply(0.00));
         // odometry adds to that
         verify(0.138, 0.098, history, 0.02);
@@ -202,6 +208,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         vu.put(0.02, visionRobotPoseMeters, visionMeasurementStdDevs);
         // initial position is unchanged
         verify(0.000, 0.1, history, 0.00);
+        verifyBias(0, 1, history, 0);
         verifyVelocity(0.000, history.apply(0.00));
         // not sure what's happening here
         verify(0.135, 0.098, history, 0.02);
@@ -248,6 +255,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         vu.put(0.04, visionRobotPoseMeters, visionMeasurementStdDevs);
         // initial position is unchanged
         verify(0.000, 0.1, history, 0.00);
+        verifyBias(0, 1, history, 0);
         verifyVelocity(0.000, history.apply(0.00));
         // camera does nothing
         verify(0.1, 0.1, history, 0.02);
@@ -298,6 +306,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         // now vision says we're one meter away, so pose goes towards that
         vu.put(0.01, visionRobotPoseMeters, visionMeasurementStdDevs);
         verify(0.000, 0.1, history, 0.00);
+        verifyBias(0, 1, history, 0);
         verify(0.038, 0.098, history, 0.01);
 
         // if we had added this vision measurement here, it would have pulled the
@@ -331,6 +340,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         // then the odometry is applied on top of that, yielding 0.405.
         vu.put(0.015, visionRobotPoseMeters, visionMeasurementStdDevs);
         verify(0.000, 0.1, history, 0.00);
+        verifyBias(0, 1, history, 0);
         verify(0.075, 0.096, history, 0.015);
         // odometry thinks no motion at 0.02 so repeat the vision estimate here
         verify(0.075, 0.096, history, 0.02);
@@ -349,6 +359,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         // a little earlier than the previous estimate does nothing
         vu.put(0.014, visionRobotPoseMeters, visionMeasurementStdDevs);
         verify(0.000, 0.1, history, 0.00);
+        verifyBias(0, 1, history, 0);
         // notices the vision input a bit earlier
         verify(0.073, 0.094, history, 0.014);
         // but doesn't change this estimate since it's the same, and we're not moving,
@@ -363,6 +374,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         // a little later than the previous estimate works normally.
         vu.put(0.016, visionRobotPoseMeters, visionMeasurementStdDevs);
         verify(0.000, 0.1, history, 0.00);
+        verifyBias(0, 1, history, 0);
         verify(0.073, 0.095, history, 0.014);
         verify(0.073, 0.095, history, 0.015);
         // drag the pose towards the vision estimate a bit.
@@ -425,6 +437,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         // now vision says we're one meter away, so pose goes towards that
         vu.put(0.01, visionRobotPoseMeters, visionMeasurementStdDevs);
         verify(0.000, 0.1, history, 0.00);
+        verifyBias(0, 1, history, 0);
         verify(0.038, 0.098, history, 0.02);
         verify(0.038, 0.098, history, 0.04);
         verify(0.038, 0.098, history, 0.06);
@@ -463,6 +476,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         // then the odometry is applied on top of that.
         vu.put(0.015, visionRobotPoseMeters, visionMeasurementStdDevs);
         verify(0.000, 0.1, history, 0.00);
+        verifyBias(0, 1, history, 0);
         verify(0.075, 0.096, history, 0.02);
         verify(0.175, 0.096, history, 0.04);
         verify(0.175, 0.096, history, 0.06);
@@ -480,6 +494,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         // a little earlier than the previous estimate does nothing.
         vu.put(0.014, visionRobotPoseMeters, visionMeasurementStdDevs);
         verify(0.000, 0.1, history, 0.00);
+        verifyBias(0, 1, history, 0);
         verify(0.073, 0.094, history, 0.02);
         verify(0.173, 0.095, history, 0.04);
         verify(0.173, 0.095, history, 0.06);
@@ -488,6 +503,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
         // a little later than the previous estimate works normally.
         vu.put(0.016, visionRobotPoseMeters, visionMeasurementStdDevs);
         verify(0.000, 0.1, history, 0.00);
+        verifyBias(0, 1, history, 0);
         verify(0.105, 0.093, history, 0.02);
         verify(0.205, 0.094, history, 0.04);
         verify(0.205, 0.094, history, 0.06);
@@ -543,6 +559,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
 
         vu.put(0.02, visionRobotPoseMeters, visionMeasurementStdDevs);
         verify(0.000, 0.1, history, 0.00);
+        verifyBias(0, 1, history, 0);
         verify(0.038, 0.098, history, 0.02);
         verify(0.038, 0.098, history, 0.04);
         verify(0.038, 0.098, history, 0.06);
@@ -550,6 +567,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
 
         vu.put(0.04, visionRobotPoseMeters, visionMeasurementStdDevs);
         verify(0.000, 0.1, history, 0.00);
+        verifyBias(0, 1, history, 0);
         verify(0.038, 0.098, history, 0.02);
         verify(0.075, 0.096, history, 0.04);
         verify(0.075, 0.096, history, 0.06);
@@ -557,6 +575,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
 
         vu.put(0.06, visionRobotPoseMeters, visionMeasurementStdDevs);
         verify(0.000, 0.1, history, 0.00);
+        verifyBias(0, 1, history, 0);
         verify(0.038, 0.098, history, 0.02);
         verify(0.075, 0.096, history, 0.04);
         verify(0.107, 0.094, history, 0.06);
@@ -601,6 +620,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
 
         vu.put(0.02, visionRobotPoseMeters, visionMeasurementStdDevs);
         verify(0.000, 0.1, history, 0.00);
+        verifyBias(0, 1, history, 0);
         verify(0.010, 0.099, history, 0.02);
         verify(0.010, 0.099, history, 0.04);
         verify(0.010, 0.099, history, 0.06);
@@ -608,6 +628,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
 
         vu.put(0.04, visionRobotPoseMeters, visionMeasurementStdDevs);
         verify(0.000, 0.1, history, 0.00);
+        verifyBias(0, 1, history, 0);
         verify(0.010, 0.099, history, 0.02);
         verify(0.020, 0.099, history, 0.04);
         verify(0.020, 0.099, history, 0.06);
@@ -615,6 +636,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
 
         vu.put(0.06, visionRobotPoseMeters, visionMeasurementStdDevs);
         verify(0.000, 0.1, history, 0.00);
+        verifyBias(0, 1, history, 0);
         verify(0.010, 0.099, history, 0.02);
         verify(0.020, 0.099, history, 0.04);
         verify(0.029, 0.099, history, 0.06);
@@ -660,6 +682,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
 
         vu.put(0.02, visionRobotPoseMeters, visionMeasurementStdDevs);
         verify(0.000, 0.05, history, 0.00);
+        verifyBias(0, 1, history, 0);
         verify(0.010, 0.049, history, 0.02);
         verify(0.010, 0.049, history, 0.04);
         verify(0.010, 0.049, history, 0.06);
@@ -667,6 +690,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
 
         vu.put(0.04, visionRobotPoseMeters, visionMeasurementStdDevs);
         verify(0.000, 0.05, history, 0.00);
+        verifyBias(0, 1, history, 0);
         verify(0.010, 0.049, history, 0.02);
         verify(0.020, 0.049, history, 0.04);
         verify(0.020, 0.049, history, 0.06);
@@ -674,6 +698,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
 
         vu.put(0.06, visionRobotPoseMeters, visionMeasurementStdDevs);
         verify(0.000, 0.05, history, 0.00);
+        verifyBias(0, 1, history, 0);
         verify(0.010, 0.049, history, 0.02);
         verify(0.020, 0.049, history, 0.04);
         verify(0.029, 0.049, history, 0.06);
@@ -721,6 +746,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
 
         vu.put(0.02, visionRobotPoseMeters, visionMeasurementStdDevs);
         verify(0.000, 0.01, history, 0.00);
+        verifyBias(0, 1, history, 0);
         verify(0.010, 0.009, history, 0.02);
         verify(0.010, 0.009, history, 0.04);
         verify(0.010, 0.009, history, 0.06);
@@ -728,6 +754,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
 
         vu.put(0.04, visionRobotPoseMeters, visionMeasurementStdDevs);
         verify(0.000, 0.01, history, 0.00);
+        verifyBias(0, 1, history, 0);
         verify(0.010, 0.009, history, 0.02);
         verify(0.020, 0.009, history, 0.04);
         verify(0.020, 0.009, history, 0.06);
@@ -735,6 +762,7 @@ class SwerveDrivePoseEstimator100Test implements Timeless {
 
         vu.put(0.06, visionRobotPoseMeters, visionMeasurementStdDevs);
         verify(0.000, 0.01, history, 0.00);
+        verifyBias(0, 1, history, 0);
         verify(0.010, 0.009, history, 0.02);
         verify(0.020, 0.009, history, 0.04);
         verify(0.029, 0.009, history, 0.06);

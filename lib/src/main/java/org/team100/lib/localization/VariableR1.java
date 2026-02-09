@@ -45,4 +45,9 @@ public class VariableR1 {
         return variance;
     }
 
+    /** For testing */
+    public double sigma() {
+        return Math.sqrt(variance);
+    }
+
 }

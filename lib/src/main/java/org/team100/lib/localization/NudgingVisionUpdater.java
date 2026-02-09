@@ -65,9 +65,13 @@ public class NudgingVisionUpdater implements VisionUpdater {
 
         Pose2d nudged = nudge(samplePose, measurement, sampleNoise, visionNoise);
 
-        // Use the interpolated gyro yaw, unmodified.
+        // Vision updates do not affect the gyro measurement.
         Rotation2d gyroYaw = sample.gyroYaw();
-        // Use the interpolated velocity, unmodified
+
+        // Vision updates do not affect the gyro bias estimate.
+        VariableR1 gyroBias = sample.gyroBias();
+    
+        // Vision updates to not affect the velocity estimate.
         VelocitySE2 sampleVelocity = sampleModel.velocity();
 
         ModelSE2 model = new ModelSE2(nudged, sampleVelocity);
@@ -75,16 +79,13 @@ public class NudgingVisionUpdater implements VisionUpdater {
         IsotropicNoiseSE2 noise = IsotropicNoiseSE2.inverseVarianceWeightedAverage(
                 sampleNoise, visionNoise);
 
-        // TODO: compute gyro bias
-        VariableR1 gyroBias = new VariableR1(0, 1);
-
         // Remember the result.
         m_history.put(timestamp, model, noise, samplePositions, gyroYaw, gyroBias);
 
         // Replay everything after the sample.
         m_odometryUpdater.replay(timestamp);
 
-        // Remember the
+        // Remember the time of this update.
         m_latestTimeS = Takt.get();
     }
 

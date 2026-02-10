@@ -144,6 +144,8 @@ public class Binder {
         whileTrue(driver::y,
                 m_machinery.m_extender.goToExtendedPosition()
                         .andThen(m_machinery.m_intake.intake()));
+        whileTrue(driver:: leftTrigger, m_machinery.m_
+       
 
         ////////////////////////////////////////////////////////////
         //

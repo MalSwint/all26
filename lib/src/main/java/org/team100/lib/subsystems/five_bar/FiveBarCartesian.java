@@ -2,13 +2,14 @@ package org.team100.lib.subsystems.five_bar;
 
 import java.util.function.Supplier;
 
-import org.team100.lib.config.Feedforward100;
+import org.team100.lib.config.SimpleDynamics;
+import org.team100.lib.config.Friction;
 import org.team100.lib.config.PIDConstants;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.mechanism.RotaryMechanism;
 import org.team100.lib.motor.MotorPhase;
-import org.team100.lib.motor.NeutralMode;
-import org.team100.lib.motor.ctre.Falcon6Motor;
+import org.team100.lib.motor.NeutralMode100;
+import org.team100.lib.motor.ctre.Falcon500Motor;
 import org.team100.lib.sensor.position.absolute.ProxyRotaryPositionSensor;
 import org.team100.lib.sensor.position.incremental.IncrementalBareEncoder;
 import org.team100.lib.subsystems.five_bar.commands.Move;
@@ -58,18 +59,20 @@ public class FiveBarCartesian extends SubsystemBase {
     public FiveBarCartesian(LoggerFactory logger) {
         // zeros
         PIDConstants pid = PIDConstants.zero(logger);
-        Feedforward100 ff = Feedforward100.zero(logger);
+        SimpleDynamics ff = SimpleDynamics.zero(logger);
+        Friction friction = Friction.zero(logger);
 
         LoggerFactory loggerP1 = logger.name("p1");
-        Falcon6Motor motorP1 = new Falcon6Motor(
+        Falcon500Motor motorP1 = new Falcon500Motor(
                 loggerP1,
                 new CanId(1),
-                NeutralMode.COAST,
+                NeutralMode100.COAST,
                 MotorPhase.FORWARD,
                 SUPPLY_LIMIT,
                 STATOR_LIMIT,
-                pid,
-                ff);
+                ff,
+                friction,
+                pid);
         IncrementalBareEncoder encoderP1 = motorP1.encoder();
         m_sensorP1 = new ProxyRotaryPositionSensor(encoderP1, 1.0);
         m_mechP1 = new RotaryMechanism(
@@ -81,15 +84,16 @@ public class FiveBarCartesian extends SubsystemBase {
                 1.0);
 
         LoggerFactory loggerP5 = logger.name("p5");
-        Falcon6Motor motorP5 = new Falcon6Motor(
+        Falcon500Motor motorP5 = new Falcon500Motor(
                 loggerP5,
                 new CanId(2),
-                NeutralMode.COAST,
+                NeutralMode100.COAST,
                 MotorPhase.FORWARD,
                 SUPPLY_LIMIT,
                 STATOR_LIMIT,
-                pid,
-                ff);
+                ff,
+                friction,
+                pid);
         IncrementalBareEncoder encoderP5 = motorP5.encoder();
         m_sensorP5 = new ProxyRotaryPositionSensor(encoderP5, 1.0);
         m_mechP5 = new RotaryMechanism(

@@ -5,12 +5,14 @@ import java.io.IOException;
 import org.team100.frc2026.ClimberExtension;
 import org.team100.frc2026.Intake;
 import org.team100.frc2026.IntakeExtend;
+import org.team100.frc2026.Serializer;
 import org.team100.frc2026.Shooter;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.indicator.Beeper;
 import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
 import org.team100.lib.localization.GroundTruthCache;
+import org.team100.lib.localization.IsotropicNoiseSE2;
 import org.team100.lib.localization.NudgingVisionUpdater;
 import org.team100.lib.localization.OdometryUpdater;
 import org.team100.lib.localization.SimulatedTagDetector;
@@ -25,6 +27,7 @@ import org.team100.lib.subsystems.swerve.SwerveDriveSubsystem;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.subsystems.swerve.module.SwerveModuleCollection;
+import org.team100.lib.util.CanId;
 import org.team100.lib.visualization.RobotPoseVisualization;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -60,6 +63,7 @@ public class Machinery {
     final Shooter m_shooter;
     final Intake m_intake;
     final IntakeExtend m_extender;
+    final Serializer m_serializer;
 
     public Machinery() {
 
@@ -73,8 +77,9 @@ public class Machinery {
 
         // Subsystem initializers go here.
         m_shooter = new Shooter(driveLog);
-        m_intake = new Intake(driveLog);
-        m_extender = new IntakeExtend(driveLog);
+        m_intake = new Intake(driveLog, new CanId(14));
+        m_extender = new IntakeExtend(driveLog, new CanId(19));
+        m_serializer = new Serializer(driveLog);
 
         ////////////////////////////////////////////////////////////
         //
@@ -102,10 +107,11 @@ public class Machinery {
                 gyro.getYawNWU(),
                 m_modules.positions(),
                 Pose2d.kZero,
+                IsotropicNoiseSE2.high(),
                 Takt.get());
         final OdometryUpdater odometryUpdater = new OdometryUpdater(
                 m_swerveKinodynamics, gyro, history, m_modules::positions);
-        odometryUpdater.reset(Pose2d.kZero);
+        odometryUpdater.reset(Pose2d.kZero, IsotropicNoiseSE2.high());
         final NudgingVisionUpdater visionUpdater = new NudgingVisionUpdater(
                 history, odometryUpdater);
 
@@ -175,6 +181,7 @@ public class Machinery {
                     groundTruthGyro.getYawNWU(),
                     m_modules.positions(),
                     Pose2d.kZero,
+                    IsotropicNoiseSE2.high(),
                     Takt.get());
 
             // Read positions and ground truth gyro (which are perfectly consistent) and

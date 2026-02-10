@@ -27,9 +27,9 @@ import org.team100.lib.logging.LoggerFactory.VelocitySE2Logger;
 import org.team100.lib.mechanism.LinearMechanism;
 import org.team100.lib.mechanism.RotaryMechanism;
 import org.team100.lib.motor.MotorPhase;
-import org.team100.lib.motor.NeutralMode;
-import org.team100.lib.motor.ctre.Falcon6Motor;
-import org.team100.lib.motor.ctre.Kraken6Motor;
+import org.team100.lib.motor.NeutralMode100;
+import org.team100.lib.motor.ctre.Falcon500Motor;
+import org.team100.lib.motor.ctre.KrakenX60Motor;
 import org.team100.lib.motor.sim.SimulatedBareMotor;
 import org.team100.lib.music.Music;
 import org.team100.lib.music.Player;
@@ -163,14 +163,15 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
                 final double elevatorLowerLimit = 0;
                 final double elevatorUpperLimit = 2.1;
 
-                Kraken6Motor elevatorFrontMotor = new Kraken6Motor(
+                KrakenX60Motor elevatorFrontMotor = new KrakenX60Motor(
                         elevatorfrontLog,
                         new CanId(11),
-                        NeutralMode.BRAKE, MotorPhase.REVERSE,
+                        NeutralMode100.BRAKE, MotorPhase.REVERSE,
                         100,
                         100,
-                        PIDConstants.makePositionPID(elevatorfrontLog, 1),
-                        Falcon6Motor.swerveSteerFF(elevatorfrontLog));
+                        Falcon500Motor.swerveSteerFF(elevatorfrontLog),
+                        Falcon500Motor.swerveSteerFriction(elevatorfrontLog),
+                        PIDConstants.makePositionPID(elevatorfrontLog, 1));
                 IncrementalBareEncoder elevatorFrontEncoder = elevatorFrontMotor.encoder();
 
                 m_elevatorFront = new LinearMechanism(
@@ -178,29 +179,31 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
                         elevatorGearRatio, elevatorDrivePulleyDiameterM,
                         elevatorLowerLimit, elevatorUpperLimit);
 
-                Kraken6Motor elevatorBackMotor = new Kraken6Motor(
+                KrakenX60Motor elevatorBackMotor = new KrakenX60Motor(
                         elevatorbackLog,
                         new CanId(12),
-                        NeutralMode.BRAKE, MotorPhase.FORWARD,
+                        NeutralMode100.BRAKE, MotorPhase.FORWARD,
                         100, // orginally 60
                         100, // originally 90
-                        PIDConstants.makePositionPID(elevatorbackLog, 1),
-                        Falcon6Motor.swerveSteerFF(elevatorbackLog));
+                        Falcon500Motor.swerveSteerFF(elevatorbackLog),
+                        Falcon500Motor.swerveSteerFriction(elevatorbackLog),
+                        PIDConstants.makePositionPID(elevatorbackLog, 1));
                 Talon6Encoder elevatorBackEncoder = elevatorBackMotor.encoder();
                 m_elevatorBack = new LinearMechanism(
                         elevatorbackLog, elevatorBackMotor, elevatorBackEncoder,
                         elevatorGearRatio, elevatorDrivePulleyDiameterM,
                         elevatorLowerLimit, elevatorUpperLimit);
 
-                Kraken6Motor shoulderMotor = new Kraken6Motor(
+                KrakenX60Motor shoulderMotor = new KrakenX60Motor(
                         shoulderLog,
                         new CanId(24),
-                        NeutralMode.BRAKE,
+                        NeutralMode100.BRAKE,
                         MotorPhase.REVERSE,
                         100, // og 60
                         100, // og 90
-                        PIDConstants.makePositionPID(shoulderLog, 1),
-                        Falcon6Motor.swerveSteerFF(shoulderLog));
+                        Falcon500Motor.swerveSteerFF(shoulderLog),
+                        Falcon500Motor.swerveSteerFriction(shoulderLog),
+                        PIDConstants.makePositionPID(shoulderLog, 1));
                 Talon6Encoder shoulderEncoder = shoulderMotor.encoder();
                 // The shoulder has a 5048 on the intermediate shaft
                 AS5048RotaryPositionSensor shoulderSensor = new AS5048RotaryPositionSensor(
@@ -223,14 +226,15 @@ public class CalgamesMech extends SubsystemBase implements Music, PositionSubsys
                         -2,
                         2);
 
-                Kraken6Motor wristMotor = new Kraken6Motor(
+                KrakenX60Motor wristMotor = new KrakenX60Motor(
                         wristLog,
                         new CanId(22),
-                        NeutralMode.COAST, MotorPhase.FORWARD,
+                        NeutralMode100.COAST, MotorPhase.FORWARD,
                         40, // og 60
                         60, // og 90
-                        PIDConstants.makePositionPID(wristLog, 1),
-                        Falcon6Motor.swerveSteerFF(wristLog));
+                        Falcon500Motor.swerveSteerFF(wristLog),
+                        Falcon500Motor.swerveSteerFriction(wristLog),
+                        PIDConstants.makePositionPID(wristLog, 1));
                 // the wrist has no angle sensor, so it needs to start in the "zero" position.
                 Talon6Encoder wristEncoder = wristMotor.encoder();
                 final double wristGearRatio = 55.710;

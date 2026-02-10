@@ -2,15 +2,16 @@ package org.team100.lib.subsystems.swerve.module;
 
 import java.util.function.Supplier;
 
-import org.team100.lib.config.Feedforward100;
+import org.team100.lib.config.SimpleDynamics;
+import org.team100.lib.config.Friction;
 import org.team100.lib.config.PIDConstants;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.mechanism.LinearMechanism;
 import org.team100.lib.mechanism.RotaryMechanism;
 import org.team100.lib.motor.MotorPhase;
-import org.team100.lib.motor.NeutralMode;
-import org.team100.lib.motor.ctre.Falcon6Motor;
-import org.team100.lib.motor.ctre.Kraken6Motor;
+import org.team100.lib.motor.NeutralMode100;
+import org.team100.lib.motor.ctre.Falcon500Motor;
+import org.team100.lib.motor.ctre.KrakenX60Motor;
 import org.team100.lib.profile.r1.IncrementalProfile;
 import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
 import org.team100.lib.reference.r1.ProfileReferenceR1;
@@ -81,7 +82,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             double turningOffset,
             SwerveKinodynamics kinodynamics,
             EncoderDrive drive,
-            NeutralMode neutral,
+            NeutralMode100 neutral,
             MotorPhase motorPhase) {
 
         LinearVelocityServo driveServo = driveKrakenServo(
@@ -117,7 +118,7 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             double turningOffset,
             SwerveKinodynamics kinodynamics,
             EncoderDrive drive,
-            NeutralMode neutral,
+            NeutralMode100 neutral,
             MotorPhase motorPhase) {
         LinearVelocityServo driveServo = driveFalconServo(
                 parent.name("Drive"),
@@ -144,18 +145,20 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             double statorLimit,
             CanId driveMotorCanId,
             DriveRatio ratio) {
-        Feedforward100 ff = Kraken6Motor.swerveDriveFF(parent);
+        SimpleDynamics ff = KrakenX60Motor.swerveDriveFF(parent);
         // note (10/2/24) 0.4 produces oscillation, on carpet.
+        Friction friction = KrakenX60Motor.swerveDriveFriction(parent);
         PIDConstants pid = PIDConstants.makeVelocityPID(parent, 0.05);
-        Kraken6Motor driveMotor = new Kraken6Motor(
+        KrakenX60Motor driveMotor = new KrakenX60Motor(
                 parent,
                 driveMotorCanId,
-                NeutralMode.COAST,
+                NeutralMode100.COAST,
                 MotorPhase.FORWARD,
                 supplyLimit,
                 statorLimit,
-                pid,
-                ff);
+                ff,
+                friction,
+                pid);
         Talon6Encoder encoder = driveMotor.encoder();
         LinearMechanism mech = new LinearMechanism(parent,
                 driveMotor,
@@ -173,17 +176,19 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             double statorLimit,
             CanId driveMotorCanId,
             DriveRatio ratio) {
-        Feedforward100 ff = Falcon6Motor.swerveDriveFF(parent);
+        SimpleDynamics ff = Falcon500Motor.swerveDriveFF(parent);
+        Friction friction = Falcon500Motor.swerveDriveFriction(parent);
         PIDConstants pid = PIDConstants.makeVelocityPID(parent, 0.05);
-        Falcon6Motor driveMotor = new Falcon6Motor(
+        Falcon500Motor driveMotor = new Falcon500Motor(
                 parent,
                 driveMotorCanId,
-                NeutralMode.COAST,
+                NeutralMode100.COAST,
                 MotorPhase.FORWARD,
                 supplyLimit,
                 statorLimit,
-                pid,
-                ff);
+                ff,
+                friction,
+                pid);
         Talon6Encoder encoder = driveMotor.encoder();
         LinearMechanism mech = new LinearMechanism(parent,
                 driveMotor, encoder, ratio.m_ratio, WHEEL_DIAMETER_M, Double.NEGATIVE_INFINITY,
@@ -201,26 +206,27 @@ public class WCPSwerveModule100 extends SwerveModule100 {
             double gearRatio,
             SwerveKinodynamics kinodynamics,
             EncoderDrive drive,
-            NeutralMode neutral,
+            NeutralMode100 neutral,
             MotorPhase motorPhase) {
+
+        SimpleDynamics ff = Falcon500Motor.swerveSteerFF(parent);
+        Friction friction = Falcon500Motor.swerveSteerFriction(parent);
 
         // Talon outboard POSITION PID
         // 10/2/24 drive torque produces about a 0.5 degree deviation so maybe
         // this is too low.
         PIDConstants pid = PIDConstants.makePositionPID(parent, 2.0);
 
-        // java uses this to calculate feedforward voltages from target velocities etc
-        Feedforward100 ff = Falcon6Motor.swerveSteerFF(parent);
-
-        Falcon6Motor turningMotor = new Falcon6Motor(
+        Falcon500Motor turningMotor = new Falcon500Motor(
                 parent,
                 turningMotorCanId,
                 neutral,
                 motorPhase,
                 STEERING_SUPPLY_LIMIT,
                 STEERING_STATOR_LIMIT,
-                pid,
-                ff);
+                ff,
+                friction,
+                pid);
 
         // this reads the steering angle directly.
         RotaryPositionSensor turningSensor = new AS5048RotaryPositionSensor(

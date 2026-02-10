@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Shooter extends SubsystemBase {
     private final BareMotor m_motor;
 
+    private final double m_speed = 30;
+
     public Shooter(LoggerFactory parent) {
         LoggerFactory log = parent.type(this);
         m_motor = new SimulatedBareMotor(log, 600);
@@ -25,7 +27,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command stop() {
-        return run(this::stopMotor);
+        return run(this::stopMotor).withName("stop");
     }
 
     public void stopMotor() {
@@ -33,7 +35,19 @@ public class Shooter extends SubsystemBase {
     }
 
     private void fullSpeed() {
-        m_motor.setDutyCycle(1);
+        setShooterSpeed();
+    }
+
+    public void setSpeed(double output) {
+        m_motor.setVelocity(output, 0, 0);
+    }
+
+    public void setShooterSpeed() {
+        setSpeed(m_speed);
+    }
+
+    public Boolean atSpeed() {
+        return m_motor.getVelocityRad_S() == m_speed;
     }
 
 }

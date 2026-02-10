@@ -2,15 +2,16 @@ package org.team100.lib.subsystems.five_bar;
 
 import java.util.function.DoubleSupplier;
 
-import org.team100.lib.config.Feedforward100;
+import org.team100.lib.config.SimpleDynamics;
+import org.team100.lib.config.Friction;
 import org.team100.lib.config.Identity;
 import org.team100.lib.config.PIDConstants;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.mechanism.RotaryMechanism;
 import org.team100.lib.motor.BareMotor;
 import org.team100.lib.motor.MotorPhase;
-import org.team100.lib.motor.NeutralMode;
-import org.team100.lib.motor.ctre.Falcon6Motor;
+import org.team100.lib.motor.NeutralMode100;
+import org.team100.lib.motor.ctre.Falcon500Motor;
 import org.team100.lib.motor.sim.SimulatedBareMotor;
 import org.team100.lib.sensor.position.absolute.HomingRotaryPositionSensor;
 import org.team100.lib.sensor.position.absolute.ProxyRotaryPositionSensor;
@@ -68,8 +69,8 @@ public class FiveBarMech extends SubsystemBase {
         LoggerFactory loggerP5 = logger.name("p5");
         switch (Identity.instance) {
             case COMP_BOT -> {
-                Falcon6Motor motorP1 = makeMotor(loggerP1, new CanId(1));
-                Falcon6Motor motorP5 = makeMotor(loggerP5, new CanId(2));
+                Falcon500Motor motorP1 = makeMotor(loggerP1, new CanId(1));
+                Falcon500Motor motorP5 = makeMotor(loggerP5, new CanId(2));
                 m_motorP1 = motorP1;
                 m_motorP5 = motorP5;
 
@@ -184,21 +185,23 @@ public class FiveBarMech extends SubsystemBase {
 
     //////////////////////
 
-    private Falcon6Motor makeMotor(LoggerFactory logger, CanId canId) {
+    private Falcon500Motor makeMotor(LoggerFactory logger, CanId canId) {
         /** Units of positional PID are volts per revolution. */
         PIDConstants pid = PIDConstants.makePositionPID(
                 logger, 2.0);
         /** We never use feedforward since all our goals are motionless. */
-        Feedforward100 ff = Feedforward100.zero(logger);
-        return new Falcon6Motor(
+        SimpleDynamics ff = SimpleDynamics.zero(logger);
+        Friction friction = Friction.zero(logger);
+        return new Falcon500Motor(
                 logger,
                 canId,
-                NeutralMode.COAST,
+                NeutralMode100.COAST,
                 MotorPhase.FORWARD,
                 SUPPLY_LIMIT,
                 STATOR_LIMIT,
-                pid,
-                ff);
+                ff,
+                friction,
+                pid);
     }
 
     /** For homing; ignores feasibility and limits. */

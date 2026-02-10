@@ -8,8 +8,8 @@ import org.team100.lib.controller.r1.PIDFeedback;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.mechanism.RotaryMechanism;
 import org.team100.lib.motor.MotorPhase;
-import org.team100.lib.motor.NeutralMode;
-import org.team100.lib.motor.ctre.Falcon6Motor;
+import org.team100.lib.motor.NeutralMode100;
+import org.team100.lib.motor.ctre.Falcon500Motor;
 import org.team100.lib.motor.sim.SimulatedBareMotor;
 import org.team100.lib.profile.r1.IncrementalProfile;
 import org.team100.lib.profile.r1.TrapezoidIncrementalProfile;
@@ -41,11 +41,12 @@ public class Climber extends SubsystemBase {
 
         switch (Identity.instance) {
             case COMP_BOT -> {
-                Falcon6Motor motor = new Falcon6Motor(
-                        log, canID, NeutralMode.BRAKE, MotorPhase.REVERSE,
+                Falcon500Motor motor = new Falcon500Motor(
+                        log, canID, NeutralMode100.BRAKE, MotorPhase.REVERSE,
                         20, 20,
-                        PIDConstants.makePositionPID(log, 0.2),
-                        Falcon6Motor.ff2(log));
+                        Falcon500Motor.ff2(log),
+                        Falcon500Motor.friction2(log),
+                        PIDConstants.makePositionPID(log, 0.2));
 
                 double inputOffset = 0.440602;
                 RotaryPositionSensor sensor = new AS5048RotaryPositionSensor(

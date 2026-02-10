@@ -2,13 +2,14 @@ package org.team100.lib.subsystems.five_bar;
 
 import java.util.function.DoubleSupplier;
 
-import org.team100.lib.config.Feedforward100;
+import org.team100.lib.config.SimpleDynamics;
+import org.team100.lib.config.Friction;
 import org.team100.lib.config.PIDConstants;
 import org.team100.lib.logging.LoggerFactory;
 import org.team100.lib.mechanism.RotaryMechanism;
 import org.team100.lib.motor.MotorPhase;
-import org.team100.lib.motor.NeutralMode;
-import org.team100.lib.motor.ctre.Falcon6Motor;
+import org.team100.lib.motor.NeutralMode100;
+import org.team100.lib.motor.ctre.Falcon500Motor;
 import org.team100.lib.profile.r1.IncrementalProfile;
 import org.team100.lib.profile.r1.TrapezoidIncrementalProfile;
 import org.team100.lib.reference.r1.IncrementalProfileReferenceR1;
@@ -67,20 +68,22 @@ public class FiveBarServo extends SubsystemBase {
     public FiveBarServo(LoggerFactory logger) {
         // zeros
         PIDConstants pid = PIDConstants.zero(logger);
-        Feedforward100 ff = Feedforward100.zero(logger);
+        SimpleDynamics ff = SimpleDynamics.zero(logger);
+        Friction friction = Friction.zero(logger);
         IncrementalProfile profile = new TrapezoidIncrementalProfile(
                 logger, MAX_VELOCITY, MAX_ACCEL, POSITION_TOLERANCE);
 
         LoggerFactory loggerP1 = logger.name("p1");
-        Falcon6Motor motorP1 = new Falcon6Motor(
+        Falcon500Motor motorP1 = new Falcon500Motor(
                 loggerP1,
                 new CanId(1),
-                NeutralMode.COAST,
+                NeutralMode100.COAST,
                 MotorPhase.FORWARD,
                 SUPPLY_LIMIT,
                 STATOR_LIMIT,
-                pid,
-                ff);
+                ff,
+                friction,
+                pid);
         IncrementalBareEncoder encoderP1 = motorP1.encoder();
         m_sensorP1 = new ProxyRotaryPositionSensor(encoderP1, 1.0);
         RotaryMechanism mechP1 = new RotaryMechanism(
@@ -99,15 +102,16 @@ public class FiveBarServo extends SubsystemBase {
                 refP1);
 
         LoggerFactory loggerP5 = logger.name("p5");
-        Falcon6Motor motorP5 = new Falcon6Motor(
+        Falcon500Motor motorP5 = new Falcon500Motor(
                 loggerP5,
                 new CanId(2),
-                NeutralMode.COAST,
+                NeutralMode100.COAST,
                 MotorPhase.FORWARD,
                 SUPPLY_LIMIT,
                 STATOR_LIMIT,
-                pid,
-                ff);
+                ff,
+                friction,
+                pid);
         IncrementalBareEncoder encoderP5 = motorP5.encoder();
         m_sensorP5 = new ProxyRotaryPositionSensor(encoderP5, 1.0);
         RotaryMechanism m_mechP5 = new RotaryMechanism(

@@ -33,15 +33,6 @@ public class UncertaintyTest {
     }
 
     @Test
-    void testStateStdDevs() {
-        // these are the "antijitter" values.
-        // 1 mm, very low
-        IsotropicNoiseSE2 stateStdDev = Uncertainty.TIGHT_STATE_STDDEV;
-        assertEquals(0.001, stateStdDev.cartesian(), DELTA);
-        assertEquals(0.1, stateStdDev.rotation(), DELTA);
-    }
-
-    @Test
     void testOdometryCartesian() {
         double odo = Uncertainty.odometryCartesianStdDev(0);
         assertEquals(0.0, odo, 1e-6);
@@ -101,18 +92,4 @@ public class UncertaintyTest {
         assertEquals(0.0, result2.getY(), DELTA);
         assertEquals(0.5, result2.getRotation().getRadians(), DELTA);
     }
-
-    @Test
-    void testVariance() {
-        // very uncertain update yields a confident result
-        assertEquals(0.990, Uncertainty.variance(1, 100), DELTA);
-        // less uncertain, result is tighter
-        assertEquals(0.91, Uncertainty.variance(1, 10), DELTA);
-        // two samples with same uncertainty -> twice as confident!
-        assertEquals(0.5, Uncertainty.variance(1, 1), DELTA);
-        assertEquals(0.91, Uncertainty.variance(10, 1), DELTA);
-        // very confident update yields a confident result
-        assertEquals(0.990, Uncertainty.variance(100, 1), DELTA);
-    }
-
 }

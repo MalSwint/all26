@@ -26,10 +26,6 @@ public enum Experiment {
      */
     StickyHeading,
     /**
-     * Use softer vision update gains
-     */
-    AvoidVisionJitter,
-    /**
      * Filter snap rotational output to remove oscillation
      */
     SnapThetaFilter,

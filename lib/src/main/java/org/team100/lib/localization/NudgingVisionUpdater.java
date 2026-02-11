@@ -79,8 +79,7 @@ public class NudgingVisionUpdater implements VisionUpdater {
 
         ModelSE2 model = new ModelSE2(nudged.pose(), sampleVelocity);
 
-        IsotropicNoiseSE2 noise = IsotropicNoiseSE2.inverseVarianceWeightedAverage(
-                sampleNoise, visionNoise);
+        IsotropicNoiseSE2 noise = nudged.noise();
 
         // System.out.printf("vision put noise %s\n", noise);
 

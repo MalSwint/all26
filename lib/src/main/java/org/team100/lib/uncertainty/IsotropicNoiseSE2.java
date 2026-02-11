@@ -36,13 +36,6 @@ public class IsotropicNoiseSE2 {
         return IsotropicNoiseSE2.fromStdDev(10, 6);
     }
 
-    /** Noise of the inverse-variance weighted mean. */
-    public static IsotropicNoiseSE2 inverseVarianceWeightedAverage(IsotropicNoiseSE2 a, IsotropicNoiseSE2 b) {
-        return new IsotropicNoiseSE2(
-                Uncertainty.variance(a.m_cartesianVariance, b.m_cartesianVariance),
-                Uncertainty.variance(a.m_rotationVariance, b.m_rotationVariance));
-    }
-
     public IsotropicNoiseSE2 plus(IsotropicNoiseSE2 other) {
         return new IsotropicNoiseSE2(
                 m_cartesianVariance + other.m_cartesianVariance,

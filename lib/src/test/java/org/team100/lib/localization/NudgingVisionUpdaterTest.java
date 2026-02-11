@@ -44,7 +44,7 @@ public class NudgingVisionUpdaterTest {
         assertEquals(0, nudged.pose().getY(), 1e-6);
         // infinite-variance vision update is completely ignored.
         assertEquals(0, nudged.pose().getRotation().getRadians(), 1e-6);
-        assertEquals(0.001000, nudged.noise().cartesian(), 1e-6);
+        assertEquals(0.003000, nudged.noise().cartesian(), 1e-6);
         // vision has infinite variance; this is the state variance.
         assertEquals(0.1, nudged.noise().rotation(), 1e-6);
 
@@ -70,7 +70,7 @@ public class NudgingVisionUpdaterTest {
         }
         // after 1 sec
         Transform2d error = measurement.pose().minus(nudged.pose());
-        assertEquals(0.033, error.getX(), DELTA);
+        assertEquals(0.019, error.getX(), DELTA);
         assertEquals(0, error.getY(), DELTA);
         assertEquals(0, error.getRotation().getRadians(), DELTA);
         //
@@ -79,7 +79,7 @@ public class NudgingVisionUpdaterTest {
         }
         // after 2 sec
         error = measurement.pose().minus(nudged.pose());
-        assertEquals(0.020, error.getX(), DELTA);
+        assertEquals(0.009, error.getX(), DELTA);
         assertEquals(0, error.getY(), DELTA);
         assertEquals(0, error.getRotation().getRadians(), DELTA);
     }
@@ -96,7 +96,7 @@ public class NudgingVisionUpdaterTest {
         assertEquals(0.003846, nudged.pose().getX(), 1e-6);
         assertEquals(0, nudged.pose().getY(), 1e-6);
         assertEquals(0, nudged.pose().getRotation().getRadians(), 1e-6);
-        assertEquals(0.009806, nudged.noise().cartesian(), 1e-6);
+        assertEquals(0.010176, nudged.noise().cartesian(), 1e-6);
         assertEquals(0.098058, nudged.noise().rotation(), 1e-6);
 
     }
@@ -113,8 +113,8 @@ public class NudgingVisionUpdaterTest {
         assertEquals(0.038461, nudged.pose().getX(), 1e-6);
         assertEquals(0.076923, nudged.pose().getY(), 1e-6);
         assertEquals(0.115385, nudged.pose().getRotation().getRadians(), 1e-6);
-        assertEquals(0.009806, nudged.noise().cartesian(), 1e-6);
-        assertEquals(0.098058, nudged.noise().rotation(), 1e-6);
+        assertEquals(0.061598, nudged.noise().cartesian(), 1e-6);
+        assertEquals(0.127562, nudged.noise().rotation(), 1e-6);
 
     }
 
@@ -135,7 +135,7 @@ public class NudgingVisionUpdaterTest {
         }
         // after 1 sec
         Transform2d error = measurement.pose().minus(nudged.pose());
-        assertEquals(0.033, error.getX(), DELTA);
+        assertEquals(0.019, error.getX(), DELTA);
         assertEquals(0, error.getY(), DELTA);
         assertEquals(0, error.getRotation().getRadians(), DELTA);
         //
@@ -144,7 +144,7 @@ public class NudgingVisionUpdaterTest {
         }
         // after 2 sec
         error = measurement.pose().minus(nudged.pose());
-        assertEquals(0.020, error.getX(), 1e-6);
+        assertEquals(0.009372, error.getX(), 1e-6);
         assertEquals(0, error.getY(), DELTA);
         assertEquals(0, error.getRotation().getRadians(), DELTA);
     }
@@ -164,7 +164,7 @@ public class NudgingVisionUpdaterTest {
         // nudged value is *more positive* even though the measurement is negative.
         assertEquals(3.056637, nudged.pose().getRotation().getRadians(), 1e-6);
         assertEquals(0.008944, nudged.noise().cartesian(), 1e-6);
-        assertEquals(0.008944, nudged.noise().rotation(), 1e-6);
+        assertEquals(0.018347, nudged.noise().rotation(), 1e-6);
 
     }
 

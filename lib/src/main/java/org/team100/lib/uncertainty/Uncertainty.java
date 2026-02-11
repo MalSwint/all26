@@ -1,8 +1,5 @@
 package org.team100.lib.uncertainty;
 
-import org.team100.lib.experiments.Experiment;
-import org.team100.lib.experiments.Experiments;
-
 /**
  * Methods governing vision update uncertainties.
  * 
@@ -10,19 +7,6 @@ import org.team100.lib.experiments.Experiments;
  * https://docs.google.com/spreadsheets/d/1StMbOyksydpzFmpHbZBL7ICMQtHnOBubrOMeYSx0M6E
  */
 public class Uncertainty {
-    /**
-     * this is the default value which, in hindsight, seems ridiculously high.
-     * TODO: do some calibration of this
-     */
-    private static final IsotropicNoiseSE2 DEFAULT_STATE_STDDEV = IsotropicNoiseSE2.fromStdDev(0.1, 0.1);
-
-    /**
-     * This value is tuned so that errors scale at 0.2x per second. See
-     * SwerveDrivePoseEstimator100Test::testFirmerNudge.
-     * TODO: get rid of this
-     */
-    static final IsotropicNoiseSE2 TIGHT_STATE_STDDEV = IsotropicNoiseSE2.fromStdDev(0.001, 0.1);
-
     /**
      * Standard deviation of vision updates in SE(2).
      * 
@@ -82,34 +66,6 @@ public class Uncertainty {
     }
 
     /**
-     * Standard devation of robot state in SE(2). Note this is just a 3 vector; the
-     * covariances are zero. We *could* use covariances here (so the shape of the
-     * error could be extended along a diagonal), but it would be more complicated
-     * for little benefit.
-     */
-    static IsotropicNoiseSE2 stateStdDevs() {
-        if (Experiments.instance.enabled(Experiment.AvoidVisionJitter)) {
-            return TIGHT_STATE_STDDEV;
-        }
-        return DEFAULT_STATE_STDDEV;
-    }
-
-    /**
-     * The error in odometry is superlinear in speed. Since the odometry samples
-     * happen regularly, we can use the sample distance as a measure of speed.
-     * 
-     * This yields zero when the robot isn't moving, which is what you'd expect.
-     * 
-     * I completely made this up
-     * https://docs.google.com/spreadsheets/d/1DmHL1UDd6vngmr-5_9fNHg2xLC4TEVWTN2nHZBOnje0/edit?gid=995645441#gid=995645441
-     */
-    public static IsotropicNoiseSE2 odometryStdDevs(double distanceM, double rotationRad) {
-        return IsotropicNoiseSE2.fromStdDev(
-                odometryCartesianStdDev(distanceM),
-                odometryRotationStdDev(distanceM, rotationRad));
-    }
-
-    /**
      * The error in odometry is superlinear in speed. Since the odometry samples
      * happen regularly, we can use the sample distance as a measure of speed.
      * 
@@ -144,20 +100,5 @@ public class Uncertainty {
         double superError = 0.5;
         // We haven't measured this, so just guess it's the same???
         return lowSpeedError * norm + superError * norm * norm;
-    }
-
-    /**
-     * Variance of the weighted mean.
-     * 
-     * This is simply the reciprocal of the sum of the reciprocals.
-     * 
-     * https://en.wikipedia.org/wiki/Inverse-variance_weighting
-     * 
-     * @param var1 state variance
-     * @param var2 update variance
-     * @return variance of the weighted mean.
-     */
-    static double variance(double var1, double var2) {
-        return 1 / (1 / var1 + 1 / var2);
     }
 }

@@ -3,6 +3,7 @@ package org.team100.frc2026.robot;
 import java.io.IOException;
 
 import org.team100.frc2026.ClimberExtension;
+import org.team100.frc2026.Climber;
 import org.team100.frc2026.Intake;
 import org.team100.frc2026.IntakeExtend;
 import org.team100.frc2026.Serializer;
@@ -64,7 +65,8 @@ public class Machinery {
     final Intake m_intake;
     final IntakeExtend m_extender;
     final Serializer m_serializer;
-
+    final ClimberExtension m_ClimberExtension;
+    final Climber m_Climber;
     public Machinery() {
 
         final LoggerFactory driveLog = logger.name("Drive");

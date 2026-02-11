@@ -24,6 +24,7 @@ public class ClimberExtension extends SubsystemBase {
     }
     private void setOutPosition() {
         m_motor.setUnwrappedPosition(m_maxExtension,0,0,0);
+    
     }
     public void setInPosition() {
         m_motor.setUnwrappedPosition(0,0,0,0);

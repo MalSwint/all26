@@ -143,33 +143,33 @@ public class NudgingVisionUpdater implements VisionUpdater {
         Pose2d sample = noisySample.pose();
         Pose2d measurement = noisyMeasurement.pose();
         IsotropicNoiseSE2 stateSigma = noisySample.noise();
-        IsotropicNoiseSE2 visionSigma = noisyMeasurement.noise();
+        IsotropicNoiseSE2 measurementSigma = noisyMeasurement.noise();
 
         // translation
         // the result is on the line segment between sample and measurement, so we just
         // look at the length of that segment.
         //
         // this is the start of that segment.
-        VariableR1 sampleV = VariableR1.fromVariance(
-                0,
-                stateSigma.cartesianVariance());
+        VariableR1 sampleV = VariableR1.fromVariance(0, stateSigma.cartesianVariance());
         // this is the end.
-        VariableR1 measurementV = VariableR1.fromVariance(
-                measurement.getTranslation().getDistance(sample.getTranslation()),
-                visionSigma.cartesianVariance());
+        Translation2d deltaTranslation = measurement.getTranslation().minus(sample.getTranslation());
+        // the variance of the delta is the sum of the two variances
+        double deltaNorm = deltaTranslation.getNorm();
+        double deltaVariance = measurementSigma.cartesianVariance() + stateSigma.cartesianVariance();
+        VariableR1 measurementV = VariableR1.fromVariance(deltaNorm, deltaVariance);
 
-        // for now this uses the same weighting as before.
-        // TODO: use covariance inflation
-        // VariableR1 cartesian = InverseVarianceWeighting.fuse(sampleV, measurementV);
         VariableR1 cartesian = m_cartesianFusor.fuse(sampleV, measurementV);
 
-        Translation2d deltaTranslation = measurement.getTranslation().minus(sample.getTranslation());
-        Rotation2d deltaTranslationDirection = deltaTranslation.getAngle();
-
-        Translation2d scaledTranslation = new Translation2d(cartesian.mean(),
-                deltaTranslationDirection);
-        Translation2d newTranslation = sample.getTranslation().plus(scaledTranslation);
-
+        Translation2d newTranslation;
+        if (deltaNorm > 1e-6) {
+            Rotation2d deltaTranslationDirection = deltaTranslation.getAngle();
+            Translation2d scaledTranslation = new Translation2d(
+                    cartesian.mean(), deltaTranslationDirection);
+            newTranslation = sample.getTranslation().plus(scaledTranslation);
+        } else {
+            // there's no angle
+            newTranslation = sample.getTranslation();
+        }
         // rotation
 
         Rotation2d deltaRotation = measurement.getRotation().minus(sample.getRotation());
@@ -178,7 +178,7 @@ public class NudgingVisionUpdater implements VisionUpdater {
                 0,
                 stateSigma.rotationVariance());
         VariableR1 measurementRV = VariableR1.fromVariance(
-                deltaRotation.getRadians(), visionSigma.rotationVariance());
+                deltaRotation.getRadians(), measurementSigma.rotationVariance());
         // TODO: use covariance inflation
 
         // VariableR1 rotation = InverseVarianceWeighting.fuse(sampleRV, measurementRV);

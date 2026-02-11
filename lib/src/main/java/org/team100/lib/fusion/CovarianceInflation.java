@@ -39,12 +39,18 @@ public class CovarianceInflation implements Fusor {
 
     @Override
     public VariableR1 fuse(VariableR1 a, VariableR1 b) {
-        if (a.variance() < CRISP_THRESHOLD && b.variance() < CRISP_THRESHOLD)
-            return VariableR1.fromVariance((a.mean() + b.mean()) / 2, 0);
-        if (a.variance() < CRISP_THRESHOLD)
-            return VariableR1.fromVariance(a.mean(), 0);
-        if (b.variance() < CRISP_THRESHOLD)
-            return VariableR1.fromVariance(b.mean(), 0);
+        if (a.variance() < CRISP_THRESHOLD && b.variance() < CRISP_THRESHOLD) {
+            System.out.println("BOTH VARIANCES TOO LOW");
+            return VariableR1.fromVariance((a.mean() + b.mean()) / 2, (a.variance() + b.variance()) / 2);
+        }
+        if (a.variance() < CRISP_THRESHOLD) {
+            System.out.println("A VARIANCE TOO LOW");
+            return VariableR1.fromVariance(a.mean(), a.variance());
+        }
+        if (b.variance() < CRISP_THRESHOLD) {
+            System.out.println("B VARIANCE TOO LOW");
+            return VariableR1.fromVariance(b.mean(), b.variance());
+        }
         double wA = 1 / a.variance();
         double wB = 1 / b.variance();
         double totalWeight = wA + wB;

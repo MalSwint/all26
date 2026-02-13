@@ -11,19 +11,24 @@ import edu.wpi.first.wpilibj2.command.Command;
 public interface AnnotatedCommand {
 
     /**
-     * command to run
+     * Must be unique.
+     */
+    String name();
+
+    /**
+     * Command to run
      */
     Command command();
 
     /**
-     * red or blue, null if it works for both.
+     * Red or blue, null if it works for both.
      */
     default Alliance alliance() {
         return null;
     }
 
     /**
-     * starting pose, null if it doesn't matter.
+     * Starting pose, null if it doesn't matter.
      */
     default Pose2d start() {
         return null;

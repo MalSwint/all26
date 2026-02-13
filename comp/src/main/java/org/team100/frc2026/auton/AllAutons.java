@@ -24,19 +24,12 @@ public class AllAutons {
     public AllAutons(Machinery machinery, ControllerSE2 controller) {
         m_autonChooser = new AutonChooser();
         LoggerFactory log = Logging.instance().rootLogger.name("Auton");
-        m_autonChooser.add("Do Nothing",
-                new AnnotatedCommand(
-                        new DoNothing().withName("Nothing from right bump"),
-                        null,
-                        StartingPositions.RIGHT_BUMP));
-        m_autonChooser.add("Right Trench Leave",
-                AnnotatedCommand.eitherAlliance(
-                        new RightTrenchLeave().get(
-                                log,
-                                machinery.m_swerveKinodynamics,
-                                controller,
-                                machinery),
-                        StartingPositions.RIGHT_TRENCH));
+        m_autonChooser.add(new DoNothing());
+        m_autonChooser.add(new RightTrenchLeave(
+                log,
+                machinery.m_swerveKinodynamics,
+                controller,
+                machinery));
     }
 
     public Command get() {

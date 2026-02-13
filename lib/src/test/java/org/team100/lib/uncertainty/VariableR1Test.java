@@ -3,10 +3,8 @@ package org.team100.lib.uncertainty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.team100.lib.uncertainty.VariableR1;
 
 public class VariableR1Test {
-    private static final boolean DEBUG = true;
     private static final double DELTA = 0.001;
 
     @Test

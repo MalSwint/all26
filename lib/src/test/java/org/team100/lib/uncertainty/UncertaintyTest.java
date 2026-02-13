@@ -21,7 +21,9 @@ public class UncertaintyTest {
     @Test
     void testFigure6() {
         assertEquals(Math.toRadians(0.342), Uncertainty.figure6(Math.PI / 4), DELTA);
-        assertEquals(Double.MAX_VALUE, Uncertainty.figure6(0), DELTA);
+        // The figure doesn't actually show a value for zero; it is presumably very
+        // high. We cap it at 3.
+        assertEquals(3, Uncertainty.figure6(0), DELTA);
     }
 
     @Test

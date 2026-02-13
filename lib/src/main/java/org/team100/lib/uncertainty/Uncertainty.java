@@ -57,10 +57,16 @@ public class Uncertainty {
     static double figure6(double offAxisAngleRad) {
         if (offAxisAngleRad < 0)
             throw new IllegalArgumentException("angle must be non-negative");
+        if (offAxisAngleRad > 1.5) {
+            // tag from behind makes no sense
+            return 0;
+        }
         // This uses degrees because figure 6 uses degrees.
         double offAxisDegrees = Math.toDegrees(offAxisAngleRad);
         if (offAxisDegrees < 3)
-            return Double.MAX_VALUE;
+            // return Double.MAX_VALUE;
+            // avoid infinity so that downstream can tone it down
+            return 3;
         double errorDeg = 10 / offAxisDegrees + 10 / Math.pow(85 - offAxisDegrees, 1.2);
         return Math.toRadians(errorDeg);
     }

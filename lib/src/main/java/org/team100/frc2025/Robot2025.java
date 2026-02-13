@@ -1,9 +1,9 @@
 package org.team100.frc2025;
 
-import org.team100.frc2025.robot.AllAutons;
-import org.team100.frc2025.robot.Binder;
-import org.team100.frc2025.robot.Machinery;
-import org.team100.frc2025.robot.Prewarmer;
+import org.team100.frc2025.robot.AllAutons2025;
+import org.team100.frc2025.robot.Binder2025;
+import org.team100.frc2025.robot.Machinery2025;
+import org.team100.frc2025.robot.Prewarmer2025;
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.Takt;
 import org.team100.lib.config.Identity;
@@ -21,14 +21,14 @@ import edu.wpi.first.wpilibj.util.WPILibVersion;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
-public class Robot extends TimedRobot100 {
+public class Robot2025 extends TimedRobot100 {
 
     private final RobotLog m_robotLog;
-    private final Machinery m_machinery;
-    private final AllAutons m_allAutons;
-    private final Binder m_binder;
+    private final Machinery2025 m_machinery;
+    private final AllAutons2025 m_allAutons;
+    private final Binder2025 m_binder;
 
-    public Robot() {
+    public Robot2025() {
         Banner.printBanner();
 
         // We want the CommandScheduler, not LiveWindow.
@@ -49,12 +49,12 @@ public class Robot extends TimedRobot100 {
 
         m_robotLog = new RobotLog();
 
-        m_machinery = new Machinery();
-        m_allAutons = new AllAutons(m_machinery);
-        m_binder = new Binder(m_machinery);
+        m_machinery = new Machinery2025();
+        m_allAutons = new AllAutons2025(m_machinery);
+        m_binder = new Binder2025(m_machinery);
         m_binder.bind();
 
-        Prewarmer.init(m_machinery);
+        Prewarmer2025.init(m_machinery);
     }
 
     @Override

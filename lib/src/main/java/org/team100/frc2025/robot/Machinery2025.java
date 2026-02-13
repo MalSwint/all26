@@ -1,10 +1,11 @@
 package org.team100.frc2025.robot;
 
 import java.io.IOException;
+import java.util.function.UnaryOperator;
 
 import org.team100.frc2025.CalgamesArm.CalgamesMech;
 import org.team100.frc2025.CalgamesArm.CalgamesViz;
-import org.team100.frc2025.Climber.Climber;
+import org.team100.frc2025.Climber.Climber2025;
 import org.team100.frc2025.Climber.ClimberIntake;
 import org.team100.frc2025.Climber.ClimberVisualization;
 import org.team100.frc2025.grip.Manipulator;
@@ -41,7 +42,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
  * This should contain all the hardware of the robot: all the subsystems etc
  * that the Binder and Auton classes may want to use.
  */
-public class Machinery {
+public class Machinery2025 {
     // for background on drive current limits:
     // https://v6.docs.ctr-electronics.com/en/stable/docs/hardware-reference/talonfx/improving-performance-with-current-limits.html
     // https://www.chiefdelphi.com/t/the-brushless-era-needs-sensible-default-current-limits/461056/51
@@ -65,7 +66,7 @@ public class Machinery {
 
     final CalgamesMech m_mech;
     final Manipulator m_manipulator;
-    final Climber m_climber;
+    final Climber2025 m_climber;
     final ClimberIntake m_climberIntake;
     final TrajectoryVisualization m_trajectoryViz;
     final SwerveKinodynamics m_swerveKinodynamics;
@@ -74,7 +75,7 @@ public class Machinery {
     final SwerveDriveSubsystem m_drive;
     final Beeper m_beeper;
 
-    public Machinery() {
+    public Machinery2025() {
 
         final LoggerFactory driveLog = logger.name("Drive");
 
@@ -86,7 +87,7 @@ public class Machinery {
         //
         m_mech = new CalgamesMech(logger, 0.5, 0.343);
         m_manipulator = new Manipulator(logger);
-        m_climber = new Climber(logger, new CanId(13));
+        m_climber = new Climber2025(logger, new CanId(13));
         m_climberIntake = new ClimberIntake(logger, new CanId(14));
 
         ////////////////////////////////////////////////////////////
@@ -121,7 +122,8 @@ public class Machinery {
                 IsotropicNoiseSE2.high(),
                 Takt.get());
         final OdometryUpdater odometryUpdater = new OdometryUpdater(
-                driveLog, m_swerveKinodynamics, gyro, history, m_modules::positions);
+                driveLog, m_swerveKinodynamics, gyro, history, m_modules::positions,
+                UnaryOperator.identity());
         odometryUpdater.reset(Pose2d.kZero, IsotropicNoiseSE2.high());
         final NudgingVisionUpdater visionUpdater = new NudgingVisionUpdater(
                 driveLog, history, odometryUpdater);

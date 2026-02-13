@@ -1,6 +1,7 @@
 package org.team100.lib.subsystems.swerve;
 
 import java.io.IOException;
+import java.util.function.UnaryOperator;
 
 import org.team100.lib.controller.se2.ControllerFactorySE2;
 import org.team100.lib.controller.se2.ControllerSE2;
@@ -64,7 +65,7 @@ public class RealisticFixture {
                 IsotropicNoiseSE2.high(),
                 0);
         OdometryUpdater odometryUpdater = new OdometryUpdater(
-                logger, swerveKinodynamics, gyro, history, collection::positions);
+                logger, swerveKinodynamics, gyro, history, collection::positions, UnaryOperator.identity());
         odometryUpdater.reset(Pose2d.kZero, IsotropicNoiseSE2.high(), 0);
 
         final NudgingVisionUpdater visionUpdater = new NudgingVisionUpdater(

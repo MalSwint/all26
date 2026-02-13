@@ -28,17 +28,17 @@ import org.team100.lib.subsystems.se2.commands.DriveWithTrajectoryFunction;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class Auton {
+public class Auton2025 {
     private static final boolean AUTON_FIXED = false;
 
     private final LoggerFactory m_log;
-    private final Machinery m_machinery;
+    private final Machinery2025 m_machinery;
     private final ProfileSE2 m_autoProfile;
     private final FullStateControllerSE2 m_autoController;
 
-    public Auton(
+    public Auton2025(
             LoggerFactory parent,
-            Machinery machinery,
+            Machinery2025 machinery,
             ProfileSE2 autoProfile,
             FullStateControllerSE2 autoController) {
         m_log = parent.type(this);

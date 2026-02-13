@@ -1,5 +1,7 @@
 package org.team100.lib.sensor.gyro;
 
+import java.util.Random;
+
 import org.team100.lib.coherence.Cache;
 import org.team100.lib.coherence.DoubleCache;
 import org.team100.lib.coherence.Takt;
@@ -19,8 +21,10 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
  */
 public class SimulatedGyro implements Gyro {
     private static final double SAMPLE_RATE = 100;
+    /** White noise in rad/s */
     private static final double NOISE = 4e-4 * Math.sqrt(SAMPLE_RATE);
     private static final double BIAS_NOISE = 1e-5;
+    private final Random m_rand;
     private final Rotation2dLogger m_log_yaw;
     private final DoubleLogger m_log_yaw_rate;
     private final SwerveKinodynamics m_kinodynamics;
@@ -39,6 +43,7 @@ public class SimulatedGyro implements Gyro {
             SwerveModuleCollection collection,
             double driftRateRad_S) {
         LoggerFactory log = parent.type(this);
+        m_rand = new Random();
         m_log_yaw = log.rotation2dLogger(Level.TRACE, "Yaw NWU (rad)");
         m_log_yaw_rate = log.doubleLogger(Level.TRACE, "Yaw Rate NWU (rad_s)");
         m_heading = 0;
@@ -69,7 +74,8 @@ public class SimulatedGyro implements Gyro {
         }
         SwerveModuleStates states = m_moduleCollection.states();
         ChassisSpeeds speeds = m_kinodynamics.toChassisSpeedsWithDiscretization(states, 0.02);
-        m_heading += (speeds.omegaRadiansPerSecond + m_driftRateRad_S) * dt;
+        double noiseRad_S = NOISE * m_rand.nextGaussian();
+        m_heading += (speeds.omegaRadiansPerSecond + m_driftRateRad_S + noiseRad_S) * dt;
         return m_heading;
     }
 

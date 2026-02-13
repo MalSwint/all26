@@ -28,11 +28,11 @@ import org.team100.lib.util.RoboRioChannel;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Climber extends SubsystemBase {
+public class Climber2025 extends SubsystemBase {
 
     private final AngularPositionServo m_servo;
 
-    public Climber(LoggerFactory parent, CanId canID) {
+    public Climber2025(LoggerFactory parent, CanId canID) {
         LoggerFactory log = parent.type(this);
 
         IncrementalProfile profile = new TrapezoidIncrementalProfile(log, 1, 2, 0.05);

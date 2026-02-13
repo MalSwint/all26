@@ -29,14 +29,14 @@ import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 public class LolipopAuto {
     private static final double HEED_RADIUS_M = 3;
     private final LoggerFactory m_log;
-    private final Machinery m_machinery;
+    private final Machinery2025 m_machinery;
     private final ProfileSE2 m_autoProfile;
     private final FullStateControllerSE2 m_autoController;
     private final TrajectorySE2Planner m_planner;
 
     public LolipopAuto(
             LoggerFactory parent,
-            Machinery machinery,
+            Machinery2025 machinery,
             ProfileSE2 autoProfile,
             FullStateControllerSE2 autoController,
             TrajectorySE2Planner planner) {

@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.interpolation.Interpolator;
 
 /**

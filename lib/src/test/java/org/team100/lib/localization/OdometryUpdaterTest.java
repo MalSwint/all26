@@ -3,6 +3,7 @@ package org.team100.lib.localization;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.logging.LoggerFactory;
@@ -31,7 +32,7 @@ public class OdometryUpdaterTest {
         MockGyro gyro = new MockGyro();
         positions = SwerveModulePositions.kZero();
         OdometryUpdater ou = new OdometryUpdater(
-                log, kinodynamics, gyro, null, () -> positions);
+                log, kinodynamics, gyro, null, () -> positions, UnaryOperator.identity());
         // previous state is at zero, but uncertain
         ModelSE2 sampleModel = new ModelSE2();
         IsotropicNoiseSE2 stateNoise = IsotropicNoiseSE2.fromStdDev(1, 1);
@@ -80,7 +81,7 @@ public class OdometryUpdaterTest {
         MockGyro gyro = new MockGyro();
         positions = SwerveModulePositions.kZero();
         OdometryUpdater ou = new OdometryUpdater(
-                log, kinodynamics, gyro, null, () -> positions);
+                log, kinodynamics, gyro, null, () -> positions, UnaryOperator.identity());
 
         // previous state is at zero, pretty sure.
         ModelSE2 sampleModel = new ModelSE2();
@@ -117,7 +118,7 @@ public class OdometryUpdaterTest {
         MockGyro gyro = new MockGyro();
         positions = SwerveModulePositions.kZero();
         OdometryUpdater ou = new OdometryUpdater(
-                log, kinodynamics, gyro, null, () -> positions);
+                log, kinodynamics, gyro, null, () -> positions, UnaryOperator.identity());
 
         // previous state is at zero, pretty sure.
         ModelSE2 sampleModel = new ModelSE2();
@@ -171,7 +172,7 @@ public class OdometryUpdaterTest {
         MockGyro gyro = new MockGyro();
         positions = SwerveModulePositions.kZero();
         OdometryUpdater ou = new OdometryUpdater(
-                log, kinodynamics, gyro, null, () -> positions);
+                log, kinodynamics, gyro, null, () -> positions, UnaryOperator.identity());
 
         // previous state is at zero, pretty sure.
         ModelSE2 sampleModel = new ModelSE2();

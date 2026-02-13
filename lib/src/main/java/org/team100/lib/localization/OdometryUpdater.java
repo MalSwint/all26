@@ -3,9 +3,9 @@ package org.team100.lib.localization;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 import org.team100.lib.coherence.Takt;
-import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.fusion.CovarianceInflation;
 import org.team100.lib.fusion.Fusor;
 import org.team100.lib.geometry.Metrics;
@@ -42,6 +42,8 @@ public class OdometryUpdater {
     private final Gyro m_gyro;
     private final SwerveHistory m_history;
     private final Supplier<SwerveModulePositions> m_positions;
+    /** For simulation. For a real robot, supply UnaryOperator.identity(). */
+    private final UnaryOperator<Twist2d> m_noise;
     /**
      * Minimum variance for this fusor represents the true bias noise, aka "bias
      * instability," which is quite low.
@@ -58,12 +60,14 @@ public class OdometryUpdater {
             SwerveKinodynamics kinodynamics,
             Gyro gyro,
             SwerveHistory estimator,
-            Supplier<SwerveModulePositions> positions) {
+            Supplier<SwerveModulePositions> positions,
+            UnaryOperator<Twist2d> noise) {
         LoggerFactory log = parent.type(this);
         m_kinodynamics = kinodynamics;
         m_gyro = gyro;
         m_history = estimator;
         m_positions = positions;
+        m_noise = noise;
         m_gyroBiasFusor = new CovarianceInflation(0.02, gyro.bias_noise());
         m_rotationFusor = new CovarianceInflation(0.02, 0.003);
         m_logState = log.swerveStateLogger(Level.TRACE, "state");
@@ -203,6 +207,8 @@ public class OdometryUpdater {
         }
 
         Twist2d twist = m_kinodynamics.getKinematics().toTwist2d(modulePositionDelta);
+        // add noise
+        twist = m_noise.apply(twist);
         if (DEBUG) {
             System.out.printf("twist %s\n", StrUtil.twistStr(twist));
         }

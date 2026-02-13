@@ -13,7 +13,6 @@ import org.team100.lib.framework.TimedRobot100;
 import org.team100.lib.indicator.Alerts;
 import org.team100.lib.indicator.AutonAlerts;
 import org.team100.lib.logging.RobotLog;
-import org.team100.lib.uncertainty.IsotropicNoiseSE2;
 import org.team100.lib.util.Banner;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -66,7 +65,7 @@ public class Robot extends TimedRobot100 {
         m_autonAlerts = new AutonAlerts(
                 m_allAutons::getAnnotated,
                 m_alerts,
-                (p) -> m_machinery.m_drive.resetPose(p, IsotropicNoiseSE2.high()));
+                m_machinery::resetPose);
 
         Prewarmer.init(m_machinery);
     }

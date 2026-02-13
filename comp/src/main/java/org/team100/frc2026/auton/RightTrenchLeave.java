@@ -18,9 +18,15 @@ import org.team100.lib.trajectory.constraint.TimingConstraintFactory;
 import org.team100.lib.trajectory.path.PathSE2Factory;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
-/** Drives a short distance from the right trench starting point */
+/**
+ * Drives a short distance from the right trench starting point.
+ * 
+ * There are no points for leaving the starting line, as there sometimes has
+ * been in other years. This is just a demo.
+ */
 public class RightTrenchLeave implements AnnotatedCommand {
     private final LoggerFactory log;
     private final ControllerSE2 controller;
@@ -52,11 +58,11 @@ public class RightTrenchLeave implements AnnotatedCommand {
         List<WaypointSE2> waypoints = List.of(
                 new WaypointSE2(
                         startingPose,
-                        new DirectionSE2(1, 0, 0),
+                        new DirectionSE2(-1, 0, 0),
                         1),
                 new WaypointSE2(
-                        new Pose2d(),
-                        new DirectionSE2(1, 0, 0),
+                        new Pose2d(2, 4, Rotation2d.kZero),
+                        new DirectionSE2(0, 1, 0),
                         1));
         return planner.restToRest(waypoints);
     }

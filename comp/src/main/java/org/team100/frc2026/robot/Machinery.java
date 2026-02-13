@@ -1,6 +1,7 @@
 package org.team100.frc2026.robot;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
 import org.team100.frc2026.Climber;
@@ -62,6 +63,7 @@ public class Machinery {
     private final Runnable m_groundTruthViz;
     private final SwerveModuleCollection m_modules;
     private final Runnable m_simulatedTagDetector;
+    private final Consumer<Pose2d> m_groundTruthResetter;
 
     public final TrajectoryVisualization m_trajectoryViz;
     public final SwerveKinodynamics m_swerveKinodynamics;
@@ -189,6 +191,8 @@ public class Machinery {
             };
             m_simulatedTagDetector = () -> {
             };
+            m_groundTruthResetter = (p) -> {
+            };
         } else {
             // This is all for simulation only.
             final LoggerFactory simLog = logger.name("Simulation");
@@ -215,6 +219,7 @@ public class Machinery {
                     simLog, m_swerveKinodynamics, groundTruthGyro,
                     groundTruthHistory, m_modules::positions,
                     UnaryOperator.identity());
+            m_groundTruthResetter = (p) -> groundTruthUpdater.reset(p, IsotropicNoiseSE2.high());
 
             GroundTruthCache groundTruthCache = new GroundTruthCache(
                     groundTruthUpdater, groundTruthHistory);
@@ -238,6 +243,14 @@ public class Machinery {
 
         // This makes beeps to warn about testing.
         m_beeper = new Beeper(m_drive);
+    }
+
+    /**
+     * Purge the history and assert the given pose as the current estimate.
+     */
+    public void resetPose(Pose2d p) {
+        m_drive.resetPose(p, IsotropicNoiseSE2.high());
+        m_groundTruthResetter.accept(p);
     }
 
     public void periodic() {

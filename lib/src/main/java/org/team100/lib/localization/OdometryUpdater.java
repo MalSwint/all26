@@ -42,10 +42,16 @@ public class OdometryUpdater {
     private final Gyro m_gyro;
     private final SwerveHistory m_history;
     private final Supplier<SwerveModulePositions> m_positions;
+    /**
+     * Minimum variance for this fusor represents the true bias noise, aka "bias
+     * instability," which is quite low.
+     */
     private final Fusor m_gyroBiasFusor;
     private final Fusor m_rotationFusor;
 
     private final SwerveStateLogger m_logState;
+
+    public boolean m_debug = false;
 
     public OdometryUpdater(
             LoggerFactory parent,
@@ -58,9 +64,7 @@ public class OdometryUpdater {
         m_gyro = gyro;
         m_history = estimator;
         m_positions = positions;
-        double dt = TimedRobot100.LOOP_PERIOD_S;
-        // bias scales with dt^1.5.
-        m_gyroBiasFusor = new CovarianceInflation(0.02, gyro.bias_noise() * dt * Math.sqrt(dt));
+        m_gyroBiasFusor = new CovarianceInflation(0.02, gyro.bias_noise());
         m_rotationFusor = new CovarianceInflation(0.02, 0.003);
         m_logState = log.swerveStateLogger(Level.TRACE, "state");
     }
@@ -139,7 +143,6 @@ public class OdometryUpdater {
             double currentTimeS,
             Rotation2d gyroYaw,
             SwerveModulePositions positions) {
-        // System.out.printf("gyroYaw %s\n", gyroYaw);
 
         // the entry right before this one, the basis for integration.
         Entry<Double, SwerveState> lowerEntry = m_history.lowerEntry(
@@ -153,7 +156,17 @@ public class OdometryUpdater {
         }
 
         double dt = currentTimeS - lowerEntry.getKey();
+
         SwerveState previousState = lowerEntry.getValue();
+        if (dt < 0.0001) {
+            // I'm not sure why this happens. In any case, the logic is deterministic so
+            // there's no reason to repeat it.
+            return previousState;
+        }
+
+        if (m_debug)
+            System.out.printf("=== compute for current time %6.3f sample time %6.3f dt %6.3f\n",
+                    currentTimeS, lowerEntry.getKey(), dt);
 
         SwerveState newState = newState(previousState, dt, gyroYaw, positions);
 
@@ -181,7 +194,7 @@ public class OdometryUpdater {
         IsotropicNoiseSE2 previousNoise = previousState.noise();
         SwerveModulePositions previousPositions = previousState.positions();
         Rotation2d previousGyroYaw = previousState.gyroYaw();
-        VariableR1 previousGyroBias = previousState.gyroBias();
+        VariableR1 previousGyroBiasRad_S = previousState.gyroBias();
 
         SwerveModuleDeltas modulePositionDelta = SwerveModuleDeltas.modulePositionDelta(
                 previousPositions, positions);
@@ -194,44 +207,53 @@ public class OdometryUpdater {
             System.out.printf("twist %s\n", StrUtil.twistStr(twist));
         }
 
-        // Gyro increment in this step
-        double gyroStep = gyroYaw.minus(previousGyroYaw).getRadians();
+        // Gyro increment in this step, radians
+        double gyroStepRad = gyroYaw.minus(previousGyroYaw).getRadians();
 
         // Noise in the increment is the noise density times the sample time.
-        double gyroWhiteNoise = m_gyro.white_noise() * Math.sqrt(dt);
-        VariableR1 gyroMeasurement = VariableR1.fromStdDev(gyroStep, gyroWhiteNoise);
+        // This is because the noise in the gyro step is a random walk --
+        // the integral of the rate. The rate noise is uncorrelated but
+        // the angle noise is not, so the angle step noise really does go to
+        // zero when dt goes to zero.
+        double gyroStepWhiteNoise = m_gyro.white_noise() * Math.sqrt(dt);
+
+        // Stddev is proportional to dt, usually the same.
+        VariableR1 gyroMeasurementRad = VariableR1.fromStdDev(gyroStepRad, gyroStepWhiteNoise);
 
         // Cartesian distance in this step
         double distanceM = Metrics.translationalNorm(twist);
         // Rotation in this step
         double rotationRad = twist.dtheta;
 
-        double odoDTheta = twist.dtheta;
+        double odoDThetaRad = twist.dtheta;
+        // This noise goes to zero when we're not moving.
         double odoDThetaStdDev = Uncertainty.odometryRotationStdDev(
                 distanceM, rotationRad);
 
-        VariableR1 odoRotationMeasurement = VariableR1.fromStdDev(
-                odoDTheta, odoDThetaStdDev);
+        // This noise goes to zero when we're not moving.
+        VariableR1 odoRotationMeasurementRad = VariableR1.fromStdDev(
+                odoDThetaRad, odoDThetaStdDev);
 
         // Gyro drift during this time step
-        // Variance here is the (constant) gyro noise and the (speed-dependent) odo
-        // noise.
-        VariableR1 gyroBiasMeasurement = VariableR1.subtract(
-                gyroMeasurement, odoRotationMeasurement);
+        VariableR1 gyroBiasMeasurementRad_S = VariableR1.subtract(
+                gyroMeasurementRad, odoRotationMeasurementRad).times(1 / dt);
 
-        // gyro bias has a very low minimum variance
-        VariableR1 newGyroBiasEstimate = m_gyroBiasFusor.fuse(
-                previousGyroBias, gyroBiasMeasurement);
-        System.out.printf("=== gyro bias previous %s measurement %s result %s\n",
-                previousGyroBias, gyroBiasMeasurement, newGyroBiasEstimate);
+        // Gyro bias has a low minimum variance
+        VariableR1 newGyroBiasEstimateRad_S = m_gyroBiasFusor.fuse(
+                previousGyroBiasRad_S, gyroBiasMeasurementRad_S);
+        if (m_debug)
+            System.out.printf("=== gyro bias previous %s measurement %s result %s\n",
+                    previousGyroBiasRad_S,
+                    gyroBiasMeasurementRad_S,
+                    newGyroBiasEstimateRad_S);
 
         // Gyro increment without the drift.
         VariableR1 correctedGyroMeasurement = VariableR1.subtract(
-                gyroMeasurement, newGyroBiasEstimate);
+                gyroMeasurementRad, newGyroBiasEstimateRad_S.times(dt));
 
         // Fuse the odometry and gyro rotations
         VariableR1 fusedRotationMeasurement = m_rotationFusor.fuse(
-                odoRotationMeasurement, correctedGyroMeasurement);
+                odoRotationMeasurementRad, correctedGyroMeasurement);
 
         // use the fused rotation as the step estimate
         twist = new Twist2d(twist.dx, twist.dy, fusedRotationMeasurement.mean());
@@ -244,7 +266,7 @@ public class OdometryUpdater {
 
         ModelSE2 model = new ModelSE2(newPose, velocity);
 
-        // Noise in this update.
+        // Noise here can be zero, if we're not moving.
         double cartesianNoise = Uncertainty.odometryCartesianStdDev(distanceM);
         IsotropicNoiseSE2 n0 = IsotropicNoiseSE2.fromStdDev(
                 cartesianNoise, fusedRotationMeasurement.sigma());
@@ -261,7 +283,7 @@ public class OdometryUpdater {
                 noise,
                 positions,
                 gyroYaw,
-                newGyroBiasEstimate);
+                newGyroBiasEstimateRad_S);
         return swerveState;
     }
 
@@ -288,15 +310,18 @@ public class OdometryUpdater {
 
     /** Replay odometry after the sample time. */
     void replay(double sampleTime) {
+        if (m_debug)
+            System.out.printf("==== REPLAY FOR TIME %f\n", sampleTime);
         // Note the exclusive tailmap: we don't see the entry at timestamp.
         for (Map.Entry<Double, SwerveState> entry : m_history.exclusiveTailMap(sampleTime).entrySet()) {
             double timestamp = entry.getKey();
-            // System.out.printf("==== REPLAY %f\n", timestamp);
             SwerveState value = entry.getValue();
             Rotation2d gyroYaw = value.gyroYaw();
             SwerveModulePositions positions = value.positions();
             put(timestamp, gyroYaw, positions);
         }
+        if (m_debug)
+            System.out.printf("==== DONE REPLAYING FOR TIME %f\n", sampleTime);
     }
 
 }

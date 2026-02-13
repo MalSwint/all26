@@ -36,6 +36,7 @@ public class IsotropicNoiseSE2 {
         return IsotropicNoiseSE2.fromStdDev(10, 6);
     }
 
+    /** Just adds the variances */
     public IsotropicNoiseSE2 plus(IsotropicNoiseSE2 other) {
         return new IsotropicNoiseSE2(
                 m_cartesianVariance + other.m_cartesianVariance,

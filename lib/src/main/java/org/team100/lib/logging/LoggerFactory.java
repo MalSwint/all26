@@ -1084,8 +1084,8 @@ public class LoggerFactory {
             m_model = modelSE2Logger(level, join(leaf, "model"));
             m_noise = isotropicNoiseSE2Logger(level, join(leaf, "noise"));
             m_positions = swerveModulePositionsLogger(level, join(leaf, "positions"));
-            m_gyroYaw = rotation2dLogger(level, join(leaf, "gyro yaw"));
-            m_gyroBias = variableR1Logger(level, join(leaf, "gyro bias"));
+            m_gyroYaw = rotation2dLogger(level, join(leaf, "gyro yaw (rad)"));
+            m_gyroBias = variableR1Logger(level, join(leaf, "gyro bias (rad_s)"));
         }
 
         public void log(Supplier<SwerveState> vals) {

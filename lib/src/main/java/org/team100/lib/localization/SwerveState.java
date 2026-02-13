@@ -18,23 +18,20 @@ public class SwerveState {
     private final SwerveModulePositions m_positions;
     /** Verbatim measurement of yaw from the gyro, uncorrected. */
     private final Rotation2d m_gyroYaw;
-    /**
-     * Estimate for the gyro bias (drift rate).
-     * Note this rate is *per sample* not *per second*.
-     */
-    private final VariableR1 m_gyroBias;
+    /** Estimate for the gyro bias (drift rate) in rad/s. */
+    private final VariableR1 m_gyroBiasRad_S;
 
     SwerveState(
             ModelSE2 state,
             IsotropicNoiseSE2 noise,
             SwerveModulePositions positions,
             Rotation2d gyroYaw,
-            VariableR1 gyroBias) {
+            VariableR1 gyroBiasRad_S) {
         m_state = state;
         m_noise = noise;
         m_positions = positions;
         m_gyroYaw = gyroYaw;
-        m_gyroBias = gyroBias;
+        m_gyroBiasRad_S = gyroBiasRad_S;
     }
 
     @Override
@@ -66,8 +63,9 @@ public class SwerveState {
         return m_gyroYaw;
     }
 
+    /** Bias in rad/s */
     public VariableR1 gyroBias() {
-        return m_gyroBias;
+        return m_gyroBiasRad_S;
     }
 
     @Override

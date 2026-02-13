@@ -119,6 +119,7 @@ public class Machinery {
                 Takt.get());
         final OdometryUpdater odometryUpdater = new OdometryUpdater(
                 driveLog, m_swerveKinodynamics, gyro, history, m_modules::positions);
+        // odometryUpdater.m_debug = true;
         odometryUpdater.reset(Pose2d.kZero, IsotropicNoiseSE2.high());
         final NudgingVisionUpdater visionUpdater = new NudgingVisionUpdater(
                 driveLog, history, odometryUpdater);

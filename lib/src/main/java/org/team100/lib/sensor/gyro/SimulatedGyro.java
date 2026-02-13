@@ -18,6 +18,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
  * A simulated gyro that uses drivetrain odometry.
  */
 public class SimulatedGyro implements Gyro {
+    private static final double SAMPLE_RATE = 100;
+    private static final double NOISE = 4e-4 * Math.sqrt(SAMPLE_RATE);
+    private static final double BIAS_NOISE = 1e-5;
     private final Rotation2dLogger m_log_yaw;
     private final DoubleLogger m_log_yaw_rate;
     private final SwerveKinodynamics m_kinodynamics;
@@ -50,12 +53,12 @@ public class SimulatedGyro implements Gyro {
 
     @Override
     public double white_noise() {
-        return 4e-4;
+        return NOISE;
     }
 
     @Override
     public double bias_noise() {
-        return 1e-5;
+        return BIAS_NOISE;
     }
 
     double update() {

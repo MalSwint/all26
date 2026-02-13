@@ -127,27 +127,51 @@ As an example, the Kalibr docs mention the ADIS16448 (a MEMS device similar to t
 gyro we use) with these noise parameters:
 
 ```
-white_noise = 0.0004 // rad/sqrt(hz)s, or, equivalently, rad/sqrt(s)
-bias_noise = 0.000004 // rad*sqrt(hz)/s
+white_noise_density = 0.0004 // rad/s/sqrt(hz)
+bias_noise_density = 0.000004 // rad/s^2/sqrt(hz)
 ```
-
 (We should attempt to verify these parameters.)
 
-These parameters scale with the sample period:
+To understand these parameters, it's useful to know how the MEMS gyroscope works.
+It senses the coriolis effect (force in one direction produces movement at 90
+degrees in a rotating reference frame) directly, and so the sensor noise
+appears in the _rotation rate_ (rad/s).
+
+The white noise variance is inversely proportional to the sample period, i.e. it
+indicates that the sensor is simply averaging the sensor noise during the sample period.
+
+So the rate noise density is expressed in rad/s/sqrt(hz).
+
+The gyro integrates this rate to obtain the yaw angle.
+Variances add,  so the variance of the yaw is proportional to
+the duration of the integral, i.e. it is just the rate noise (rad/s) times the
+integral duration (s), yielding yaw noise (rad).  The gyros we typically use
+do this integration a bit faster (100hz) than the robot clock (50hz).
+
+We take the difference of two yaw measurements, which is the same as just doing
+the integral with different bounds, so again the integrated noise in the
+yaw increment is the rate noise times the clock period.
+
+So to compute the noise in a yaw step:
 
 ```
-dt = 0.02 // sec
+gyro_rate = 100 // gyro internal clock, hz
+dt = 0.02 // robot main loop period, sec
 
-// noise in one sample
-noise_stddev = white_noise * sqrt(dt)
-noise = noise_stddev * random.nextGaussian()
-
-// bias increment for one sample
-bias_stddev = bias_noise * dt * sqrt(dt)
-bias += bias_stddev * random.nextGaussian()
-
-measurement = ground_truth + bias + noise
+noise_rate_stddev  = white_noise_density * sqrt(gyro_rate) // rad/s
+noise_sample_stddev = noise_rate_stddev * dt               // rad
 ```
+
+In addition to sensor noise in the rate measurement, gyros also produce
+_bias_, i.e. a nonzero rate measurement for zero ground-truth, and this
+bias itself changes over time.  There are several additional sources of
+noise (see references) but they operate on longer timescales than
+we care about.  For our purposes, we can use a single bias noise
+term, "bias instability," used as the floor for the bias variance
+estimate, which doesn't depend on anything.
+
+The effect should be for the bias variance to converge to a stable estimate and
+then change quite slowly, because new evidence doesn't make much difference.
 
 We use several steps to ingest the gyro measurement:
 
@@ -224,3 +248,7 @@ References:
 * [more about IMU specs](https://stechschulte.net/2023/10/11/imu-specs.html)
 * [example IMU calibration](https://github.com/rpng/ar_table_dataset/blob/master/calibration/kalibr_color_0_imu/d455_calib_02-imu.yaml) with noise = 0.008 (high!) and bias = 1e-5.  More examples can be found on Github by searching for Kalibr configuration YAML files, with the keys gyroscope_noise_density and gyroscope_random_walk.
 * [Vectornav examples](https://www.vectornav.com/resources/inertial-navigation-primer/examples/noise)
+* [how MEMS sensors work](https://www.vectornav.com/resources/inertial-navigation-primer/theory-of-operation/theory-mems)
+* [Coriolis force](https://en.wikipedia.org/wiki/Coriolis_force)
+* [Analog Devices gyros](https://www.analog.com/media/en/news-marketing-collateral/solutions-bulletins-brochures/MEMS-IMU-Brochure.pdf)
+* [Overview of gyro errors](https://home.engineering.iastate.edu/shermanp/AERE432/lectures/Rate%20Gyros/14-xvagne04.pdf)

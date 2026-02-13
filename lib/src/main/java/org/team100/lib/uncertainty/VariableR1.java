@@ -50,6 +50,15 @@ public class VariableR1 {
         return VariableR1.fromVariance(a.mean - b.mean, a.variance + b.variance);
     }
 
+    /**
+     * Multiply this variable by x.
+     * 
+     * Variance is multiplied by x^2, i.e. standard deviation is affected linearly.
+     */
+    public VariableR1 times(double x) {
+        return new VariableR1(x * mean(), x * x * variance());
+    }
+
     public double mean() {
         return mean;
     }

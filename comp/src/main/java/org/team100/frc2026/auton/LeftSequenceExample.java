@@ -1,5 +1,8 @@
 package org.team100.frc2026.auton;
 
+import static edu.wpi.first.wpilibj2.command.Commands.sequence;
+import static edu.wpi.first.wpilibj2.command.Commands.waitSeconds;
+
 import java.util.List;
 
 import org.team100.frc2026.robot.Machinery;
@@ -21,13 +24,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
-/**
- * Drives a short distance from the right trench starting point.
- * 
- * There are no points for leaving the starting line, as there sometimes has
- * been in other years. This is just a demo.
- */
-public class RightTrenchLeave implements AnnotatedCommand {
+/** An example of a simple sequence */
+public class LeftSequenceExample implements AnnotatedCommand {
     private final LoggerFactory log;
     private final ControllerSE2 controller;
     private final Machinery machinery;
@@ -36,7 +34,7 @@ public class RightTrenchLeave implements AnnotatedCommand {
     private final PathSE2Factory pathFactory;
     private final TrajectorySE2Planner planner;
 
-    public RightTrenchLeave(
+    public LeftSequenceExample(
             LoggerFactory parent,
             SwerveKinodynamics kinodynamics,
             ControllerSE2 controller,
@@ -52,35 +50,60 @@ public class RightTrenchLeave implements AnnotatedCommand {
 
     @Override
     public String name() {
-        return "Right Trench Leave";
+        return "Left Sequence Example";
     }
 
-    TrajectorySE2 trajectory(Pose2d startingPose) {
+    // go to the middle while spinning 90 degrees
+    TrajectorySE2 t1(Pose2d startingPose) {
         List<WaypointSE2> waypoints = List.of(
                 new WaypointSE2(
                         startingPose,
                         new DirectionSE2(-1, 0, 0),
                         1),
                 new WaypointSE2(
-                        new Pose2d(2, 4, Rotation2d.kZero),
+                        new Pose2d(2, 4, Rotation2d.kCW_Pi_2),
+                        new DirectionSE2(0, -1, 0),
+                        1));
+        return planner.restToRest(waypoints);
+    }
+
+    // go back where we started.
+    TrajectorySE2 t2(Pose2d startingPose) {
+        List<WaypointSE2> waypoints = List.of(
+                new WaypointSE2(
+                        startingPose,
                         new DirectionSE2(0, 1, 0),
+                        1),
+                new WaypointSE2(
+                        StartingPositions.LEFT_TRENCH,
+                        new DirectionSE2(1, 0, 0),
                         1));
         return planner.restToRest(waypoints);
     }
 
     @Override
     public Command command() {
-        DriveWithTrajectoryFunction navigator = new DriveWithTrajectoryFunction(
+        DriveWithTrajectoryFunction n1 = new DriveWithTrajectoryFunction(
                 log,
                 machinery.m_drive,
                 controller,
                 machinery.m_trajectoryViz,
-                this::trajectory);
-        return navigator.until(navigator::isDone);
+                this::t1);
+        DriveWithTrajectoryFunction n2 = new DriveWithTrajectoryFunction(
+                log,
+                machinery.m_drive,
+                controller,
+                machinery.m_trajectoryViz,
+                this::t2);
+        return sequence(
+                n1.until(n1::isDone),
+                waitSeconds(1),
+                n2.until(n2::isDone));
     }
 
     @Override
     public Pose2d start() {
-        return StartingPositions.RIGHT_TRENCH;
+        return StartingPositions.LEFT_TRENCH;
     }
+
 }

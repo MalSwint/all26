@@ -10,6 +10,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 public class DoNothing implements AnnotatedCommand {
 
     @Override
+    public String name() {
+        return "Do Nothing";
+    }
+
+    @Override
     public Command command() {
         return Commands.idle().withName("Nothing from right bump");
     }
@@ -18,5 +23,4 @@ public class DoNothing implements AnnotatedCommand {
     public Pose2d start() {
         return StartingPositions.RIGHT_BUMP;
     }
-
 }

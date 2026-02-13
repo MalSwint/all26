@@ -7,18 +7,25 @@ import edu.wpi.first.wpilibj2.command.Command;
 /**
  * A command with annotations that are checked against ground truth while
  * disabled.
- * 
- * If you don't care about the annotations at all, e.g. because the same command
- * works on both sides from anywhere, use null.
- * 
- * @param command  command to run
- * @param alliance red or blue
- * @param start    starting pose
  */
-public record AnnotatedCommand(Command command, Alliance alliance, Pose2d start) {
+public interface AnnotatedCommand {
 
-    /** For rotationally-symmetric fields */
-    public static AnnotatedCommand eitherAlliance(Command c, Pose2d start) {
-        return new AnnotatedCommand(c, null, start);
+    /**
+     * command to run
+     */
+    Command command();
+
+    /**
+     * red or blue, null if it works for both.
+     */
+    default Alliance alliance() {
+        return null;
+    }
+
+    /**
+     * starting pose, null if it doesn't matter.
+     */
+    default Pose2d start() {
+        return null;
     }
 }

@@ -16,4 +16,9 @@ import edu.wpi.first.wpilibj2.command.Command;
  * @param start    starting pose
  */
 public record AnnotatedCommand(Command command, Alliance alliance, Pose2d start) {
+
+    /** For rotationally-symmetric fields */
+    public static AnnotatedCommand eitherAlliance(Command c, Pose2d start) {
+        return new AnnotatedCommand(c, null, start);
+    }
 }

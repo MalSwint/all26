@@ -33,6 +33,7 @@ import org.team100.lib.uncertainty.IsotropicNoiseSE2;
 import org.team100.lib.uncertainty.VariableR1;
 import org.team100.lib.util.CanId;
 import org.team100.lib.visualization.RobotPoseVisualization;
+import org.team100.lib.visualization.TrajectoryVisualization;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -62,9 +63,10 @@ public class Machinery {
     private final SwerveModuleCollection m_modules;
     private final Runnable m_simulatedTagDetector;
 
-    final SwerveKinodynamics m_swerveKinodynamics;
+    public final TrajectoryVisualization m_trajectoryViz;
+    public final SwerveKinodynamics m_swerveKinodynamics;
     final AprilTagRobotLocalizer m_localizer;
-    final SwerveDriveSubsystem m_drive;
+    public final SwerveDriveSubsystem m_drive;
     final Beeper m_beeper;
     final Shooter m_shooter;
     final Intake m_intake;
@@ -96,7 +98,7 @@ public class Machinery {
         // VISUALIZATIONS
         //
 
-        // Visualization initializers go here
+        m_trajectoryViz = new TrajectoryVisualization(fieldLogger);
 
         ////////////////////////////////////////////////////////////
         //

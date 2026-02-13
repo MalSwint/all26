@@ -13,7 +13,6 @@ import org.team100.lib.coherence.Takt;
 import org.team100.lib.indicator.Beeper;
 import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
-import org.team100.lib.localization.IsotropicNoiseSE2;
 import org.team100.lib.localization.NudgingVisionUpdater;
 import org.team100.lib.localization.OdometryUpdater;
 import org.team100.lib.localization.SimulatedTagDetector;
@@ -29,6 +28,8 @@ import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.subsystems.swerve.module.SwerveModuleCollection;
 import org.team100.lib.targeting.SimulatedTargetWriter;
 import org.team100.lib.targeting.Targets;
+import org.team100.lib.uncertainty.IsotropicNoiseSE2;
+import org.team100.lib.uncertainty.VariableR1;
 import org.team100.lib.util.CanId;
 import org.team100.lib.visualization.RobotPoseVisualization;
 import org.team100.lib.visualization.TrajectoryVisualization;
@@ -112,16 +113,18 @@ public class Machinery {
         final SwerveHistory history = new SwerveHistory(
                 driveLog,
                 m_swerveKinodynamics,
+                0.2,
                 gyro.getYawNWU(),
+                VariableR1.fromStdDev(0, 1),
                 m_modules.positions(),
                 Pose2d.kZero,
                 IsotropicNoiseSE2.high(),
                 Takt.get());
         final OdometryUpdater odometryUpdater = new OdometryUpdater(
-                m_swerveKinodynamics, gyro, history, m_modules::positions);
+                driveLog, m_swerveKinodynamics, gyro, history, m_modules::positions);
         odometryUpdater.reset(Pose2d.kZero, IsotropicNoiseSE2.high());
         final NudgingVisionUpdater visionUpdater = new NudgingVisionUpdater(
-                history, odometryUpdater);
+                driveLog, history, odometryUpdater);
 
         ////////////////////////////////////////////////////////////
         //

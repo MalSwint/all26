@@ -13,7 +13,6 @@ import org.team100.lib.indicator.Beeper;
 import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
 import org.team100.lib.localization.GroundTruthCache;
-import org.team100.lib.localization.IsotropicNoiseSE2;
 import org.team100.lib.localization.NudgingVisionUpdater;
 import org.team100.lib.localization.OdometryUpdater;
 import org.team100.lib.localization.SimulatedTagDetector;
@@ -28,6 +27,8 @@ import org.team100.lib.subsystems.swerve.SwerveDriveSubsystem;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamics;
 import org.team100.lib.subsystems.swerve.kinodynamics.SwerveKinodynamicsFactory;
 import org.team100.lib.subsystems.swerve.module.SwerveModuleCollection;
+import org.team100.lib.uncertainty.IsotropicNoiseSE2;
+import org.team100.lib.uncertainty.VariableR1;
 import org.team100.lib.util.CanId;
 import org.team100.lib.visualization.RobotPoseVisualization;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -67,6 +68,7 @@ public class Machinery {
     final Serializer m_serializer;
     final ClimberExtension m_ClimberExtension;
     final Climber m_Climber;
+
     public Machinery() {
 
         final LoggerFactory driveLog = logger.name("Drive");
@@ -82,6 +84,8 @@ public class Machinery {
         m_intake = new Intake(driveLog, new CanId(14));
         m_extender = new IntakeExtend(driveLog, new CanId(19));
         m_serializer = new Serializer(driveLog);
+        m_ClimberExtension = new ClimberExtension(driveLog);
+        m_Climber = new Climber(driveLog);
 
         ////////////////////////////////////////////////////////////
         //
@@ -106,16 +110,19 @@ public class Machinery {
         final SwerveHistory history = new SwerveHistory(
                 driveLog,
                 m_swerveKinodynamics,
+                0.2,
                 gyro.getYawNWU(),
+                VariableR1.fromStdDev(0, 1),
                 m_modules.positions(),
                 Pose2d.kZero,
                 IsotropicNoiseSE2.high(),
                 Takt.get());
         final OdometryUpdater odometryUpdater = new OdometryUpdater(
-                m_swerveKinodynamics, gyro, history, m_modules::positions);
+                driveLog, m_swerveKinodynamics, gyro, history, m_modules::positions);
+        // odometryUpdater.m_debug = true;
         odometryUpdater.reset(Pose2d.kZero, IsotropicNoiseSE2.high());
         final NudgingVisionUpdater visionUpdater = new NudgingVisionUpdater(
-                history, odometryUpdater);
+                driveLog, history, odometryUpdater);
 
         ////////////////////////////////////////////////////////////
         //
@@ -171,16 +178,19 @@ public class Machinery {
             };
         } else {
             // This is all for simulation only.
+            final LoggerFactory simLog = logger.name("Simulation");
 
             // Ground-truth simulated gyro does not drift at all.
-            SimulatedGyro groundTruthGyro = new SimulatedGyro(driveLog,
+            SimulatedGyro groundTruthGyro = new SimulatedGyro(simLog,
                     m_swerveKinodynamics, m_modules, 0);
 
             // History of ground-truth poses is based only on odometry.
             SwerveHistory groundTruthHistory = new SwerveHistory(
-                    driveLog,
+                    simLog,
                     m_swerveKinodynamics,
+                    0.2,
                     groundTruthGyro.getYawNWU(),
+                    VariableR1.fromStdDev(0, 1),
                     m_modules.positions(),
                     Pose2d.kZero,
                     IsotropicNoiseSE2.high(),
@@ -189,9 +199,11 @@ public class Machinery {
             // Read positions and ground truth gyro (which are perfectly consistent) and
             // maintain the ground truth history.
             OdometryUpdater groundTruthUpdater = new OdometryUpdater(
-                    m_swerveKinodynamics, groundTruthGyro, groundTruthHistory, m_modules::positions);
+                    simLog, m_swerveKinodynamics, groundTruthGyro,
+                    groundTruthHistory, m_modules::positions);
 
-            GroundTruthCache groundTruthCache = new GroundTruthCache(groundTruthUpdater, groundTruthHistory);
+            GroundTruthCache groundTruthCache = new GroundTruthCache(
+                    groundTruthUpdater, groundTruthHistory);
 
             // Visualization of the simulated "ground truth" of the robot pose.
             m_groundTruthViz = new RobotPoseVisualization(
@@ -199,7 +211,8 @@ public class Machinery {
 
             // Simulated camera uses the ground truth because the real cameras are not aware
             // of the pose estimate.
-            m_simulatedTagDetector = SimulatedTagDetector.get(layout, groundTruthHistory);
+            m_simulatedTagDetector = SimulatedTagDetector.get(
+                    layout, groundTruthHistory);
         }
 
         ////////////////////////////////////////////////////////////

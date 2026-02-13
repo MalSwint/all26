@@ -24,8 +24,8 @@ import edu.wpi.first.wpilibj2.command.Command;
  * Exercise some code to try to force various initialization and GC delays to
  * happen right now.
  */
-public class Prewarmer {
-    public static void init(Machinery machinery) {
+public class Prewarmer2025 {
+    public static void init(Machinery2025 machinery) {
         System.out.println("\n*** PREWARM START");
 
         final LoggerFactory logger = Logging.instance().rootLogger.name("Prewarmer");

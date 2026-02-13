@@ -10,12 +10,12 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /** Run pre- and post-match test sequences automatically. */
-public class Tester {
+public class Tester2025 {
     private static final String TEST = "TEST: ";
-    private final Machinery m_machinery;
+    private final Machinery2025 m_machinery;
     private final Alert m_alert;
 
-    public Tester(Machinery machinery) {
+    public Tester2025(Machinery2025 machinery) {
         m_machinery = machinery;
         m_alert = new Alert(text("waiting"), AlertType.kInfo);
         m_alert.set(true);

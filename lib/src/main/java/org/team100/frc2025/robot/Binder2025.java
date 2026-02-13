@@ -38,12 +38,12 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 /**
  * Binds buttons to commands. Also creates default commands.
  */
-public class Binder {
+public class Binder2025 {
     private static final LoggerFactory rootLogger = Logging.instance().rootLogger;
     private static final LoggerFactory fieldLogger = Logging.instance().fieldLogger;
-    private final Machinery m_machinery;
+    private final Machinery2025 m_machinery;
 
-    public Binder(Machinery machinery) {
+    public Binder2025(Machinery2025 machinery) {
         m_machinery = machinery;
     }
 
@@ -270,7 +270,7 @@ public class Binder {
         //
         // TEST
         //
-        Tester tester = new Tester(m_machinery);
+        Tester2025 tester = new Tester2025(m_machinery);
         whileTrue(() -> (RobotState.isTest() && driver.a() && driver.b()),
                 tester.prematch());
     }

@@ -3,6 +3,7 @@ package org.team100.lib.subsystems.swerve.kinodynamics.limiter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
+import java.util.function.UnaryOperator;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.coherence.Takt;
@@ -70,7 +71,7 @@ public class SimulatedDrivingTest implements Timeless {
                 IsotropicNoiseSE2.high(),
                 0);
         odometryUpdater = new OdometryUpdater(
-                logger, swerveKinodynamics, gyro, history, collection::positions);
+                logger, swerveKinodynamics, gyro, history, collection::positions, UnaryOperator.identity());
         odometryUpdater.reset(Pose2d.kZero, IsotropicNoiseSE2.high(), 0);
 
         NudgingVisionUpdater visionUpdater = new NudgingVisionUpdater(

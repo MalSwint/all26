@@ -26,10 +26,10 @@ import edu.wpi.first.wpilibj2.command.Command;
  * It's a good idea to instantiate them all here, even if you're not using them
  * all, even if they're just in development, so they don't rot.
  */
-public class AllAutons {
+public class AllAutons2025 {
     private final AutonChooser m_autonChooser;
 
-    public AllAutons(Machinery machinery) {
+    public AllAutons2025(Machinery2025 machinery) {
         m_autonChooser = new AutonChooser();
         LoggerFactory autoLog = Logging.instance().rootLogger.name("Auton");
 
@@ -59,7 +59,7 @@ public class AllAutons {
         m_autonChooser.add("Coral 1 right",
                 new AnnotatedCommand(driveAndScore.get(ScoringLevel.L4, ReefPoint.F), null, null));
 
-        Auton auton = new Auton(autoLog, machinery, profile, controller);
+        Auton2025 auton = new Auton2025(autoLog, machinery, profile, controller);
         m_autonChooser.add("Left Preload Only", new AnnotatedCommand(
                 auton.leftPreloadOnly(), null, null));
         m_autonChooser.add("Center Preload Only", new AnnotatedCommand(

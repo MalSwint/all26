@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.UnaryOperator;
 
 import org.junit.jupiter.api.Test;
 import org.team100.lib.controller.se2.ControllerFactorySE2;
@@ -180,7 +181,7 @@ public class DriveWithTrajectoryTest implements Timeless {
                 IsotropicNoiseSE2.high(),
                 0); // initial time is zero here for testing
         OdometryUpdater odometryUpdater = new OdometryUpdater(
-                logger, swerveKinodynamics, gyro, history, collection::positions);
+                logger, swerveKinodynamics, gyro, history, collection::positions, UnaryOperator.identity());
         odometryUpdater.reset(Pose2d.kZero, IsotropicNoiseSE2.high(), 0);
 
         NudgingVisionUpdater visionUpdater = new NudgingVisionUpdater(

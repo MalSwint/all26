@@ -25,13 +25,13 @@ public class DriveAndScore {
     private static final double HEED_RADIUS_M = 3;
 
     private final LoggerFactory m_logger;
-    private final Machinery m_machinery;
+    private final Machinery2025 m_machinery;
     private final ProfileSE2 m_autoProfile;
     private final FullStateControllerSE2 m_autoController;
 
     public DriveAndScore(
             LoggerFactory logger,
-            Machinery machinery,
+            Machinery2025 machinery,
             ProfileSE2 autoProfile,
             FullStateControllerSE2 autoController) {
         m_logger = logger;

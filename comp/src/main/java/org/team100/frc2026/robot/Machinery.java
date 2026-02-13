@@ -1,9 +1,10 @@
 package org.team100.frc2026.robot;
 
 import java.io.IOException;
+import java.util.function.UnaryOperator;
 
-import org.team100.frc2026.ClimberExtension;
 import org.team100.frc2026.Climber;
+import org.team100.frc2026.ClimberExtension;
 import org.team100.frc2026.Intake;
 import org.team100.frc2026.IntakeExtend;
 import org.team100.frc2026.Serializer;
@@ -14,6 +15,7 @@ import org.team100.lib.localization.AprilTagFieldLayoutWithCorrectOrientation;
 import org.team100.lib.localization.AprilTagRobotLocalizer;
 import org.team100.lib.localization.GroundTruthCache;
 import org.team100.lib.localization.NudgingVisionUpdater;
+import org.team100.lib.localization.OdometryNoise;
 import org.team100.lib.localization.OdometryUpdater;
 import org.team100.lib.localization.SimulatedTagDetector;
 import org.team100.lib.localization.SwerveHistory;
@@ -31,7 +33,9 @@ import org.team100.lib.uncertainty.IsotropicNoiseSE2;
 import org.team100.lib.uncertainty.VariableR1;
 import org.team100.lib.util.CanId;
 import org.team100.lib.visualization.RobotPoseVisualization;
+
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -117,8 +121,15 @@ public class Machinery {
                 Pose2d.kZero,
                 IsotropicNoiseSE2.high(),
                 Takt.get());
+        // New! Odometry noise is applied in simulation.
+        UnaryOperator<Twist2d> odometryNoise = RobotBase.isReal() ? UnaryOperator.identity() : new OdometryNoise();
         final OdometryUpdater odometryUpdater = new OdometryUpdater(
-                driveLog, m_swerveKinodynamics, gyro, history, m_modules::positions);
+                driveLog,
+                m_swerveKinodynamics,
+                gyro,
+                history,
+                m_modules::positions,
+                odometryNoise);
         // odometryUpdater.m_debug = true;
         odometryUpdater.reset(Pose2d.kZero, IsotropicNoiseSE2.high());
         final NudgingVisionUpdater visionUpdater = new NudgingVisionUpdater(
@@ -200,7 +211,8 @@ public class Machinery {
             // maintain the ground truth history.
             OdometryUpdater groundTruthUpdater = new OdometryUpdater(
                     simLog, m_swerveKinodynamics, groundTruthGyro,
-                    groundTruthHistory, m_modules::positions);
+                    groundTruthHistory, m_modules::positions,
+                    UnaryOperator.identity());
 
             GroundTruthCache groundTruthCache = new GroundTruthCache(
                     groundTruthUpdater, groundTruthHistory);
